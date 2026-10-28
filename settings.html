@@ -63,6 +63,30 @@
                 <div id="imsg_wallpaper_pick" class="menu_button" role="button" tabindex="0">Choose Background…</div>
             </div>
 
+            <label class="checkbox_label" for="imsg_sounds">
+                <input id="imsg_sounds" type="checkbox" />
+                <span>Play sounds when you send and when a reply arrives</span>
+            </label>
+
+            <div id="imsg_sound_options" class="imsg-wallpaper-options">
+                <div class="imsg-setting-row">
+                    <label for="imsg_sound_volume">Volume</label>
+                    <input id="imsg_sound_volume" type="range" min="0" max="100" step="5" />
+                    <span id="imsg_sound_volume_value" class="imsg-value"></span>
+                </div>
+                <div class="imsg-setting-row">
+                    <div id="imsg_sound_send" class="menu_button" role="button" tabindex="0">Play Send</div>
+                    <div id="imsg_sound_receive" class="menu_button" role="button" tabindex="0">Play Reply</div>
+                </div>
+            </div>
+
+            <label class="checkbox_label" for="imsg_notify">
+                <input id="imsg_notify" type="checkbox" />
+                <span>Notify me of replies while the tab is in the background</span>
+            </label>
+
+            <small class="imsg-note">Shortcuts: ⌘F search, ⌥⌘N new message, ⌘, settings, Esc closes a sheet, ↑ edits your last message (Ctrl in place of ⌘ on Windows and Linux).</small>
+
             <small class="imsg-note">Turn off other UI themes (such as Microsoft Teams, Moonlit Echoes or Yodayo Tavern) while this one is on. The background is hidden unless you turn it on above; pick it in Backgrounds.</small>
         </div>
     </div>

@@ -632,6 +632,7 @@ body.imessage #chat:has(.mes.imsg-pending) #imsg-typing {
 /* The typing bubble while a reply is on its way (messages.js) */
 body.imessage.imsg-typing-on #imsg-typing:not([hidden]):last-child {
     position: relative;
+    flex: none;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -1002,4 +1003,86 @@ body.imessage #chat .mes :is(.mes_img_controls, .mes_video_controls) {
 /* while editing, only the edit bar shows */
 body.imessage #chat .mes:has(.edit_textarea) .mes_buttons {
     display: none !important;
+}
+
+/* Motion: new bubbles and each bubble of a reply coming in slide up and fade in */
+@keyframes imsg-arrive {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+}
+
+body.imessage #chat .mes.imsg-new .mes_block,
+body.imessage #chat .mes.imsg-revealing .imsg-parts > :is(.imsg-part, .imsg-part-typing),
+body.imessage #chat .mes.imsg-pending .mes_block {
+    animation: imsg-arrive 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+body.imessage #chat .mes[is_user="true"].imsg-new .mes_block {
+    transform-origin: bottom right;
+}
+
+body.imessage.reduced-motion #chat .mes .mes_block,
+body.imessage.reduced-motion #chat .mes .imsg-parts > * {
+    animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.imessage #chat .mes .mes_block,
+    body.imessage #chat .mes .imsg-parts > * {
+        animation: none;
+    }
+}
+
+/* the list row of a conversation whose reply is being written shows typing dots */
+body.imessage .imsg-row-typing {
+    display: none;
+    align-items: center;
+    gap: 3px;
+    height: 17px;
+    padding: 0 8px;
+    width: max-content;
+    border-radius: 9px;
+    background: var(--imsg-bubble-in);
+}
+
+body.imessage .imsg-row-typing span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--imsg-fg-2);
+    opacity: 0.3;
+    animation: imsg-dot 1.2s ease-in-out infinite;
+}
+
+body.imessage .imsg-row-typing span:nth-child(2) { animation-delay: 0.2s; }
+body.imessage .imsg-row-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+body.imessage.imsg-generating .imsg-row.imsg-selected .imsg-row-preview {
+    display: none;
+}
+
+body.imessage.imsg-generating .imsg-row.imsg-selected .imsg-row-typing {
+    display: flex;
+    margin-top: 2px;
+}
+
+body.imessage .imsg-row.imsg-selected .imsg-row-typing {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+body.imessage .imsg-row.imsg-selected .imsg-row-typing span {
+    background: #ffffff;
+}
+
+/* replies that came while you were away: the blue dot by the conversation */
+body.imessage.imsg-unread .imsg-row.imsg-selected::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    margin-top: -4px;
+    border-radius: 50%;
+    background: #ffffff;
 }

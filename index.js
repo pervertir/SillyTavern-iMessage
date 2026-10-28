@@ -7,6 +7,8 @@ import { initSplit, resetSplits } from './split.js';
 import { initMonograms } from './monograms.js';
 import { refreshTitle, setDisguise } from './disguise.js';
 import { initShell, openDrawer, refreshHeader, refreshPanelTitles } from './shell.js';
+import { askToNotify, initAlerts, previewSound } from './alerts.js';
+import { initKeys } from './keys.js';
 
 const MODULE_NAME = 'iMessageTheme';
 /** Folder path under scripts/extensions/, e.g. third-party/SillyTavern-iMessage */
@@ -35,6 +37,12 @@ const defaultSettings = Object.freeze({
     wallpaperBlur: 12,
     /** How much the window color is laid over the background, in percent */
     wallpaperDim: 30,
+    /** A soft sound when you send and when a reply arrives */
+    sounds: true,
+    /** Sound volume, in percent */
+    soundVolume: 50,
+    /** A system notification for replies that arrive while the tab is in the background */
+    notify: false,
 });
 
 const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -129,7 +137,12 @@ async function renderSettingsPanel() {
     const wallpaper = field('imsg_wallpaper');
     const wallpaperBlur = field('imsg_wallpaper_blur');
     const wallpaperDim = field('imsg_wallpaper_dim');
+    const sounds = field('imsg_sounds');
+    const soundVolume = field('imsg_sound_volume');
+    const notify = field('imsg_notify');
     const showValues = () => {
+        document.getElementById('imsg_sound_volume_value').textContent = `${settings.soundVolume}%`;
+        document.getElementById('imsg_sound_options').classList.toggle('imsg-off', !settings.sounds);
         document.getElementById('imsg_wallpaper_blur_value').textContent = `${settings.wallpaperBlur}px`;
         document.getElementById('imsg_wallpaper_dim_value').textContent = `${settings.wallpaperDim}%`;
         document.getElementById('imsg_wallpaper_options').classList.toggle('imsg-off', !settings.wallpaper);
@@ -145,6 +158,9 @@ async function renderSettingsPanel() {
     wallpaper.checked = settings.wallpaper;
     wallpaperBlur.value = String(settings.wallpaperBlur);
     wallpaperDim.value = String(settings.wallpaperDim);
+    sounds.checked = settings.sounds;
+    soundVolume.value = String(settings.soundVolume);
+    notify.checked = settings.notify;
     showValues();
 
     const bind = (element, key, read, after) => {
@@ -169,6 +185,19 @@ async function renderSettingsPanel() {
     bind(wallpaperBlur, 'wallpaperBlur', () => Number(wallpaperBlur.value), showValues);
     bind(wallpaperDim, 'wallpaperDim', () => Number(wallpaperDim.value), showValues);
     document.getElementById('imsg_wallpaper_pick').addEventListener('click', () => openDrawer('backgrounds-button'));
+    bind(sounds, 'sounds', () => sounds.checked, showValues);
+    bind(soundVolume, 'soundVolume', () => Number(soundVolume.value), showValues);
+    soundVolume.addEventListener('change', () => previewSound('receive'));
+    document.getElementById('imsg_sound_send').addEventListener('click', () => previewSound('send'));
+    document.getElementById('imsg_sound_receive').addEventListener('click', () => previewSound('receive'));
+    bind(notify, 'notify', () => notify.checked, async () => {
+        if (settings.notify && !(await askToNotify())) {
+            settings.notify = false;
+            notify.checked = false;
+            saveSettings();
+            toastr.info('Allow notifications for this site in your browser to get them.', 'Notifications are blocked');
+        }
+    });
 }
 
 async function init() {
@@ -183,6 +212,8 @@ async function init() {
     initSplit();
     initMessages();
     initMonograms();
+    initAlerts({ settings: getSettings });
+    initKeys();
     applySettings();
 
     const { eventSource, eventTypes } = SillyTavern.getContext();

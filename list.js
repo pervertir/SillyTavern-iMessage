@@ -127,7 +127,12 @@ function buildRow(entry) {
     const preview = document.createElement('span');
     preview.className = 'imsg-row-preview';
     preview.textContent = entry.preview;
-    text.append(top, preview);
+    // shown in place of the preview while this conversation's reply is being written
+    const typing = document.createElement('span');
+    typing.className = 'imsg-row-typing';
+    typing.setAttribute('aria-hidden', 'true');
+    typing.append(document.createElement('span'), document.createElement('span'), document.createElement('span'));
+    text.append(top, preview, typing);
 
     row.append(buildAvatar(entry), text);
     return row;

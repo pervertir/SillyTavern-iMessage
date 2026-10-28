@@ -209,6 +209,20 @@ export function initMessages() {
         eventSource.on(type, refreshMessages);
     }
 
+    // a new bubble slides up into place; not the ones drawn when a conversation opens
+    let openedAt = 0;
+    eventSource.on(eventTypes.CHAT_CHANGED, () => { openedAt = Date.now(); });
+    for (const type of [eventTypes.CHARACTER_MESSAGE_RENDERED, eventTypes.USER_MESSAGE_RENDERED]) {
+        eventSource.on(type, (messageId) => {
+            const mes = document.querySelector(`#chat .mes[mesid="${Number(messageId)}"]`);
+            if (!mes?.classList.contains('last_mes') || Date.now() - openedAt < 1500) {
+                return;
+            }
+            mes.classList.add('imsg-new');
+            setTimeout(() => mes.classList.remove('imsg-new'), 600);
+        });
+    }
+
     eventSource.on(eventTypes.GENERATION_STARTED, (type, _options, dryRun) => {
         if (dryRun || type === 'quiet' || type === 'impersonate') {
             return;
