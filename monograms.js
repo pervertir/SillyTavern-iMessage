@@ -147,7 +147,7 @@ export function initMonograms() {
     eventSource.on(eventTypes.MORE_MESSAGES_LOADED, later);
 
     // Characters
-    const people = () => monogramizeAll(document.getElementById('rm_print_characters_block'), '.avatar img', rowName);
+    const people = () => monogramizeAll(document.getElementById('rm_print_characters_block'), '.avatar:not(.avatar_collage) > img', rowName);
     eventSource.on(eventTypes.CHARACTER_PAGE_LOADED, () => setTimeout(people, 0));
     people();
 

@@ -503,7 +503,26 @@ function markAlerts(root = document) {
     }
 }
 
+/** Contacts shows a group's picture as the same cluster as the sidebar, not the app's quartered collage. */
+function clusterGroupRows() {
+    const { groups } = SillyTavern.getContext();
+    document.querySelectorAll('#rm_print_characters_block .group_select[data-grid] .avatar.avatar_collage').forEach((avatar) => {
+        const group = groups.find(x => String(x.id) === avatar.closest('.group_select').dataset.grid);
+        const key = (group?.members ?? []).slice(0, 3).join('\n');
+        if (!group || avatar.dataset.imsgCluster === key) {
+            return;
+        }
+        avatar.querySelector(':scope > .imsg-cluster')?.remove();
+        avatar.append(buildGroupAvatar(group));
+        avatar.dataset.imsgCluster = key;
+    });
+}
+
 export function initShell(options) {
+    const { eventSource, eventTypes } = SillyTavern.getContext();
+    eventSource.on(eventTypes.CHARACTER_PAGE_LOADED, () => setTimeout(clusterGroupRows, 0));
+    eventSource.on(eventTypes.GROUP_UPDATED, () => setTimeout(clusterGroupRows, 0));
+    clusterGroupRows();
     markAlerts();
     new MutationObserver(() => markAlerts()).observe(document.body, { childList: true });
     shellOptions = options;

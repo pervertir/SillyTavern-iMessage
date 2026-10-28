@@ -59,7 +59,7 @@ body.imessage .mes_button {
 }
 
 /* Text fields */
-body.imessage :is(.text_pole, textarea:not(#send_textarea), select, input[type="text"], input[type="number"], input[type="search"], input[type="password"], input[type="url"], input[type="email"]):not(.imsg-search input) {
+body.imessage :is(.text_pole, textarea:not([id="send_textarea"]), select, input[type="text"], input[type="number"], input[type="search"], input[type="password"], input[type="url"], input[type="email"]):not(.imsg-search input) {
     border: none;
     border-radius: var(--imsg-radius-sm);
     background: var(--imsg-field);
@@ -71,7 +71,7 @@ body.imessage :is(.text_pole, textarea:not(#send_textarea), select, input[type="
     transition: box-shadow 0.1s var(--imsg-ease);
 }
 
-body.imessage :is(.text_pole, textarea:not(#send_textarea), select, input[type="text"], input[type="number"], input[type="search"], input[type="password"], input[type="url"], input[type="email"]):not(.imsg-search input):focus {
+body.imessage :is(.text_pole, textarea:not([id="send_textarea"]), select, input[type="text"], input[type="number"], input[type="search"], input[type="password"], input[type="url"], input[type="email"]):not(.imsg-search input):focus {
     box-shadow: inset 0 0 0 1px var(--imsg-blue), 0 0 0 3px var(--imsg-focus);
     outline: none;
 }
@@ -80,13 +80,6 @@ body.imessage textarea::placeholder,
 body.imessage input::placeholder {
     color: var(--imsg-fg-3) !important;
     opacity: 1;
-}
-
-/* Pop-up buttons */
-body.imessage select {
-    padding-right: 24px;
-    background-color: var(--imsg-button);
-    box-shadow: var(--imsg-shadow-button);
 }
 
 /* Checkboxes: blue fill with a white tick */
@@ -665,4 +658,21 @@ body.imessage .select_chat_block:hover .select_chat_actions {
     body.imessage .select_chat_actions {
         opacity: 0.6;
     }
+}
+
+/* a group in Contacts: the sidebar's cluster instead of the quartered collage */
+body.imessage #rm_print_characters_block .avatar.avatar_collage[data-imsg-cluster] {
+    overflow: visible;
+    --imsg-face-ring: var(--imsg-sheet);
+}
+
+body.imessage #rm_print_characters_block .avatar.avatar_collage[data-imsg-cluster] > img {
+    display: none;
+}
+
+/* settings that don't apply: faded, not darkened */
+body.imessage #AdvancedFormatting .disabled,
+body.imessage :is(input, textarea, select):disabled {
+    filter: none;
+    opacity: 0.6;
 }

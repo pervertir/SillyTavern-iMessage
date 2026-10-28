@@ -1,0 +1,367 @@
+/* The app's settings as clean forms: labels start-aligned, sliders with their value beside them,
+   checkboxes level with their labels, pop-up menus with their up/down chevrons, quiet icon
+   buttons, small disclosure chevrons. Scoped to the sheets and dialogs. */
+
+body.imessage :is(.drawer-content, .popup) {
+    --imsg-form-gap: 10px;
+}
+
+/* labels and help text */
+body.imessage :is(.drawer-content, .popup) :is(label, .range-block-title, h4, h5) {
+    text-align: start;
+}
+
+body.imessage :is(.drawer-content, .popup) :is(small, .toggle-description, .notes-link, .text_muted) {
+    color: var(--imsg-fg-2);
+    font-size: var(--imsg-text-xs);
+    line-height: 14px;
+}
+
+/* sliders: the title on its own line at the start, the track and its value field in a row */
+body.imessage .drawer-content .range-block {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    margin: 0 0 var(--imsg-form-gap);
+}
+
+body.imessage .drawer-content .range-block-title {
+    flex: 1 1 100%;
+    width: auto;
+    margin: 0;
+    color: var(--imsg-fg);
+    font-size: var(--imsg-text);
+    font-weight: 500;
+    text-align: start;
+}
+
+body.imessage .drawer-content .range-block-range-and-counter {
+    align-items: center;
+    gap: 10px;
+}
+
+body.imessage .drawer-content .range-block-range {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+body.imessage .drawer-content .range-block-counter {
+    flex: none;
+    width: 64px;
+    margin: 0;
+}
+
+body.imessage .drawer-content .range-block-counter input {
+    width: 100%;
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+}
+
+/* checkboxes level with their label */
+body.imessage :is(.drawer-content, .popup) :is(.checkbox_label, label:has(> input[type="checkbox"])) {
+    align-items: center;
+    column-gap: 7px;
+}
+
+body.imessage :is(.drawer-content, .popup) input[type="checkbox"] {
+    flex: none;
+    margin: 0;
+    align-self: center;
+}
+
+/* labels the app packs with no gap */
+body.imessage :is(.drawer-content, .popup) .flexNoGap > input[type="checkbox"] {
+    margin-right: 7px;
+}
+
+body.imessage :is(.drawer-content, .popup) .checkbox_label + :is(small, .toggle-description) {
+    display: block;
+    margin: 2px 0 var(--imsg-form-gap) 21px;
+}
+
+/* fields: one height, roomy padding */
+body.imessage :is(.drawer-content, .popup) :is(input.text_pole, input[type="text"], input[type="number"], input[type="search"], input[type="password"], input[type="url"]) {
+    min-height: 24px;
+    padding: 3px 8px;
+    box-sizing: border-box;
+}
+
+body.imessage :is(.drawer-content, .popup) textarea:not([id="send_textarea"]) {
+    padding: 6px 8px;
+    line-height: 17px;
+}
+
+/* pop-up menus: Mac push-button look with the up/down chevrons (the :not()s outweigh the field rule) */
+body.imessage select:not(.imsg-search select):not([multiple]) {
+    appearance: none;
+    -webkit-appearance: none;
+    min-height: 24px;
+    padding: 2px 24px 2px 8px;
+    background-color: var(--imsg-button);
+    background-image: var(--imsg-select-arrow);
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 8px 12px;
+    box-shadow: var(--imsg-shadow-button);
+    cursor: default;
+}
+
+/* icon buttons: quiet glyphs that get a soft background under the pointer */
+body.imessage :is(.drawer-content, .popup) .menu_button:is(.fa-solid, .fa-regular, .fa-brands):not(.toggleEnabled, .active, .redWarningBG) {
+    background: none;
+    box-shadow: none;
+    color: var(--imsg-fg-2);
+}
+
+body.imessage :is(.drawer-content, .popup) .menu_button:is(.fa-solid, .fa-regular, .fa-brands):not(.toggleEnabled, .active, .redWarningBG):hover {
+    background: var(--imsg-hover);
+    color: var(--imsg-fg);
+}
+
+body.imessage :is(.drawer-content, .popup) .menu_button.redWarningBG:is(.fa-solid, .fa-regular) {
+    background: none;
+    box-shadow: none;
+    color: var(--imsg-red);
+}
+
+/* text buttons with an icon: the icon smaller and quieter than the words */
+body.imessage :is(.drawer-content, .popup) .menu_button.menu_button_icon {
+    gap: 5px;
+}
+
+body.imessage :is(.drawer-content, .popup) .menu_button.menu_button_icon > i {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+/* disclosure: a small chevron instead of the big circled one */
+body.imessage .inline-drawer-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--imsg-fg-3);
+    font-size: 11px;
+    transition: transform 0.15s var(--imsg-ease);
+}
+
+body.imessage .inline-drawer-icon.fa-circle-chevron-down::before,
+body.imessage .inline-drawer-icon.fa-circle-chevron-up::before {
+    content: "\f078";
+}
+
+body.imessage .inline-drawer-icon.up {
+    transform: rotate(180deg);
+}
+
+body.imessage .inline-drawer-header {
+    align-items: center;
+}
+
+body.imessage .inline-drawer-toggle {
+    cursor: default;
+}
+
+/* tags: small rounded labels in their own colors, readable on any of them */
+body.imessage .tag {
+    padding: 1px 8px;
+    border-radius: 9px;
+    font-size: var(--imsg-text-xs);
+    line-height: 16px;
+    text-shadow: none;
+}
+
+body.imessage .tag[style*="background"] {
+    color: #ffffff;
+}
+
+/* the app's hairlines between groups */
+body.imessage .drawer-content hr {
+    margin: 10px 0;
+    border: none;
+    border-top: 1px solid var(--imsg-line);
+}
+
+/* searchable pickers (lorebooks, tags): the same field and pop-up looks as everything else */
+body.imessage .select2-container .select2-selection {
+    min-height: 26px;
+    border: none !important;
+    border-radius: var(--imsg-radius-sm) !important;
+    background: var(--imsg-field) !important;
+    box-shadow: inset 0 0 0 1px var(--imsg-field-line);
+    color: var(--imsg-fg);
+}
+
+body.imessage .select2-container .select2-selection--single {
+    background: var(--imsg-button) var(--imsg-select-arrow) no-repeat right 8px center / 8px 12px !important;
+    box-shadow: var(--imsg-shadow-button);
+}
+
+body.imessage .select2-container .select2-selection--single .select2-selection__arrow {
+    display: none;
+}
+
+body.imessage .select2-container .select2-selection__rendered {
+    color: var(--imsg-fg) !important;
+    line-height: 26px !important;
+    padding: 0 26px 0 8px !important;
+}
+
+body.imessage .select2-container .select2-selection--multiple {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px !important;
+}
+
+body.imessage .select2-container .select2-selection--multiple .select2-selection__rendered {
+    display: contents !important;
+}
+
+body.imessage .select2-container .select2-selection--multiple .select2-search--inline {
+    flex: 1;
+    min-width: 120px;
+}
+
+body.imessage .select2-container .select2-search--inline .select2-search__field {
+    display: block;
+    margin: 0;
+    height: 22px;
+    min-height: 0;
+    padding: 0 2px !important;
+    line-height: 22px;
+    resize: none;
+    overflow: hidden;
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    color: var(--imsg-fg);
+}
+
+body.imessage .select2-container .select2-selection__placeholder,
+body.imessage .select2-container .select2-search__field::placeholder {
+    color: var(--imsg-fg-3) !important;
+}
+
+body.imessage .select2-container--focus .select2-selection,
+body.imessage .select2-container--open .select2-selection {
+    box-shadow: inset 0 0 0 1px var(--imsg-blue), 0 0 0 3px var(--imsg-focus) !important;
+}
+
+body.imessage .select2-dropdown {
+    border: none !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+    background: var(--imsg-menu, var(--imsg-sheet)) !important;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22), 0 0 0 0.5px var(--imsg-field-line);
+    color: var(--imsg-fg);
+}
+
+body.imessage .select2-results__option--highlighted {
+    background: var(--imsg-blue) !important;
+    color: #ffffff !important;
+}
+
+/* destructive icon buttons: a red glyph, not a red block */
+body.imessage :is(.drawer-content, .popup) .menu_button.redWarningBG:is(.fa-solid, .fa-regular) {
+    background: none !important;
+    box-shadow: none;
+    color: var(--imsg-red);
+}
+
+body.imessage :is(.drawer-content, .popup) .menu_button.redWarningBG:is(.fa-solid, .fa-regular):hover {
+    background: color-mix(in srgb, var(--imsg-red) 14%, transparent) !important;
+}
+
+/* chosen items in a picker: small rounded chips */
+body.imessage .select2-container .select2-selection__choice {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 !important;
+    padding: 1px 8px !important;
+    border: none !important;
+    border-radius: 10px !important;
+    background: var(--imsg-blue) !important;
+    color: #ffffff !important;
+    font-size: 12px;
+}
+
+body.imessage .select2-container .select2-selection__choice__remove {
+    position: static !important;
+    order: 2;
+    border: none !important;
+    background: none !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    padding: 0 !important;
+}
+
+/* on/off settings: switches */
+body.imessage :is(.drawer-content, .popup) input[type="checkbox"]:not(.del_checkbox, .bulk_select_checkbox, .tag_as_folder) {
+    width: 26px;
+    height: 15px;
+    border-radius: 8px;
+    background: var(--imsg-switch-off);
+    box-shadow: inset 0 0 0 0.5px var(--imsg-field-line);
+    transition: background-color 0.18s var(--imsg-ease);
+}
+
+body.imessage :is(.drawer-content, .popup) input[type="checkbox"]:not(.del_checkbox, .bulk_select_checkbox, .tag_as_folder)::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    inset-inline: auto;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0.5px 1.5px rgba(0, 0, 0, 0.3);
+    -webkit-mask: none;
+    mask: none;
+    transition: transform 0.18s var(--imsg-ease);
+}
+
+body.imessage :is(.drawer-content, .popup) input[type="checkbox"]:not(.del_checkbox, .bulk_select_checkbox, .tag_as_folder):checked {
+    background: var(--imsg-blue);
+    box-shadow: none;
+}
+
+body.imessage :is(.drawer-content, .popup) input[type="checkbox"]:not(.del_checkbox, .bulk_select_checkbox, .tag_as_folder):checked::after {
+    inset: auto;
+    top: 1px;
+    left: 1px;
+    transform: translateX(11px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.imessage :is(.drawer-content, .popup) input[type="checkbox"],
+    body.imessage :is(.drawer-content, .popup) input[type="checkbox"]::after {
+        transition: none;
+    }
+}
+
+
+/* a switch's own label reads as a label, not as help text */
+body.imessage :is(.drawer-content, .popup) .checkbox_label > :is(small, span) {
+    color: var(--imsg-fg);
+    opacity: 1;
+}
+
+/* Settings: each column as a rounded group box, as in System Settings */
+body.imessage #user-settings-block-content {
+    gap: 12px;
+    align-items: flex-start;
+}
+
+body.imessage #user-settings-block-content > [name^="UserSettings"] {
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--imsg-card);
+    box-shadow: 0 0 0 0.5px var(--imsg-field-line);
+}
