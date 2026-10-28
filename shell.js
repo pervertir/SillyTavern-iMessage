@@ -2,6 +2,7 @@
 // compose), the conversation header, the app's menus as Mac sheets with a Done button, and the
 // empty pane while no conversation is open.
 
+import { openContactCard } from './card.js';
 import { buildMonogram, monogramize } from './monograms.js';
 
 const HEADER_ID = 'imsg-head';
@@ -278,7 +279,7 @@ export function buildSidebarToolbar() {
 }
 
 function openProfile() {
-    openDrawer('rightNavHolder');
+    openContactCard();
 }
 
 function createHeader() {
