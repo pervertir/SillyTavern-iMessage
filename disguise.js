@@ -41,6 +41,8 @@ export function refreshTitle() {
 
 export function setDisguise(enabled) {
     const textarea = document.getElementById('send_textarea');
+    // the app icon, for notification banners
+    document.documentElement.style.setProperty('--imsg-app-icon', `url("${ICON}")`);
     if (enabled) {
         remember();
         active = true;

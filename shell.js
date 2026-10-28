@@ -72,30 +72,50 @@ export function clickOption(id) {
     (options.find(x => !x.classList.contains('displayNone')) ?? options[0])?.click();
 }
 
-/**
- * Opens one of the message box's own menus (chat options or the extensions menu). Their buttons
- * stay in place, out of sight, so the menus still open beside the box; the click waits for the
- * menu click that asked for it to finish, which would otherwise close the menu straight away.
- */
-function openComposerMenu(buttonId) {
-    setTimeout(() => {
-        const button = document.getElementById(buttonId);
-        if (!button) {
-            return;
+/** Whether an element of one of the app's menus is showing (its menu itself may be closed). */
+function isShown(element, root) {
+    for (let node = element; node && node !== root; node = node.parentElement) {
+        if (node.hidden || node.classList.contains('displayNone') || getComputedStyle(node).display === 'none') {
+            return false;
         }
-        if (!button.hasAttribute('tabindex')) {
-            button.tabIndex = -1;
-        }
-        // the app keeps its options menu open only while its button has focus or the pointer
-        button.focus({ preventScroll: true });
-        button.click();
-    }, 0);
+    }
+    return true;
 }
 
-/** Whether the extensions menu has anything in it (the app hides its button when it's empty). */
-function hasExtensionsMenu() {
-    const button = document.getElementById('extensionsMenuButton');
-    return !!button && button.style.display !== 'none';
+/** Menu items for a list of the app's menu entries, with separators where it has rules. */
+function itemsFrom(root, entries) {
+    const items = [];
+    for (const entry of entries) {
+        if (entry.tagName === 'HR') {
+            if (items.length && items.at(-1).label) {
+                items.push({});
+            }
+            continue;
+        }
+        if (!isShown(entry, root)) {
+            continue;
+        }
+        const label = entry.textContent.replace(/\s+/g, ' ').trim();
+        if (label) {
+            items.push({ label, raw: true, run: () => entry.click() });
+        }
+    }
+    while (items.length && !items.at(-1).label) {
+        items.pop();
+    }
+    return items;
+}
+
+/** The chat options (the app's ☰ menu by the message box), as a plain menu. */
+function chatOptionItems() {
+    const root = document.getElementById('options');
+    return root ? itemsFrom(root, root.querySelectorAll('.options-content > a, .options-content > hr')) : [];
+}
+
+/** What extensions add to the message box's menu, as a plain menu. */
+function appItems() {
+    const root = document.getElementById('extensionsMenu');
+    return root ? itemsFrom(root, root.querySelectorAll('.list-group-item')) : [];
 }
 
 /** New Message: pick someone from Contacts. */
@@ -144,7 +164,7 @@ function getMenu() {
  * Opens a Mac menu under a button (or at a point), or closes it when it's already open there.
  * Items with no label are separators; `checked` puts a tick before the label.
  * @param {HTMLElement} anchor
- * @param {Array<{label?: string, run?: () => void, checked?: boolean, danger?: boolean}>} items
+ * @param {Array<{label?: string, run?: () => void, checked?: boolean, danger?: boolean, raw?: boolean}>} items
  * @param {{x: number, y: number}} [point] Where a right-click happened
  */
 export function toggleMenu(anchor, items, point) {
@@ -154,7 +174,7 @@ export function toggleMenu(anchor, items, point) {
         return;
     }
     closeMenu();
-    menu.replaceChildren(...items.map(({ label, run, checked, danger }) => {
+    menu.replaceChildren(...items.map(({ label, run, checked, danger, raw }) => {
         if (!label) {
             const line = document.createElement('div');
             line.className = 'imsg-menu-sep';
@@ -170,7 +190,7 @@ export function toggleMenu(anchor, items, point) {
         if (checked !== undefined) {
             item.setAttribute('aria-checked', String(!!checked));
         }
-        item.textContent = t(label);
+        item.textContent = raw ? label : t(label);
         item.addEventListener('click', () => {
             closeMenu();
             run?.();
@@ -288,28 +308,21 @@ function createHeader() {
     const name = document.createElement('span');
     name.className = 'imsg-head-name';
     who.append(avatar, to, name);
-    who.addEventListener('click', openProfile);
+    // on a Mac the name opens the details; on a phone, where there's no ⓘ, it opens the menu
+    who.addEventListener('click', () => {
+        if (window.matchMedia(PHONE_QUERY).matches) {
+            openInfoMenu(who);
+        } else {
+            openProfile();
+        }
+    });
 
     const actions = document.createElement('div');
     actions.className = 'imsg-head-actions';
     const video = symbolButton('imsg-head-video', 'New conversation', 'video');
     video.addEventListener('click', () => clickOption('option_start_new_chat'));
     const info = symbolButton('imsg-head-info', 'Details', 'info');
-    info.addEventListener('click', () => toggleMenu(info, [
-        { label: 'Details', run: openProfile },
-        { label: 'Conversation History', run: () => clickOption('option_select_chat') },
-        { label: 'New Conversation', run: () => clickOption('option_start_new_chat') },
-        {},
-        { label: 'Chat Options', run: () => openComposerMenu('options_button') },
-        ...(hasExtensionsMenu() ? [{ label: 'Apps', run: () => openComposerMenu('extensionsMenuButton') }] : []),
-        {},
-        {
-            label: 'Close Conversation', run: () => {
-                clickOption('option_close_chat');
-                document.body.classList.remove('imsg-m-chat');
-            },
-        },
-    ]));
+    info.addEventListener('click', () => openInfoMenu(info));
     actions.append(video, info);
 
     const showSide = symbolButton('imsg-show-side', 'Show sidebar', 'sidebar');
@@ -317,6 +330,31 @@ function createHeader() {
 
     head.append(back, showSide, who, actions);
     sheld.prepend(head);
+}
+
+const PHONE_QUERY = '(max-width: 1000px)';
+
+/** The conversation's menu (ⓘ): details, history, the chat options and apps as submenus. */
+function openInfoMenu(anchor) {
+    const options = chatOptionItems();
+    const apps = appItems();
+    // a submenu opens in the same place once the click that chose it is done
+    const submenu = (items) => () => setTimeout(() => toggleMenu(anchor, items), 0);
+    toggleMenu(anchor, [
+        { label: 'Details', run: openProfile },
+        { label: 'Conversation History', run: () => clickOption('option_select_chat') },
+        { label: 'New Conversation', run: () => clickOption('option_start_new_chat') },
+        {},
+        ...(options.length ? [{ label: 'Chat Options…', run: submenu(options) }] : []),
+        ...(apps.length ? [{ label: 'Apps…', run: submenu(apps) }] : []),
+        {},
+        {
+            label: 'Close Conversation', run: () => {
+                clickOption('option_close_chat');
+                document.body.classList.remove('imsg-m-chat');
+            },
+        },
+    ]);
 }
 
 /** A group's picture: up to three of its members' pictures in a cluster, as Messages shows a group. */
@@ -454,7 +492,20 @@ function trackDrawers() {
  * @param {(appearance: string) => void} options.setAppearance Switches between light, dark and the system's
  * @param {() => boolean} options.isDark Whether the dark look is showing
  */
+/** Short questions (a line or two and buttons) get the compact alert look; bigger dialogs don't. */
+function markAlerts(root = document) {
+    for (const dialog of root.querySelectorAll?.('dialog.popup:not([data-imsg-checked])') ?? []) {
+        dialog.dataset.imsgChecked = '';
+        const big = dialog.matches('.wide_dialogue_popup, .wider_dialogue_popup, .large_dialogue_popup, .transparent_dialogue_popup')
+            || !!dialog.querySelector('#loader, .popup-content :is(textarea, table, img, select, ul, ol, .flex-container, .list-group, .inline-drawer)')
+            || (dialog.querySelector('.popup-content')?.textContent.length ?? 0) > 400;
+        dialog.classList.toggle('imsg-alert', !big);
+    }
+}
+
 export function initShell(options) {
+    markAlerts();
+    new MutationObserver(() => markAlerts()).observe(document.body, { childList: true });
     shellOptions = options;
     createHeader();
     createEmptyState();
