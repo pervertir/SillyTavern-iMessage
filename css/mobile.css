@@ -17,6 +17,8 @@
         --imsg-text: 15px;
         --imsg-text-sm: 13px;
         --imsg-text-bubble: 17px;
+        --imsg-bubble-lh: 1.3;
+        --imsg-bubble-pad-x: 13px;
         --imsg-text-md: 17px;
         --imsg-side-w: 100vw;
     }
@@ -302,12 +304,7 @@
         padding-right: 12px;
     }
 
-    body.imessage #chat .mes .mes_block {
-        padding: 7px 13px 8px;
-    }
-
     body.imessage #chat .mes :is(.mes_text, .imsg-part) {
-        line-height: 22px;
         letter-spacing: -0.02em;
     }
 

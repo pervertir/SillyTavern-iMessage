@@ -195,7 +195,7 @@ export function initSplit() {
     });
     eventSource.on(eventTypes.CHARACTER_MESSAGE_RENDERED, (messageId) => {
         streaming = false;
-        if (generating && !streamedThisTurn && isOn()) {
+        if (generating && !streamedThisTurn && isOn() && !document.body.classList.contains('imsg-c-noReveal')) {
             pendingReveal.add(Number(messageId));
         }
     });

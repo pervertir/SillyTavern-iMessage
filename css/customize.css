@@ -1,0 +1,310 @@
+/* Customize: the panel beside the conversation, and the switches it sets (imsg-c-*). */
+
+#imsg-customize {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3050;
+    display: flex;
+    flex-direction: column;
+    width: 340px;
+    box-sizing: border-box;
+    border-left: 0.5px solid var(--imsg-line-strong);
+    background: color-mix(in srgb, var(--imsg-sheet) 92%, transparent);
+    -webkit-backdrop-filter: blur(30px) saturate(1.8);
+    backdrop-filter: blur(30px) saturate(1.8);
+    color: var(--imsg-fg);
+    font-family: var(--imsg-font);
+    font-size: var(--imsg-text);
+    animation: imsg-cz-in 0.22s var(--imsg-ease);
+}
+
+@keyframes imsg-cz-in {
+    from { transform: translateX(24px); opacity: 0; }
+}
+
+/* on a wide screen the conversation moves over, so nothing is hidden behind the panel */
+@media screen and (min-width: 1001px) {
+    body.imessage.imsg-customizing #sheld {
+        right: 340px !important;
+    }
+}
+
+#imsg-customize .imsg-cz-head {
+    display: flex;
+    align-items: center;
+    flex: none;
+    height: var(--imsg-bar-h, 52px);
+    padding: 0 12px 0 18px;
+    border-bottom: 0.5px solid var(--imsg-line);
+}
+
+#imsg-customize .imsg-cz-title {
+    flex: 1;
+    margin: 0;
+    color: var(--imsg-fg);
+    font: 600 15px/20px var(--imsg-font-display);
+}
+
+#imsg-customize .imsg-cz-done {
+    padding: 4px 12px;
+    border: none;
+    border-radius: 999px;
+    background: var(--imsg-blue);
+    color: var(--imsg-on-accent);
+    font: 600 13px/18px var(--imsg-font);
+    cursor: pointer;
+}
+
+#imsg-customize .imsg-cz-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 12px 16px;
+    overscroll-behavior: contain;
+}
+
+#imsg-customize .imsg-cz-section {
+    margin: 0 0 8px;
+    border-radius: var(--imsg-radius-lg);
+    background: var(--imsg-card);
+    box-shadow: inset 0 0 0 0.5px var(--imsg-line);
+}
+
+#imsg-customize .imsg-cz-section > summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+#imsg-customize .imsg-cz-section > summary::-webkit-details-marker {
+    display: none;
+}
+
+#imsg-customize .imsg-cz-section > summary::before {
+    content: '';
+    width: 8px;
+    height: 12px;
+    background: var(--imsg-fg-2);
+    -webkit-mask: var(--imsg-sym-chevron-right) center / contain no-repeat;
+    mask: var(--imsg-sym-chevron-right) center / contain no-repeat;
+    transition: transform 0.15s var(--imsg-ease);
+}
+
+#imsg-customize .imsg-cz-section[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+#imsg-customize .imsg-cz-section-title {
+    flex: 1;
+    font-weight: 600;
+}
+
+#imsg-customize .imsg-cz-section-reset,
+#imsg-customize .imsg-cz-reset {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--imsg-blue);
+    font: inherit;
+    cursor: pointer;
+}
+
+#imsg-customize .imsg-cz-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto 18px;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    padding: 4px 12px;
+    border-top: 0.5px solid var(--imsg-line);
+}
+
+#imsg-customize .imsg-cz-label {
+    grid-column: 1;
+    margin: 0;
+    color: var(--imsg-fg);
+    font-size: inherit;
+}
+
+#imsg-customize .imsg-cz-row > :where(input, select, textarea, button.menu_button) {
+    grid-column: 2 / 4;
+    margin: 0;
+}
+
+#imsg-customize .imsg-cz-range > input {
+    grid-column: 2;
+    width: 120px;
+}
+
+#imsg-customize .imsg-cz-range > output {
+    grid-column: 3;
+    min-width: 40px;
+    color: var(--imsg-fg-2);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+#imsg-customize .imsg-cz-color > input {
+    width: 44px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    box-shadow: inset 0 0 0 0.5px var(--imsg-line-strong);
+    cursor: pointer;
+}
+
+#imsg-customize .imsg-cz-color > input::-webkit-color-swatch-wrapper {
+    padding: 2px;
+}
+
+#imsg-customize .imsg-cz-color > input::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+#imsg-customize .imsg-cz-select > select {
+    max-width: 160px;
+}
+
+#imsg-customize .imsg-cz-text > input {
+    width: 160px;
+}
+
+#imsg-customize :is(.imsg-cz-css, .imsg-cz-button) {
+    grid-template-columns: minmax(0, 1fr) 18px;
+}
+
+#imsg-customize .imsg-cz-css > .imsg-cz-label {
+    grid-column: 1 / -1;
+}
+
+#imsg-customize .imsg-cz-css > textarea {
+    grid-column: 1;
+    min-height: 120px;
+    font: 12px/16px ui-monospace, "SF Mono", Menlo, monospace;
+    resize: vertical;
+}
+
+#imsg-customize .imsg-cz-button > .imsg-cz-label {
+    display: none;
+}
+
+#imsg-customize .imsg-cz-button > button {
+    grid-column: 1;
+    justify-self: start;
+}
+
+#imsg-customize .imsg-cz-reset {
+    grid-column: 4;
+    width: 18px;
+    height: 18px;
+    background: var(--imsg-fg-2);
+    -webkit-mask: var(--imsg-sym-arrow-clockwise) center / 14px no-repeat;
+    mask: var(--imsg-sym-arrow-clockwise) center / 14px no-repeat;
+}
+
+#imsg-customize :is(.imsg-cz-css, .imsg-cz-button) .imsg-cz-reset {
+    grid-column: 2;
+    align-self: start;
+}
+
+#imsg-customize .imsg-cz-reset:hover {
+    background: var(--imsg-blue);
+}
+
+#imsg-customize .imsg-cz-foot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: none;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    border-top: 0.5px solid var(--imsg-line);
+}
+
+#imsg-customize .imsg-cz-foot .menu_button {
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* on a phone it's a sheet over the lower part of the screen */
+@media screen and (max-width: 1000px) {
+    #imsg-customize {
+        top: auto;
+        left: 0;
+        width: auto;
+        height: 62dvh;
+        border-left: none;
+        border-top: 0.5px solid var(--imsg-line-strong);
+        border-radius: 14px 14px 0 0;
+        box-shadow: var(--imsg-shadow-sheet);
+        animation-name: imsg-cz-up;
+    }
+
+    @keyframes imsg-cz-up {
+        from { transform: translateY(40px); opacity: 0; }
+    }
+
+    #imsg-customize .imsg-cz-range > input {
+        width: 110px;
+    }
+}
+
+/* ── Switches ── */
+
+body.imessage.imsg-c-noTail #chat .mes :is(.mes_block, .imsg-part)::before {
+    display: none !important;
+}
+
+body.imessage.imsg-c-avatar-rounded :is(.imsg-avatar, .imsg-avatar img, #chat .mes .avatar, #chat .mes .avatar img) {
+    border-radius: 28% !important;
+}
+
+body.imessage.imsg-c-avatar-square :is(.imsg-avatar, .imsg-avatar img, #chat .mes .avatar, #chat .mes .avatar img) {
+    border-radius: 4px !important;
+}
+
+body.imessage.imsg-c-hidePins .imsg-pins,
+body.imessage.imsg-c-hideSearch .imsg-search,
+body.imessage.imsg-c-hidePreviews .imsg-row-preview,
+body.imessage.imsg-c-hideVideo .imsg-head-video,
+body.imessage.imsg-c-hideStamps #chat .mes > .imsg-stamp,
+body.imessage.imsg-c-hideNames #chat .mes .name_text,
+body.imessage.imsg-c-hideTapbacks #chat .imsg-tapback,
+body.imessage.imsg-c-hideJump #imsg-jump {
+    display: none !important;
+}
+
+/* acrylic: a sheen and a fine grain over a see-through bubble */
+body.imessage.imsg-c-acrylic #chat .mes:not(.imsg-split, .imsg-media, .imsg-jumbo) .mes_block,
+body.imessage.imsg-c-acrylic #chat .mes .imsg-parts > .imsg-part {
+    background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 55%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+    box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.5), inset 0 0 0 0.5px rgba(255, 255, 255, 0.16), 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+body.imessage.imsg-c-bubbleShadow #chat .mes:not(.imsg-split, .imsg-media, .imsg-jumbo) .mes_block,
+body.imessage.imsg-c-bubbleShadow #chat .mes .imsg-parts > .imsg-part,
+body.imessage.imsg-c-bubbleShadow #chat .mes .imsg-photo {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+body.imessage.imsg-c-acrylic.imsg-c-bubbleShadow #chat .mes:not(.imsg-split, .imsg-media, .imsg-jumbo) .mes_block,
+body.imessage.imsg-c-acrylic.imsg-c-bubbleShadow #chat .mes .imsg-parts > .imsg-part {
+    box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.5), inset 0 0 0 0.5px rgba(255, 255, 255, 0.16), 0 1px 2px rgba(0, 0, 0, 0.12), 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+body.imessage.imsg-c-still *,
+body.imessage.imsg-c-still *::before,
+body.imessage.imsg-c-still *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+}

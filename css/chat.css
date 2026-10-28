@@ -121,7 +121,7 @@ body.imessage #chat .mes {
         ". receipt .";
     column-gap: var(--imsg-av-gap);
     align-items: end;
-    padding: 1px 16px;
+    padding: var(--imsg-mes-gap) 16px;
     margin: 0;
     box-sizing: border-box;
     background: none;
@@ -230,18 +230,18 @@ body.imessage #chat .mes .mes_block {
     width: auto;
     min-width: 0;
     max-width: 100%;
-    padding: 7px 12px 8px;
+    padding: var(--imsg-bubble-pad-y) var(--imsg-bubble-pad-x) calc(var(--imsg-bubble-pad-y) + 1px);
     margin: 0;
     box-sizing: border-box;
     border-radius: var(--imsg-bubble-radius);
-    background: var(--imsg-bubble-in);
+    background: color-mix(in srgb, var(--imsg-bubble-in) var(--imsg-bubble-alpha), transparent);
     color: var(--imsg-bubble-in-fg);
     overflow: visible;
     --imsg-bubble: var(--imsg-bubble-in);
 }
 
 body.imessage #chat .mes[is_user="true"] .mes_block {
-    background: var(--imsg-bubble-out);
+    background: color-mix(in srgb, var(--imsg-bubble-out) var(--imsg-bubble-alpha), transparent);
     color: var(--imsg-bubble-out-fg);
     --imsg-bubble: var(--imsg-bubble-out);
 }
@@ -256,7 +256,7 @@ body.imessage #chat .mes.imsg-last:not(.imsg-sys) .mes_block::before {
     width: 20px;
     height: 20px;
     z-index: -1;
-    background: var(--imsg-bubble);
+    background: color-mix(in srgb, var(--imsg-bubble) var(--imsg-bubble-alpha), transparent);
     -webkit-mask: var(--imsg-tail) center / 100% 100% no-repeat;
     mask: var(--imsg-tail) center / 100% 100% no-repeat;
 }
@@ -324,7 +324,7 @@ body.imessage #chat .mes :is(.mes_text, .imsg-part) {
     color: inherit;
     font-family: var(--imsg-font);
     font-size: var(--imsg-text-bubble);
-    line-height: 19px;
+    line-height: var(--imsg-bubble-lh);
     font-weight: 400;
     letter-spacing: -0.005em;
     overflow-wrap: anywhere;

@@ -183,6 +183,44 @@ body.imessage #rightSendForm > #mes_stop {
     --imsg-glyph-size: 24px;
 }
 
+/* Script controls: plain glyphs, and only while a typed command is running (the app's own rule
+   for this uses CSS nesting, which some browsers drop, leaving coloured pills on show) */
+body.imessage #rightSendForm > .stscript_btn {
+    display: none !important;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    place-self: end;
+    color: var(--imsg-fg-2);
+}
+
+body.imessage #form_sheld.isExecutingCommandsFromChatInput:not(.script_paused) #rightSendForm > :is(.stscript_pause, .stscript_stop),
+body.imessage #form_sheld.isExecutingCommandsFromChatInput.script_paused #rightSendForm > :is(.stscript_continue, .stscript_stop) {
+    display: flex !important;
+}
+
+body.imessage #rightSendForm > .stscript_btn > * {
+    width: auto;
+    height: auto;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: none !important;
+    box-shadow: none;
+    color: inherit !important;
+    font-size: 15px;
+}
+
+body.imessage #rightSendForm > .stscript_btn:hover {
+    color: var(--imsg-fg);
+}
+
+body.imessage #rightSendForm > .displayNone:not(#send_but) {
+    display: none !important;
+}
+
 body.imessage #file_form {
     padding: 0 0 8px;
 }

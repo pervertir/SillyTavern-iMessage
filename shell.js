@@ -232,6 +232,7 @@ function appMenuItems() {
         { label: 'Light Mode', checked: !dark, run: () => shellOptions.setAppearance('light') },
         { label: 'Dark Mode', checked: dark, run: () => shellOptions.setAppearance('dark') },
         { label: 'Match System', run: () => shellOptions.setAppearance('system') },
+        { label: 'Customize…', run: () => shellOptions.customize?.() },
     ];
 }
 

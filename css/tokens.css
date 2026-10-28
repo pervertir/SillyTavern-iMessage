@@ -54,6 +54,12 @@ body.imessage {
     --imsg-radius-md: 8px;
     --imsg-radius-lg: 12px;
     --imsg-bubble-radius: 18px;
+    /* bubble fill, spacing and text, all adjustable in Customize */
+    --imsg-bubble-alpha: 100%;
+    --imsg-bubble-pad-y: 7px;
+    --imsg-bubble-pad-x: 12px;
+    --imsg-bubble-lh: 1.36;
+    --imsg-mes-gap: 1px;
     --imsg-shadow-button: 0 0 0 0.5px rgba(0, 0, 0, 0.12), 0 0.5px 1.5px rgba(0, 0, 0, 0.2);
     --imsg-shadow-menu: 0 0 0 0.5px rgba(0, 0, 0, 0.15), 0 10px 30px rgba(0, 0, 0, 0.2);
     --imsg-shadow-sheet: 0 0 0 0.5px rgba(0, 0, 0, 0.18), 0 22px 70px rgba(0, 0, 0, 0.3);

@@ -11,6 +11,7 @@ import { askToNotify, initAlerts, previewSound } from './alerts.js';
 import { initKeys } from './keys.js';
 import { initFeatures } from './features.js';
 import { initImages } from './images.js';
+import { initCustomize, openCustomize } from './customize.js';
 
 const MODULE_NAME = 'iMessageTheme';
 /** Folder path under scripts/extensions/, e.g. third-party/SillyTavern-iMessage */
@@ -47,7 +48,22 @@ const defaultSettings = Object.freeze({
     soundVolume: 50,
     /** A system notification for replies that arrive while the tab is in the background */
     notify: false,
+    /** Customize: theme variables, switches and your own CSS (customize.js) */
+    customize: { tokens: {}, flags: {}, css: '' },
 });
+
+/** The theme settings field for each setting Customize can change */
+const SETTING_FIELDS = {
+    windowButtons: 'imsg_window_buttons',
+    receipts: 'imsg_receipts',
+    typing: 'imsg_typing',
+    splitReplies: 'imsg_split',
+    imageLinks: 'imsg_image_links',
+    wallpaper: 'imsg_wallpaper',
+    wallpaperBlur: 'imsg_wallpaper_blur',
+    wallpaperDim: 'imsg_wallpaper_dim',
+    sounds: 'imsg_sounds',
+};
 
 const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -193,6 +209,7 @@ async function renderSettingsPanel() {
     bind(wallpaperBlur, 'wallpaperBlur', () => Number(wallpaperBlur.value), showValues);
     bind(wallpaperDim, 'wallpaperDim', () => Number(wallpaperDim.value), showValues);
     document.getElementById('imsg_wallpaper_pick').addEventListener('click', () => openDrawer('backgrounds-button'));
+    document.getElementById('imsg_customize').addEventListener('click', () => openCustomize());
     bind(sounds, 'sounds', () => sounds.checked, showValues);
     bind(soundVolume, 'soundVolume', () => Number(soundVolume.value), showValues);
     soundVolume.addEventListener('change', () => previewSound('receive'));
@@ -215,6 +232,7 @@ async function init() {
     initShell({
         setAppearance,
         isDark: () => document.body.classList.contains('imsg-dark'),
+        customize: () => openCustomize(),
     });
     const listLoaded = initList({ settings: getSettings, opened: showChatOnPhone });
     initSplit();
@@ -224,6 +242,24 @@ async function init() {
     initKeys();
     initFeatures();
     initImages({ settings: getSettings });
+    initCustomize({
+        settings: getSettings,
+        save: saveSettings,
+        // a setting changed in Customize goes through its own field, so both stay in step
+        setSetting: (key, value) => {
+            const input = /** @type {HTMLInputElement} */ (document.getElementById(SETTING_FIELDS[key]));
+            if (!input) {
+                return;
+            }
+            if (input.type === 'checkbox') {
+                input.checked = !!value;
+            } else {
+                input.value = String(value);
+            }
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        },
+        pickBackground: () => openDrawer('backgrounds-button'),
+    });
     applySettings();
 
     const { eventSource, eventTypes } = SillyTavern.getContext();

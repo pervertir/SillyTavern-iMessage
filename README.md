@@ -66,6 +66,27 @@ Find them under **Extensions** → **iMessage Theme**:
 | Blur | How soft the background is (0 to 40 px). |
 | Fade | How much the window color is laid over it, so bubbles stay readable (0 to 90%). |
 | Choose Background… | Opens Backgrounds. |
+| Split long replies | Shows a long reply as several short bubbles, split at the ends of sentences. Markdown is kept whole. |
+| Show image links as pictures | A link to an image, or a Markdown image, shows as the picture. Click it to see it full size. Works even with Forbid External Media on. |
+| Sounds, Notifications | A soft sound on send and reply, and a system notification for replies while the tab is in the background. |
+
+### Customize
+
+**Customize…** (in the settings, or the ⋯ menu) opens a panel beside the conversation. Every change shows straight away:
+
+- **Colors**: accent, conversation, sidebar, sheets and menus, text, lines, selection
+- **Text**: font, message size, line spacing, interface size
+- **Shape**: bubble and panel corners, bubble tails, picture shape
+- **Spacing**: space between messages, bubble padding, bubble width, sidebar width
+- **Layout**: show or hide pins, search, previews, the video button, times, names, tapbacks, receipts and more
+- **Messages**: your and their bubble and text colors, bubble opacity, blur, acrylic glass, shadow
+- **Chat background**, **Motion**, and **Advanced** (your own CSS, applied only while the theme is on)
+
+Each section has Reset, and the panel has Reset All, Export and Import (a JSON file with `themeId` and `version`).
+
+### Shortcuts
+
+⌘F or ⌘K search, ⌥⌘N new message, ⌃⌘S hide or show the sidebar, ⌘, settings, Esc closes a sheet. Ctrl takes the place of ⌘ on Windows and Linux (Ctrl+Shift+S for the sidebar).
 
 ## Requirements
 
