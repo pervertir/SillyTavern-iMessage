@@ -42,7 +42,7 @@ A SillyTavern extension that makes the whole app look and work like Messages on 
 - **Phones.** Like Messages on an iPhone: the large "Messages" title with Edit (the app menu) and compose, edge-to-edge rows with a chevron, one screen at a time, and menus as full-height sheets.
 - **No trace of SillyTavern.** While the theme is on, the browser tab reads "Messages" with a green speech-bubble icon, the message box says "iMessage", the welcome screen gives way to "No Conversation Selected", the version number is hidden, and loading shows a plain window instead of SillyTavern's logo. Turning the theme off puts all of it back. Some of SillyTavern's own menus still mention it by name.
 
-SillyTavern's background image is hidden while the theme is on.
+SillyTavern's background image is hidden while the theme is on, unless you turn on **Show a background** in the settings. Then the background you pick in Backgrounds fills the conversation pane, blurred and faded as much as you like, with the header and message box frosted over it.
 
 ## Install
 
@@ -62,6 +62,10 @@ Find them under **Extensions** → **iMessage Theme**:
 | Show Delivered and Read | The receipt under your last message. |
 | Show the typing bubble | The three dots while a reply is being written. |
 | Conversations in the list | How many recent conversations the sidebar shows (5 to 500). |
+| Show a background | The background picked in Backgrounds, behind the conversation. Off by default. |
+| Blur | How soft the background is (0 to 40 px). |
+| Fade | How much the window color is laid over it, so bubbles stay readable (0 to 90%). |
+| Choose Background… | Opens Backgrounds. |
 
 ## Requirements
 

@@ -5,7 +5,7 @@ import { initList, markCurrent, scheduleRefresh } from './list.js';
 import { initMessages, refreshMessages } from './messages.js';
 import { initMonograms } from './monograms.js';
 import { refreshTitle, setDisguise } from './disguise.js';
-import { initShell, refreshHeader, refreshPanelTitles } from './shell.js';
+import { initShell, openDrawer, refreshHeader, refreshPanelTitles } from './shell.js';
 
 const MODULE_NAME = 'iMessageTheme';
 /** Folder path under scripts/extensions/, e.g. third-party/SillyTavern-iMessage */
@@ -26,6 +26,12 @@ const defaultSettings = Object.freeze({
     /** The three-dot bubble while a reply is being written */
     typing: true,
     recentMax: 50,
+    /** The background picked in Backgrounds, behind the conversation */
+    wallpaper: false,
+    /** Blur on the background, in pixels */
+    wallpaperBlur: 12,
+    /** How much the window color is laid over the background, in percent */
+    wallpaperDim: 30,
 });
 
 const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -62,6 +68,9 @@ function applySettings() {
     body.classList.toggle('imsg-lights', !!settings.windowButtons);
     body.classList.toggle('imsg-receipts', !!settings.receipts);
     body.classList.toggle('imsg-typing-on', !!settings.typing);
+    body.classList.toggle('imsg-wall', on && !!settings.wallpaper);
+    body.style.setProperty('--imsg-wall-blur', `${Number(settings.wallpaperBlur) || 0}px`);
+    body.style.setProperty('--imsg-wall-dim', `${Number(settings.wallpaperDim) || 0}%`);
     setDisguise(on);
     refreshPanelTitles(on);
 }
@@ -112,6 +121,14 @@ async function renderSettingsPanel() {
     const receipts = field('imsg_receipts');
     const typing = field('imsg_typing');
     const recentMax = field('imsg_recent_max');
+    const wallpaper = field('imsg_wallpaper');
+    const wallpaperBlur = field('imsg_wallpaper_blur');
+    const wallpaperDim = field('imsg_wallpaper_dim');
+    const showValues = () => {
+        document.getElementById('imsg_wallpaper_blur_value').textContent = `${settings.wallpaperBlur}px`;
+        document.getElementById('imsg_wallpaper_dim_value').textContent = `${settings.wallpaperDim}%`;
+        document.getElementById('imsg_wallpaper_options').classList.toggle('imsg-off', !settings.wallpaper);
+    };
 
     enabled.checked = settings.enabled;
     appearance.value = settings.appearance;
@@ -119,6 +136,10 @@ async function renderSettingsPanel() {
     receipts.checked = settings.receipts;
     typing.checked = settings.typing;
     recentMax.value = String(settings.recentMax);
+    wallpaper.checked = settings.wallpaper;
+    wallpaperBlur.value = String(settings.wallpaperBlur);
+    wallpaperDim.value = String(settings.wallpaperDim);
+    showValues();
 
     const bind = (element, key, read, after) => {
         element.addEventListener('input', () => {
@@ -134,6 +155,10 @@ async function renderSettingsPanel() {
     bind(receipts, 'receipts', () => receipts.checked);
     bind(typing, 'typing', () => typing.checked);
     bind(recentMax, 'recentMax', () => Math.min(500, Math.max(5, Number(recentMax.value) || defaultSettings.recentMax)), () => scheduleRefresh());
+    bind(wallpaper, 'wallpaper', () => wallpaper.checked, showValues);
+    bind(wallpaperBlur, 'wallpaperBlur', () => Number(wallpaperBlur.value), showValues);
+    bind(wallpaperDim, 'wallpaperDim', () => Number(wallpaperDim.value), showValues);
+    document.getElementById('imsg_wallpaper_pick').addEventListener('click', () => openDrawer('backgrounds-button'));
 }
 
 async function init() {

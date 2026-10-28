@@ -1,0 +1,93 @@
+/* The background picked in Backgrounds, behind the conversation, when the theme's setting is on
+   (body.imsg-wall). It fills the conversation pane only, blurred by --imsg-wall-blur and faded
+   toward the window color by --imsg-wall-dim; the header and the message box turn translucent
+   over it. */
+
+body.imessage.imsg-wall #bg1 {
+    display: block;
+    position: fixed;
+    /* reach past the pane's edges so the blur doesn't soften them */
+    top: calc(var(--imsg-wall-blur) * -2);
+    bottom: calc(var(--imsg-wall-blur) * -2);
+    left: calc(var(--imsg-content-left) - var(--imsg-wall-blur) * 2);
+    right: calc(var(--imsg-wall-blur) * -2);
+    width: auto !important;
+    height: auto !important;
+    background-attachment: scroll;
+    filter: blur(var(--imsg-wall-blur));
+    z-index: 0;
+}
+
+body.imessage.imsg-wall #bg1::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--imsg-window) var(--imsg-wall-dim), transparent);
+}
+
+body.imessage.imsg-wall #sheld,
+body.imessage.imsg-wall #chat {
+    background: transparent;
+}
+
+body.imessage.imsg-wall #imsg-head,
+body.imessage.imsg-wall #form_sheld {
+    background: var(--imsg-toolbar);
+    /* the app's No Blur mode turns every backdrop blur off with !important */
+    backdrop-filter: blur(20px) saturate(1.8) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(1.8) !important;
+}
+
+/* the character pictures holder sat behind the solid pane; keep it out of the picture */
+body.imessage.imsg-wall #expression-wrapper,
+body.imessage.imsg-wall #expression-holder {
+    display: none;
+}
+
+body.imessage.imsg-wall #imsg-empty {
+    background: transparent;
+}
+
+/* the time lines, names, receipts and reply counters sit on the picture: give them a small
+   frosted pill so they stay readable */
+body.imessage.imsg-wall #chat .mes[data-imsg-stamp]::before,
+body.imessage.imsg-wall.imsg-receipts #chat .mes[data-imsg-receipt]::after,
+body.imessage.imsg-wall #chat .mes .name_text,
+body.imessage.imsg-wall #chat .mes .swipeRightBlock {
+    padding: 2px 7px;
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--imsg-window) 78%, transparent);
+    color: var(--imsg-fg-2);
+}
+
+body.imessage.imsg-wall #chat .mes .name_text {
+    width: fit-content;
+    margin-bottom: 2px;
+    padding-bottom: 2px;
+}
+
+body.imessage.imsg-wall.imsg-group #chat .mes.imsg-first:not([is_user="true"], .imsg-sys) .mes_block {
+    margin-top: 21px;
+}
+
+body.imessage.imsg-wall #chat .mes .swipeRightBlock {
+    padding: 0 4px;
+}
+
+/* The theme's settings for it */
+.imsg-wallpaper-options.imsg-off {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.imsg-value {
+    flex: none;
+    min-width: 3em;
+    text-align: end;
+    opacity: 0.7;
+}
+
+#imsg_wallpaper_pick {
+    width: fit-content;
+    white-space: nowrap;
+}

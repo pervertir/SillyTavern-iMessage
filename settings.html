@@ -39,7 +39,26 @@
                 <input id="imsg_recent_max" class="text_pole" type="number" min="5" max="500" step="5" />
             </div>
 
-            <small class="imsg-note">Turn off other UI themes (such as Microsoft Teams, Moonlit Echoes or Yodayo Tavern) while this one is on. The background image is hidden while the theme is on.</small>
+            <label class="checkbox_label" for="imsg_wallpaper">
+                <input id="imsg_wallpaper" type="checkbox" />
+                <span>Show a background behind the conversation</span>
+            </label>
+
+            <div id="imsg_wallpaper_options" class="imsg-wallpaper-options">
+                <div class="imsg-setting-row">
+                    <label for="imsg_wallpaper_blur">Blur</label>
+                    <input id="imsg_wallpaper_blur" type="range" min="0" max="40" step="1" />
+                    <span id="imsg_wallpaper_blur_value" class="imsg-value"></span>
+                </div>
+                <div class="imsg-setting-row">
+                    <label for="imsg_wallpaper_dim">Fade</label>
+                    <input id="imsg_wallpaper_dim" type="range" min="0" max="90" step="5" />
+                    <span id="imsg_wallpaper_dim_value" class="imsg-value"></span>
+                </div>
+                <div id="imsg_wallpaper_pick" class="menu_button" role="button" tabindex="0">Choose Background…</div>
+            </div>
+
+            <small class="imsg-note">Turn off other UI themes (such as Microsoft Teams, Moonlit Echoes or Yodayo Tavern) while this one is on. The background is hidden unless you turn it on above; pick it in Backgrounds.</small>
         </div>
     </div>
 </div>
