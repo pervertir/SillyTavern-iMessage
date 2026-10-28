@@ -72,6 +72,32 @@ export function clickOption(id) {
     (options.find(x => !x.classList.contains('displayNone')) ?? options[0])?.click();
 }
 
+/**
+ * Opens one of the message box's own menus (chat options or the extensions menu). Their buttons
+ * stay in place, out of sight, so the menus still open beside the box; the click waits for the
+ * menu click that asked for it to finish, which would otherwise close the menu straight away.
+ */
+function openComposerMenu(buttonId) {
+    setTimeout(() => {
+        const button = document.getElementById(buttonId);
+        if (!button) {
+            return;
+        }
+        if (!button.hasAttribute('tabindex')) {
+            button.tabIndex = -1;
+        }
+        // the app keeps its options menu open only while its button has focus or the pointer
+        button.focus({ preventScroll: true });
+        button.click();
+    }, 0);
+}
+
+/** Whether the extensions menu has anything in it (the app hides its button when it's empty). */
+function hasExtensionsMenu() {
+    const button = document.getElementById('extensionsMenuButton');
+    return !!button && button.style.display !== 'none';
+}
+
 /** New Message: pick someone from Contacts. */
 export function newMessage() {
     openDrawer('rightNavHolder');
@@ -273,6 +299,9 @@ function createHeader() {
         { label: 'Details', run: openProfile },
         { label: 'Conversation History', run: () => clickOption('option_select_chat') },
         { label: 'New Conversation', run: () => clickOption('option_start_new_chat') },
+        {},
+        { label: 'Chat Options', run: () => openComposerMenu('options_button') },
+        ...(hasExtensionsMenu() ? [{ label: 'Apps', run: () => openComposerMenu('extensionsMenuButton') }] : []),
         {},
         {
             label: 'Close Conversation', run: () => {

@@ -331,7 +331,7 @@
         min-width: 60vw;
     }
 
-    /* Message box: + in a disc, then the pill with the send arrow inside */
+    /* Message box: the pill with the send arrow inside */
     body.imessage #form_sheld {
         padding: 6px 8px calc(8px + var(--imsg-safe-bottom));
         background: var(--imsg-toolbar);
@@ -339,40 +339,28 @@
         -webkit-backdrop-filter: blur(20px) saturate(1.8);
     }
 
-    body.imessage #leftSendForm {
-        padding: 0 8px 2px 4px;
-    }
-
-    body.imessage #leftSendForm > div {
-        width: 32px;
-        height: 32px;
-    }
-
-    body.imessage #options_button {
-        background: rgba(118, 118, 128, 0.16);
-        --imsg-glyph-size: 18px;
+    body.imessage #nonQRFormItems {
+        border-radius: 18px;
     }
 
     body.imessage #send_textarea {
-        min-height: 36px;
-        height: 36px;
+        min-height: 34px;
+        height: 34px;
         padding: 7px 4px 7px 14px;
         border-radius: 18px 0 0 18px;
-        background: var(--imsg-window);
         font-size: 17px;
         line-height: 22px;
     }
 
     body.imessage #rightSendForm {
         border-radius: 0 18px 18px 0;
-        background: var(--imsg-window);
         padding: 0 3px 3px 0;
     }
 
     body.imessage #rightSendForm > #send_but {
         width: 30px;
         height: 30px;
-        --imsg-glyph-size: 30px;
+        --imsg-glyph-size: 17px;
     }
 
     /* Menus open as full-height sheets with Done */

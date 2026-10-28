@@ -1,5 +1,4 @@
-/* The message box: the + (chat options) and emoji (extensions) buttons on the left, then the
-   rounded "iMessage" field with the blue send arrow inside it once there's something to send. */
+/* The message box: one rounded "iMessage" field with the blue up-arrow send button inside it. */
 
 body.imessage #form_sheld {
     width: auto;
@@ -32,47 +31,49 @@ body.imessage #nonQRFormItems {
     font-size: 16px;
 }
 
+/* Only the field and its send arrow show. The + and emoji buttons stay in place but out of
+   sight, so their menus (opened from the header's ⓘ menu) still appear beside the box. */
+/* the field: one oval around the text and the send arrow */
+body.imessage #nonQRFormItems {
+    position: relative;
+    border: 1px solid var(--imsg-field-line);
+    border-radius: 17px;
+    background: var(--imsg-window);
+}
+
 body.imessage #leftSendForm {
+    position: absolute;
+    left: 0;
+    top: 0;
     display: flex;
-    align-items: flex-end;
-    gap: 4px;
-    height: auto;
-    padding: 0 8px 3px 0;
+    width: 0;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
 }
 
 body.imessage #leftSendForm > div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 0;
+    height: 100%;
     margin: 0;
     padding: 0;
-    border-radius: 50%;
-    color: var(--imsg-fg-2);
-    font-size: 0;
-    opacity: 1;
-    filter: none;
-    cursor: default;
-}
-
-body.imessage #leftSendForm > div:hover {
-    color: var(--imsg-fg);
+    outline: none;
 }
 
 /* the field, drawn across the text box and the buttons beside it */
 body.imessage #send_textarea {
     flex: 1;
-    min-height: 34px;
-    height: 34px;
+    min-height: 32px;
+    height: 32px;
     max-height: 40dvh;
     margin: 0;
     padding: 7px 4px 7px 14px;
     box-sizing: border-box;
-    border: 1px solid var(--imsg-field-line);
-    border-right: none;
+    border: none;
     border-radius: 17px 0 0 17px;
-    background: var(--imsg-window);
+    background: transparent;
     color: var(--imsg-fg);
     font-family: var(--imsg-font);
     font-size: var(--imsg-text-bubble);
@@ -103,12 +104,11 @@ body.imessage #rightSendForm {
     min-width: 18px;
     height: auto;
     margin: 0;
-    padding: 0 3px 3px 0;
+    padding: 0 3px 2px 0;
     box-sizing: border-box;
-    border: 1px solid var(--imsg-field-line);
-    border-left: none;
+    border: none;
     border-radius: 0 17px 17px 0;
-    background: var(--imsg-window);
+    background: transparent;
 }
 
 body.imessage #rightSendForm > div:not(.mes_stop, .stscript_btn) {
@@ -132,7 +132,7 @@ body.imessage #rightSendForm > div:hover {
 }
 
 /* Messages' glyphs on the app's buttons */
-body.imessage :is(#options_button, #extensionsMenuButton, #send_but, #mes_stop)::before {
+body.imessage :is(#send_but, #mes_stop)::before {
     content: '';
     display: block;
     width: var(--imsg-glyph-size, 20px);
@@ -146,27 +146,28 @@ body.imessage #mes_stop > i {
     display: none;
 }
 
-/* + in a grey disc, as the apps button beside the field */
-body.imessage #options_button {
-    background: var(--imsg-search);
-    --imsg-glyph: var(--imsg-sym-plus);
-    --imsg-glyph-size: 16px;
-}
-
-body.imessage #extensionsMenuButton {
-    --imsg-glyph: var(--imsg-sym-emoji);
-    --imsg-glyph-size: 22px;
-}
-
-/* Send: the blue arrow in a disc, only while there's text to send */
+/* Send: the blue arrow in a disc */
 body.imessage #rightSendForm > #send_but {
-    color: var(--imsg-blue);
+    border-radius: 50%;
+    background: var(--imsg-blue);
+    color: #ffffff;
     --imsg-glyph: var(--imsg-sym-send);
-    --imsg-glyph-size: 26px;
+    --imsg-glyph-size: 15px;
 }
 
-body.imessage #send_textarea:placeholder-shown ~ #rightSendForm > #send_but {
-    display: none;
+body.imessage #rightSendForm > #send_but:hover {
+    color: #ffffff;
+    background: var(--imsg-blue-pressed);
+}
+
+/* the arrow is always there, even before there's text or a connection; the stop button takes
+   its place while a reply is being written */
+body.imessage #rightSendForm > #send_but.displayNone {
+    display: flex !important;
+}
+
+body.imessage #rightSendForm > #mes_stop[style*="flex"] ~ #send_but {
+    display: none !important;
 }
 
 body.imessage #rightSendForm > #mes_stop {
@@ -183,7 +184,7 @@ body.imessage #rightSendForm > #mes_stop {
 }
 
 body.imessage #file_form {
-    padding: 0 0 8px 72px;
+    padding: 0 0 8px;
 }
 
 body.imessage #file_form .file_attached {
