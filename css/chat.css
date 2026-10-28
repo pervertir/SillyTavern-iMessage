@@ -405,18 +405,39 @@ body.imessage #chat .mes :is(.mes_reasoning, .mes_reasoning_header_title, .mes_r
     opacity: 0.8;
 }
 
-/* A reply being streamed in starts empty: it shows the typing dots until words arrive */
-body.imessage.imsg-typing-on.imsg-generating #chat .mes.last_mes:not([is_user="true"]) .mes_text:empty::before {
-    content: '';
-    display: block;
-    width: 34px;
-    height: 19px;
-    background:
-        radial-gradient(circle, currentColor 3.6px, transparent 4px) 0 50% / 12px 12px no-repeat,
-        radial-gradient(circle, currentColor 3.6px, transparent 4px) 11px 50% / 12px 12px no-repeat,
-        radial-gradient(circle, currentColor 3.6px, transparent 4px) 22px 50% / 12px 12px no-repeat;
-    opacity: 0.35;
-    animation: imsg-pulse 1.2s ease-in-out infinite;
+/* A reply being streamed in starts as "..." or empty (messages.js marks it .imsg-pending): it
+   shows as the typing bubble, three bouncing dots, until words arrive */
+body.imessage #chat .mes .imsg-dots {
+    display: none;
+}
+
+body.imessage #chat .mes.imsg-pending .mes_block > .mes_text {
+    display: none;
+}
+
+body.imessage #chat .mes.imsg-pending .imsg-dots {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 21px;
+    padding: 0 1px;
+}
+
+body.imessage #chat .mes.imsg-pending .imsg-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.3;
+    animation: imsg-dot 1.2s ease-in-out infinite;
+}
+
+body.imessage #chat .mes.imsg-pending .imsg-dots span:nth-child(2) { animation-delay: 0.2s; }
+body.imessage #chat .mes.imsg-pending .imsg-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+/* the separate typing bubble steps aside once the reply's own bubble is showing the dots */
+body.imessage #chat:has(.mes.imsg-pending) #imsg-typing {
+    display: none !important;
 }
 
 /* The typing bubble while a reply is on its way (messages.js) */
@@ -471,22 +492,15 @@ body.imessage #imsg-typing span:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes imsg-dot {
     0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
-    30% { opacity: 0.65; transform: translateY(-1px); }
+    30% { opacity: 0.8; transform: translateY(-3px); }
 }
 
-@keyframes imsg-pulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.6; }
-}
-
-body.imessage.reduced-motion #imsg-typing span,
-body.imessage.reduced-motion #chat .mes_text:empty::before {
+body.imessage.reduced-motion :is(#imsg-typing, .imsg-dots, .imsg-part-typing) span {
     animation: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    body.imessage #imsg-typing span,
-    body.imessage #chat .mes_text:empty::before {
+    body.imessage :is(#imsg-typing, .imsg-dots, .imsg-part-typing) span {
         animation: none;
     }
 }

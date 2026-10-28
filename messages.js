@@ -82,6 +82,10 @@ function markAll() {
         previous.last = true;
     }
 
+    for (const row of rows) {
+        markPending(row.mes, row.message);
+    }
+
     let lastYours = null;
     for (const row of rows) {
         row.mes.classList.toggle('imsg-first', !!row.first);
@@ -97,6 +101,22 @@ function markAll() {
         lastYours.mes.dataset.imsgReceipt = answered ? t('Read') : t('Delivered');
     }
     splitAll(rows.map((row) => row.mes));
+}
+
+/** A reply that's started but has no words yet ("..." while streaming starts) shows as typing dots. */
+function markPending(mes, message) {
+    const text = typeof message?.mes === 'string' ? message.mes.trim() : '';
+    const pending = !!message && !message.is_user && !message.is_system && mes.classList.contains('last_mes')
+        && document.body.classList.contains('imsg-generating') && (text === '' || text === '...' || text === '…');
+    mes.classList.toggle('imsg-pending', pending);
+    let dots = mes.querySelector(':scope .mes_block > .imsg-dots');
+    if (pending && !dots) {
+        dots = document.createElement('div');
+        dots.className = 'imsg-dots';
+        dots.setAttribute('aria-label', t('Typing'));
+        dots.append(document.createElement('span'), document.createElement('span'), document.createElement('span'));
+        mes.querySelector('.mes_block > .mes_text')?.after(dots);
+    }
 }
 
 /** Re-marks the chat on the next frame, so a burst of events costs one pass. */
@@ -165,10 +185,17 @@ export function initMessages() {
     for (const type of [eventTypes.CHARACTER_MESSAGE_RENDERED, eventTypes.STREAM_TOKEN_RECEIVED]) {
         eventSource.on(type, hideTyping);
     }
+    // a streamed reply's first bubble arrives without an event of its own; its words, as tokens
+    eventSource.on(eventTypes.STREAM_TOKEN_RECEIVED, refreshMessages);
+    const chatElement = document.getElementById('chat');
+    if (chatElement) {
+        new MutationObserver(refreshMessages).observe(chatElement, { childList: true });
+    }
     for (const type of [eventTypes.GENERATION_ENDED, eventTypes.GENERATION_STOPPED, eventTypes.CHAT_CHANGED]) {
         eventSource.on(type, () => {
             document.body.classList.remove('imsg-generating');
             hideTyping();
+            refreshMessages();
         });
     }
     refreshMessages();
