@@ -292,10 +292,6 @@
         background: none;
     }
 
-    body.imessage .imsg-head-info {
-        display: none;
-    }
-
     body.imessage #chat {
         padding: 6px 0 8px;
         --imsg-room: 18%;
@@ -411,7 +407,7 @@
 
     body.imessage .imsg-menu-item {
         min-height: 44px;
-        padding: 10px 16px 10px 40px;
+        padding: 10px 16px;
         border-radius: 0;
         font-size: 17px;
         line-height: 22px;
@@ -428,6 +424,11 @@
 
     body.imessage .imsg-menu-item:active {
         background: var(--imsg-pressed-bg);
+    }
+
+    /* room for the tick only in menus that have one */
+    body.imessage #imsg-menu:has([role="menuitemcheckbox"]) .imsg-menu-item {
+        padding-left: 40px;
     }
 
     body.imessage .imsg-menu-checked::before {

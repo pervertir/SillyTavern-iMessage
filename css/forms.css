@@ -109,18 +109,18 @@ body.imessage select:not(.imsg-search select):not([multiple]) {
 }
 
 /* icon buttons: quiet glyphs that get a soft background under the pointer */
-body.imessage :is(.drawer-content, .popup) .menu_button:is(.fa-solid, .fa-regular, .fa-brands):not(.toggleEnabled, .active, .redWarningBG) {
+body.imessage :is(.drawer-content, .popup) .menu_button:is(.fa-solid, .fa-regular, .fa-brands):not(.toggleEnabled, .active, .redWarningBG, .red_button) {
     background: none;
     box-shadow: none;
     color: var(--imsg-fg-2);
 }
 
-body.imessage :is(.drawer-content, .popup) .menu_button:is(.fa-solid, .fa-regular, .fa-brands):not(.toggleEnabled, .active, .redWarningBG):hover {
+body.imessage :is(.drawer-content, .popup) .menu_button:is(.fa-solid, .fa-regular, .fa-brands):not(.toggleEnabled, .active, .redWarningBG, .red_button):hover {
     background: var(--imsg-hover);
     color: var(--imsg-fg);
 }
 
-body.imessage :is(.drawer-content, .popup) .menu_button.redWarningBG:is(.fa-solid, .fa-regular) {
+body.imessage :is(.drawer-content, .popup) .menu_button:is(.redWarningBG, .red_button):is(.fa-solid, .fa-regular) {
     background: none;
     box-shadow: none;
     color: var(--imsg-red);
@@ -267,13 +267,13 @@ body.imessage .select2-results__option--highlighted {
 }
 
 /* destructive icon buttons: a red glyph, not a red block */
-body.imessage :is(.drawer-content, .popup) .menu_button.redWarningBG:is(.fa-solid, .fa-regular) {
+body.imessage :is(.drawer-content, .popup) .menu_button:is(.redWarningBG, .red_button):is(.fa-solid, .fa-regular) {
     background: none !important;
     box-shadow: none;
     color: var(--imsg-red);
 }
 
-body.imessage :is(.drawer-content, .popup) .menu_button.redWarningBG:is(.fa-solid, .fa-regular):hover {
+body.imessage :is(.drawer-content, .popup) .menu_button:is(.redWarningBG, .red_button):is(.fa-solid, .fa-regular):hover {
     background: color-mix(in srgb, var(--imsg-red) 14%, transparent) !important;
 }
 

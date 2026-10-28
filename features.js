@@ -200,7 +200,7 @@ function initTooltips() {
         target = null;
     };
     document.addEventListener('pointerover', (event) => {
-        if (!isOn() || event.pointerType === 'touch') {
+        if (!isOn() || event.pointerType === 'touch' || !matchMedia('(hover: hover)').matches) {
             return;
         }
         const element = /** @type {HTMLElement} */ (event.target).closest?.('[title]');

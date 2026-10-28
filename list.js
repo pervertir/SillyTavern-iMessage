@@ -3,7 +3,7 @@
 // Pins are the app's own pinned chats, so pinning here and on the welcome screen is one list.
 
 import { monogramizeAll } from './monograms.js';
-import { buildGroupAvatar, buildSidebarToolbar, toggleMenu } from './shell.js';
+import { buildGroupAvatar, buildSidebarToolbar, clickOption, toggleMenu } from './shell.js';
 
 const SIDEBAR_ID = 'imsg-sidebar';
 /** The app's own pinned chats, kept in account storage by welcome-screen.js */
@@ -365,6 +365,12 @@ function openRowMenu(anchor, entry, point) {
     toggleMenu(anchor, [
         { label: 'Open', run: () => openEntry(entry) },
         { label: entry.pinned ? 'Unpin' : 'Pin', run: () => togglePin(entry) },
+        {
+            label: 'Conversation History', run: async () => {
+                await openEntry(entry);
+                setTimeout(() => clickOption('option_select_chat'), 300);
+            },
+        },
         {},
         { label: 'Delete Conversation…', run: () => deleteEntry(entry), danger: true },
     ], point);

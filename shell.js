@@ -309,14 +309,8 @@ function createHeader() {
     const name = document.createElement('span');
     name.className = 'imsg-head-name';
     who.append(avatar, to, name);
-    // on a Mac the name opens the details; on a phone, where there's no ⓘ, it opens the menu
-    who.addEventListener('click', () => {
-        if (window.matchMedia(PHONE_QUERY).matches) {
-            openInfoMenu(who);
-        } else {
-            openProfile();
-        }
-    });
+    // the name opens the contact card, as tapping a name does in Messages
+    who.addEventListener('click', openProfile);
 
     const actions = document.createElement('div');
     actions.className = 'imsg-head-actions';
@@ -333,7 +327,6 @@ function createHeader() {
     sheld.prepend(head);
 }
 
-const PHONE_QUERY = '(max-width: 1000px)';
 
 /** The conversation's menu (ⓘ): details, history, the chat options and apps as submenus. */
 function openInfoMenu(anchor) {

@@ -215,3 +215,16 @@ body.imessage #qr--bar > .qr--buttons .qr--button:hover {
     background: var(--imsg-blue);
     color: #ffffff;
 }
+
+/* Dropping a file on the message box: a soft blue highlight instead of the app's pulsing border */
+body.imessage #form_sheld.dragover {
+    animation: none;
+    filter: none;
+    outline: none;
+    border: none;
+}
+
+body.imessage #form_sheld.dragover #send_form {
+    background: color-mix(in srgb, var(--imsg-blue) 10%, var(--imsg-field));
+    box-shadow: inset 0 0 0 1.5px var(--imsg-blue), 0 0 0 4px var(--imsg-focus);
+}
