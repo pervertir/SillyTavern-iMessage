@@ -1,0 +1,718 @@
+/* The conversation: the "To:" header, then Messages bubbles. Theirs are grey on the left, yours
+   blue on the right; a run from the same sender sits close together with the tail on its last
+   bubble (messages.js marks .imsg-first / .imsg-last), a centered time line starts each stretch,
+   and "Delivered" / "Read" sits under your last message. */
+
+/* Header */
+body.imessage #imsg-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+    height: var(--imsg-bar-h);
+    padding: 0 12px 0 20px;
+    box-sizing: border-box;
+    background: var(--imsg-window);
+    border-bottom: 1px solid var(--imsg-line);
+    user-select: none;
+}
+
+body.imessage #imsg-head .imsg-back,
+body.imessage #imsg-head .imsg-avatar {
+    display: none;
+}
+
+/* with the sidebar hidden, the header gets the button back to it */
+body.imessage #imsg-head .imsg-show-side {
+    display: none;
+}
+
+body.imessage.imsg-side-hidden #imsg-head .imsg-show-side {
+    display: inline-flex;
+}
+
+body.imessage .imsg-head-who {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    padding: 4px 0;
+    margin: 0;
+    border: none;
+    background: none;
+    color: var(--imsg-fg);
+    font: inherit;
+    text-align: left;
+    cursor: default;
+}
+
+body.imessage .imsg-head-to {
+    color: var(--imsg-fg-2);
+    font-size: var(--imsg-text);
+}
+
+body.imessage .imsg-head-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--imsg-text);
+    line-height: 18px;
+}
+
+body.imessage .imsg-head-actions {
+    display: flex;
+    gap: 2px;
+    --imsg-sym-size: 19px;
+}
+
+body.imessage .imsg-head-actions .imsg-sym-button {
+    width: 34px;
+}
+
+/* No conversation open */
+body.imessage.imsg-no-chat #imsg-head,
+body.imessage.imsg-no-chat #chat,
+body.imessage.imsg-no-chat #form_sheld {
+    display: none;
+}
+
+body.imessage.imsg-no-chat #imsg-empty {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    background: var(--imsg-window);
+}
+
+body.imessage #imsg-empty p {
+    margin: 0;
+    color: var(--imsg-fg-3);
+    font-size: 20px;
+    font-weight: 500;
+}
+
+/* Message area */
+body.imessage #chat {
+    max-height: none;
+    padding: 10px 0 12px;
+    background: var(--imsg-window);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    text-shadow: none;
+    scroll-padding-top: 16px;
+    --imsg-av: 0px;
+    --imsg-av-gap: 0px;
+    --imsg-room: 28%;
+}
+
+body.imessage.imsg-group #chat {
+    --imsg-av: 28px;
+    --imsg-av-gap: 8px;
+}
+
+body.imessage #chat .mes {
+    display: grid;
+    grid-template-columns: var(--imsg-av) minmax(0, max-content) minmax(var(--imsg-room), 1fr);
+    grid-template-areas:
+        "stamp stamp stamp"
+        "avatar bubble ."
+        ". swipes ."
+        ". receipt .";
+    column-gap: var(--imsg-av-gap);
+    align-items: end;
+    padding: 1px 16px;
+    margin: 0;
+    box-sizing: border-box;
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    color: var(--imsg-fg);
+    font-family: var(--imsg-font);
+}
+
+body.imessage #chat .mes.imsg-first {
+    padding-top: 8px;
+}
+
+body.imessage #chat .mes[is_user="true"] {
+    grid-template-columns: minmax(var(--imsg-room), 1fr) minmax(0, max-content);
+    grid-template-areas:
+        "stamp stamp"
+        ". bubble"
+        ". swipes"
+        ". receipt";
+}
+
+/* the time line above a stretch of conversation */
+body.imessage #chat .mes[data-imsg-stamp]::before {
+    content: attr(data-imsg-stamp);
+    grid-area: stamp;
+    justify-self: center;
+    margin: 10px 0 8px;
+    color: var(--imsg-label);
+    font-size: var(--imsg-text-xs);
+    line-height: 13px;
+    font-weight: 500;
+}
+
+/* Delivered / Read under your last message */
+body.imessage.imsg-receipts #chat .mes[data-imsg-receipt]::after {
+    content: attr(data-imsg-receipt);
+    grid-area: receipt;
+    justify-self: end;
+    margin: 2px 4px 0 0;
+    color: var(--imsg-label);
+    font-size: var(--imsg-text-xs);
+    line-height: 13px;
+    font-weight: 500;
+}
+
+/* Pictures: none in a one-on-one conversation; in a group, a small one beside the last bubble of a run */
+body.imessage #chat .mes .mesAvatarWrapper {
+    grid-area: avatar;
+    display: none;
+    padding: 0;
+    margin: 0;
+}
+
+body.imessage.imsg-group #chat .mes:not([is_user="true"]):not(.imsg-sys) .mesAvatarWrapper {
+    display: block;
+    visibility: hidden;
+}
+
+body.imessage.imsg-group #chat .mes.imsg-last:not([is_user="true"]):not(.imsg-sys) .mesAvatarWrapper {
+    visibility: visible;
+}
+
+body.imessage #chat .mes .mesAvatarWrapper > :not(.avatar) {
+    display: none;
+}
+
+body.imessage #chat .mes .avatar,
+body.imessage.big-avatars #chat .mes .avatar,
+body.imessage.square-avatars #chat .mes .avatar,
+body.imessage.rounded-avatars #chat .mes .avatar {
+    width: var(--imsg-av);
+    height: var(--imsg-av);
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: none;
+    border: none;
+    container-type: inline-size;
+}
+
+body.imessage #chat .mes .avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top center;
+    box-shadow: none;
+    border: none;
+}
+
+body.imessage.hideChatAvatars.imsg-group #chat {
+    --imsg-av: 0px;
+    --imsg-av-gap: 0px;
+}
+
+/* The bubble */
+body.imessage #chat .mes .mes_block {
+    grid-area: bubble;
+    position: relative;
+    z-index: 0;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+    padding: 7px 12px 8px;
+    margin: 0;
+    box-sizing: border-box;
+    border-radius: var(--imsg-bubble-radius);
+    background: var(--imsg-bubble-in);
+    color: var(--imsg-bubble-in-fg);
+    overflow: visible;
+    --imsg-bubble: var(--imsg-bubble-in);
+}
+
+body.imessage #chat .mes[is_user="true"] .mes_block {
+    background: var(--imsg-bubble-out);
+    color: var(--imsg-bubble-out-fg);
+    --imsg-bubble: var(--imsg-bubble-out);
+}
+
+/* The tail: a curl of bubble color, trimmed by a curl of window color */
+body.imessage #chat .mes.imsg-last:not(.imsg-sys) .mes_block::before,
+body.imessage #chat .mes.imsg-last:not(.imsg-sys) .mes_block::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    height: 20px;
+    z-index: -1;
+}
+
+body.imessage #chat .mes.imsg-last:not(.imsg-sys) .mes_block::before {
+    left: -7px;
+    width: 20px;
+    background: var(--imsg-bubble);
+    border-bottom-right-radius: 16px 14px;
+}
+
+body.imessage #chat .mes.imsg-last:not(.imsg-sys) .mes_block::after {
+    left: -10px;
+    width: 10px;
+    background: var(--imsg-window);
+    border-bottom-right-radius: 10px;
+}
+
+body.imessage #chat .mes.imsg-last[is_user="true"] .mes_block::before {
+    left: auto;
+    right: -7px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 16px 14px;
+}
+
+body.imessage #chat .mes.imsg-last[is_user="true"] .mes_block::after {
+    left: auto;
+    right: -10px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 10px;
+}
+
+/* Name line, time and actions live outside the bubble: the name over a group run's first bubble */
+body.imessage #chat .mes .ch_name {
+    position: absolute;
+    left: 12px;
+    right: 0;
+    bottom: 100%;
+    display: flex;
+    align-items: flex-end;
+    min-height: 0;
+    margin: 0;
+    font-weight: 400;
+    pointer-events: none;
+}
+
+body.imessage #chat .mes .ch_name > * {
+    pointer-events: auto;
+}
+
+body.imessage #chat .mes .ch_name .timestamp,
+body.imessage #chat .mes .ch_name .mes_ghost {
+    display: none;
+}
+
+body.imessage #chat .mes .name_text {
+    display: none;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-bottom: 2px;
+    color: var(--imsg-label);
+    font-size: var(--imsg-text-xs);
+    line-height: 13px;
+    font-weight: 400;
+}
+
+body.imessage.imsg-group #chat .mes.imsg-first:not([is_user="true"]) .name_text {
+    display: block;
+}
+
+/* room for the name between the time line and the bubble */
+body.imessage.imsg-group #chat .mes.imsg-first:not([is_user="true"], .imsg-sys) .mes_block {
+    margin-top: 15px;
+}
+
+/* a hidden-from-the-AI message is faded, as an unsent draft */
+body.imessage #chat .mes[is_system="true"]:not(.smallSysMes) .mes_block {
+    opacity: 0.55;
+}
+
+/* Message text */
+body.imessage #chat .mes .mes_text {
+    padding: 0;
+    margin: 0;
+    color: inherit;
+    font-family: var(--imsg-font);
+    font-size: var(--imsg-text-bubble);
+    line-height: 19px;
+    font-weight: 400;
+    letter-spacing: -0.005em;
+    overflow-wrap: anywhere;
+    text-shadow: none;
+}
+
+body.imessage #chat .mes .mes_text :is(p, li, span, font) {
+    color: inherit;
+}
+
+body.imessage #chat .mes .mes_text p {
+    margin: 0 0 8px;
+}
+
+body.imessage #chat .mes .mes_text p:last-child {
+    margin-bottom: 0;
+}
+
+body.imessage #chat .mes .mes_text :is(em, i) {
+    color: inherit;
+    opacity: 0.75;
+}
+
+body.imessage #chat .mes .mes_text :is(q, q *, strong, b, u) {
+    color: inherit;
+}
+
+body.imessage #chat .mes .mes_text a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+body.imessage #chat .mes .mes_text blockquote {
+    margin: 4px 0 8px;
+    padding: 0 0 0 10px;
+    border-left: 2px solid currentColor;
+    opacity: 0.85;
+}
+
+body.imessage #chat .mes .mes_text code {
+    padding: 1px 4px;
+    border-radius: 4px;
+    background: rgba(127, 127, 127, 0.18);
+    color: inherit;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12.5px;
+}
+
+body.imessage #chat .mes .mes_text pre {
+    margin: 4px 0 8px;
+    border-radius: var(--imsg-radius-md);
+    background: rgba(127, 127, 127, 0.15);
+    overflow-x: auto;
+}
+
+body.imessage #chat .mes .mes_text pre code {
+    display: block;
+    padding: 8px 10px;
+    background: none;
+}
+
+body.imessage #chat .mes .mes_text hr {
+    border-color: currentColor;
+    opacity: 0.3;
+}
+
+body.imessage #chat .mes .mes_text img {
+    border-radius: 12px;
+}
+
+body.imessage #chat .mes .mes_reasoning_details {
+    margin: 0 0 6px;
+    padding: 4px 8px;
+    border-radius: 10px;
+    background: rgba(127, 127, 127, 0.15);
+    color: inherit;
+}
+
+body.imessage #chat .mes :is(.mes_reasoning, .mes_reasoning_header_title, .mes_reasoning_arrow) {
+    color: inherit;
+    font-size: var(--imsg-text-sm);
+    opacity: 0.8;
+}
+
+/* A reply being streamed in starts empty: it shows the typing dots until words arrive */
+body.imessage.imsg-typing-on.imsg-generating #chat .mes.last_mes:not([is_user="true"]) .mes_text:empty::before {
+    content: '';
+    display: block;
+    width: 34px;
+    height: 19px;
+    background:
+        radial-gradient(circle, currentColor 3.6px, transparent 4px) 0 50% / 12px 12px no-repeat,
+        radial-gradient(circle, currentColor 3.6px, transparent 4px) 11px 50% / 12px 12px no-repeat,
+        radial-gradient(circle, currentColor 3.6px, transparent 4px) 22px 50% / 12px 12px no-repeat;
+    opacity: 0.35;
+    animation: imsg-pulse 1.2s ease-in-out infinite;
+}
+
+/* The typing bubble while a reply is on its way (messages.js) */
+body.imessage.imsg-typing-on #imsg-typing:not([hidden]):last-child {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: max-content;
+    height: 36px;
+    margin: 8px 0 4px calc(16px + var(--imsg-av) + var(--imsg-av-gap));
+    padding: 0 13px;
+    box-sizing: border-box;
+    border-radius: var(--imsg-bubble-radius);
+    background: var(--imsg-bubble-in);
+}
+
+/* its two little thought-bubble circles */
+body.imessage #imsg-typing::before,
+body.imessage #imsg-typing::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: var(--imsg-bubble-in);
+}
+
+body.imessage #imsg-typing::before {
+    left: -2px;
+    bottom: -2px;
+    width: 12px;
+    height: 12px;
+}
+
+body.imessage #imsg-typing::after {
+    left: -7px;
+    bottom: -7px;
+    width: 6px;
+    height: 6px;
+}
+
+body.imessage #imsg-typing span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--imsg-bubble-in-fg);
+    opacity: 0.3;
+    animation: imsg-dot 1.2s ease-in-out infinite;
+}
+
+body.imessage #imsg-typing span:nth-child(2) { animation-delay: 0.2s; }
+body.imessage #imsg-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes imsg-dot {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30% { opacity: 0.65; transform: translateY(-1px); }
+}
+
+@keyframes imsg-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+body.imessage.reduced-motion #imsg-typing span,
+body.imessage.reduced-motion #chat .mes_text:empty::before {
+    animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.imessage #imsg-typing span,
+    body.imessage #chat .mes_text:empty::before {
+        animation: none;
+    }
+}
+
+/* Message actions: a tapback-style bar over the bubble while the pointer is on it */
+body.imessage #chat .mes .mes_buttons {
+    position: absolute;
+    left: -12px;
+    bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 30px;
+    margin: 0;
+    padding: 0 4px;
+    box-sizing: border-box;
+    border-radius: 15px;
+    background: var(--imsg-menu);
+    box-shadow: var(--imsg-shadow-menu);
+    backdrop-filter: blur(30px) saturate(1.8);
+    -webkit-backdrop-filter: blur(30px) saturate(1.8);
+    opacity: 0;
+    pointer-events: none;
+    overflow: visible;
+    transition: opacity 0.12s var(--imsg-ease);
+    z-index: 5;
+}
+
+body.imessage #chat .mes[is_user="true"] .mes_buttons {
+    left: auto;
+    right: 0;
+}
+
+body.imessage #chat .mes:hover .mes_buttons,
+body.imessage #chat .mes:focus-within .mes_buttons {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+body.imessage #chat .mes .extraMesButtons {
+    gap: 0;
+    padding: 0;
+}
+
+body.imessage #chat .mes .mes_button,
+body.imessage #chat .mes .extraMesButtons > div {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border-radius: 13px;
+    font-size: 13px;
+    color: var(--imsg-fg-2);
+    opacity: 1;
+    filter: none;
+}
+
+body.imessage #chat .mes .mes_button:hover,
+body.imessage #chat .mes .extraMesButtons > div:hover {
+    background: var(--imsg-hover);
+    color: var(--imsg-blue);
+}
+
+body.imessage #chat .mes .mes_edit_buttons {
+    gap: 4px;
+    margin: 0 0 6px auto;
+    padding: 0;
+    filter: none;
+}
+
+body.imessage #chat .mes .mes_edit_buttons .menu_button {
+    width: 26px;
+    height: 26px;
+    margin: 0;
+    opacity: 1;
+    font-size: 12px;
+}
+
+body.imessage #chat .mes .edit_textarea {
+    min-width: min(480px, 60vw);
+    padding: 6px 8px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #000000;
+    font-family: var(--imsg-font);
+    font-size: var(--imsg-text-bubble);
+    line-height: 19px;
+}
+
+body.imessage.imsg-dark #chat .mes .edit_textarea {
+    background: rgba(0, 0, 0, 0.35);
+    color: #ffffff;
+}
+
+/* Swipes: "‹ 1/3 ›" under the last reply */
+body.imessage #chat .mes .swipe_left,
+body.imessage #chat .mes .swipeRightBlock {
+    grid-area: swipes;
+    position: static;
+    align-self: center;
+    justify-self: start;
+    margin-top: 3px;
+    pointer-events: auto;
+}
+
+body.imessage #chat .mes .swipeRightBlock {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 2px;
+    margin-left: 22px;
+}
+
+body.imessage #chat .mes .swipe_left,
+body.imessage #chat .mes .swipe_right {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    color: var(--imsg-label);
+    font-size: 11px;
+    opacity: 1;
+    filter: none;
+    text-shadow: none;
+}
+
+body.imessage #chat .mes .swipe_left:hover,
+body.imessage #chat .mes .swipe_right:hover {
+    background: var(--imsg-hover);
+    color: var(--imsg-blue);
+}
+
+body.imessage #chat .mes .swipes-counter {
+    opacity: 1;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    color: var(--imsg-label);
+    font-size: var(--imsg-text-xs);
+    line-height: 13px;
+    font-weight: 500;
+}
+
+body.imessage #chat .mes[is_user="true"] .swipe_left,
+body.imessage #chat .mes[is_user="true"] .swipeRightBlock {
+    justify-self: end;
+}
+
+/* only the last message swipes, unless Swipe All Messages is on */
+body.imessage:not(.swipeAllMessages) #chat .mes:not(.last_mes) .swipe_left,
+body.imessage:not(.swipeAllMessages) #chat .mes:not(.last_mes) .swipeRightBlock {
+    display: none;
+}
+
+/* Delete mode checkboxes */
+body.imessage #chat .mes .del_checkbox {
+    grid-area: bubble;
+    justify-self: start;
+    align-self: center;
+    margin: 0 0 0 -28px;
+    z-index: 3;
+}
+
+body.imessage #chat .mes .for_checkbox {
+    display: none;
+}
+
+/* System notes: a quiet centered line, like Messages' "Name named the conversation" */
+body.imessage #chat .mes.smallSysMes,
+body.imessage #chat .mes.imsg-sys {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "stamp" "bubble" "swipes" "receipt";
+    padding: 6px 24px;
+}
+
+body.imessage #chat .mes.imsg-sys :is(.mesAvatarWrapper, .ch_name .name_text, .swipe_left, .swipeRightBlock) {
+    display: none;
+}
+
+body.imessage #chat .mes.imsg-sys .mes_block {
+    justify-self: center;
+    max-width: 640px;
+    padding: 0;
+    background: none;
+    color: var(--imsg-label);
+    text-align: center;
+    opacity: 1;
+}
+
+body.imessage #chat .mes.imsg-sys .mes_text {
+    font-size: var(--imsg-text-xs);
+    line-height: 14px;
+    font-weight: 500;
+}
+
+/* The app's chat display modes all take the Messages look */
+body.imessage:is(.bubblechat, .documentstyle) #chat .mes {
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+body.imessage.documentstyle #chat .mes .mes_text {
+    padding: 0;
+}
+
+body.imessage #chat {
+    border: none;
+    box-shadow: none;
+}

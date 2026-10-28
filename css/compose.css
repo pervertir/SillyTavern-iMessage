@@ -1,0 +1,202 @@
+/* The message box: the + (chat options) and emoji (extensions) buttons on the left, then the
+   rounded "iMessage" field with the blue send arrow inside it once there's something to send. */
+
+body.imessage #form_sheld {
+    width: auto;
+    margin: 0;
+    padding: 6px 16px 14px;
+    box-sizing: border-box;
+    background: var(--imsg-window);
+    white-space: normal;
+}
+
+body.imessage #send_form,
+body.imessage #send_form.no-connection {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    /* the app forces its tint here with !important while No Blur is on */
+    background: none !important;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+body.imessage #nonQRFormItems {
+    display: flex;
+    align-items: stretch;
+    column-gap: 0;
+    padding: 0;
+    font-size: 16px;
+}
+
+body.imessage #leftSendForm {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: auto;
+    padding: 0 8px 3px 0;
+}
+
+body.imessage #leftSendForm > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin: 0;
+    padding: 0;
+    border-radius: 50%;
+    color: var(--imsg-fg-2);
+    font-size: 0;
+    opacity: 1;
+    filter: none;
+    cursor: default;
+}
+
+body.imessage #leftSendForm > div:hover {
+    color: var(--imsg-fg);
+}
+
+/* the field, drawn across the text box and the buttons beside it */
+body.imessage #send_textarea {
+    flex: 1;
+    min-height: 34px;
+    height: 34px;
+    max-height: 40dvh;
+    margin: 0;
+    padding: 7px 4px 7px 14px;
+    box-sizing: border-box;
+    border: 1px solid var(--imsg-field-line);
+    border-right: none;
+    border-radius: 17px 0 0 17px;
+    background: var(--imsg-window);
+    color: var(--imsg-fg);
+    font-family: var(--imsg-font);
+    font-size: var(--imsg-text-bubble);
+    line-height: 19px;
+    text-align: start;
+    text-shadow: none;
+    resize: none;
+    box-shadow: none;
+    outline: none;
+}
+
+body.imessage #send_textarea::placeholder {
+    color: var(--imsg-fg-3) !important;
+    opacity: 1;
+    text-align: start;
+}
+
+/* no focus ring around the box, as in Messages */
+body.imessage #send_form:has(#send_textarea:focus-visible) {
+    border: none;
+    outline: none;
+}
+
+body.imessage #rightSendForm {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    min-width: 18px;
+    height: auto;
+    margin: 0;
+    padding: 0 3px 3px 0;
+    box-sizing: border-box;
+    border: 1px solid var(--imsg-field-line);
+    border-left: none;
+    border-radius: 0 17px 17px 0;
+    background: var(--imsg-window);
+}
+
+body.imessage #rightSendForm > div:not(.mes_stop, .stscript_btn) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    margin: 0;
+    padding: 0;
+    border-radius: 50%;
+    color: var(--imsg-fg-2);
+    font-size: 13px;
+    opacity: 1;
+    filter: none;
+    cursor: default;
+}
+
+body.imessage #rightSendForm > div:hover {
+    color: var(--imsg-fg);
+}
+
+/* Messages' glyphs on the app's buttons */
+body.imessage :is(#options_button, #extensionsMenuButton, #send_but, #mes_stop)::before {
+    content: '';
+    display: block;
+    width: var(--imsg-glyph-size, 20px);
+    height: var(--imsg-glyph-size, 20px);
+    background-color: currentColor;
+    -webkit-mask: var(--imsg-glyph) center / contain no-repeat;
+    mask: var(--imsg-glyph) center / contain no-repeat;
+}
+
+body.imessage #mes_stop > i {
+    display: none;
+}
+
+/* + in a grey disc, as the apps button beside the field */
+body.imessage #options_button {
+    background: var(--imsg-search);
+    --imsg-glyph: var(--imsg-sym-plus);
+    --imsg-glyph-size: 16px;
+}
+
+body.imessage #extensionsMenuButton {
+    --imsg-glyph: var(--imsg-sym-emoji);
+    --imsg-glyph-size: 22px;
+}
+
+/* Send: the blue arrow in a disc, only while there's text to send */
+body.imessage #rightSendForm > #send_but {
+    color: var(--imsg-blue);
+    --imsg-glyph: var(--imsg-sym-send);
+    --imsg-glyph-size: 26px;
+}
+
+body.imessage #send_textarea:placeholder-shown ~ #rightSendForm > #send_but {
+    display: none;
+}
+
+body.imessage #rightSendForm > #mes_stop {
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    place-self: end;
+    opacity: 1;
+    color: var(--imsg-fg-2);
+    --imsg-glyph: var(--imsg-sym-stop);
+    --imsg-glyph-size: 24px;
+}
+
+body.imessage #file_form {
+    padding: 0 0 8px 72px;
+}
+
+body.imessage #file_form .file_attached {
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: var(--imsg-radius-lg);
+    background: var(--imsg-bubble-in);
+    color: var(--imsg-bubble-in-fg);
+    font-size: var(--imsg-text-sm);
+}
+
+/* Delete-messages bar */
+body.imessage #dialogue_del_mes {
+    gap: 8px;
+    padding: 0 0 8px;
+}

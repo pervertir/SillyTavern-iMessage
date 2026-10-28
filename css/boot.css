@@ -1,0 +1,74 @@
+/* Loading: a plain window-colored page, the way a Mac app opens, in place of the app's splash.
+   index.js sets body.imsg-booting as soon as the theme's code loads and lifts it once the
+   Messages window has drawn, so the old layout never shows while loading. */
+
+body:is(.imessage, .imsg-booting) {
+    --imsg-boot-bg: #ffffff;
+}
+
+body:is(.imessage, .imsg-booting).imsg-dark {
+    --imsg-boot-bg: #1e1e1e;
+}
+
+body:is(.imessage, .imsg-booting) #preloader {
+    background: var(--imsg-boot-bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+body:is(.imessage, .imsg-booting) dialog.popup:has(#loader.splash-screen) {
+    position: fixed;
+    inset: 0;
+    width: 100vw !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    max-height: none !important;
+    margin: 0;
+    padding: 0;
+    border: none !important;
+    border-radius: 0;
+    outline: none;
+    background: var(--imsg-boot-bg) !important;
+    box-shadow: none;
+}
+
+body:is(.imessage, .imsg-booting) dialog.popup:has(#loader.splash-screen)::backdrop {
+    background: var(--imsg-boot-bg);
+}
+
+body:is(.imessage, .imsg-booting) #loader.splash-screen > * {
+    display: none;
+}
+
+body.imsg-booting::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    background: var(--imsg-boot-bg);
+    pointer-events: none;
+    transition: opacity 0.2s ease-out;
+}
+
+body.imsg-booting.imsg-boot-done::before {
+    opacity: 0;
+}
+
+/* Other loading moments: the macOS spinner in place of the gear */
+body.imessage #loader:not(.splash-screen) #load-spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--imsg-line-strong);
+    border-top-color: var(--imsg-fg-2);
+    border-radius: 50%;
+    font-size: 0;
+    animation: imsg-spin 0.9s linear infinite;
+}
+
+body.imessage #loader:not(.splash-screen) #load-spinner::before {
+    content: none;
+}
+
+@keyframes imsg-spin {
+    to { transform: rotate(360deg); }
+}

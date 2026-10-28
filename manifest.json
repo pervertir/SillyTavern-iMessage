@@ -1,0 +1,13 @@
+{
+    "display_name": "iMessage Theme",
+    "description": "Makes SillyTavern look like Messages on a Mac (and on an iPhone): a sidebar of conversations with pinned contacts, blue and grey bubbles with tails, timestamps, Delivered and Read, a typing bubble and the iMessage box, in light or dark.",
+    "loading_order": 10,
+    "minimum_client_version": "1.19.0",
+    "js": "index.js",
+    "css": "style.css",
+    "author": "pervertir",
+    "version": "1.0.0",
+    "license": "MIT",
+    "homepage": "https://github.com/pervertir/SillyTavern-iMessage",
+    "auto_update": true
+}

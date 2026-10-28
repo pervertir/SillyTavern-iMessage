@@ -1,0 +1,45 @@
+<div class="imsg-settings">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b>iMessage Theme</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content">
+            <label class="checkbox_label" for="imsg_enabled">
+                <input id="imsg_enabled" type="checkbox" />
+                <span>Enable theme</span>
+            </label>
+
+            <div class="imsg-setting-row">
+                <label for="imsg_appearance">Appearance</label>
+                <select id="imsg_appearance" class="text_pole">
+                    <option value="system">Auto (follow the system)</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+            </div>
+
+            <label class="checkbox_label" for="imsg_window_buttons">
+                <input id="imsg_window_buttons" type="checkbox" />
+                <span>Show the window buttons (close, minimize, full screen)</span>
+            </label>
+
+            <label class="checkbox_label" for="imsg_receipts">
+                <input id="imsg_receipts" type="checkbox" />
+                <span>Show Delivered and Read</span>
+            </label>
+
+            <label class="checkbox_label" for="imsg_typing">
+                <input id="imsg_typing" type="checkbox" />
+                <span>Show the typing bubble while a reply is written</span>
+            </label>
+
+            <div class="imsg-setting-row">
+                <label for="imsg_recent_max">Conversations in the list</label>
+                <input id="imsg_recent_max" class="text_pole" type="number" min="5" max="500" step="5" />
+            </div>
+
+            <small class="imsg-note">Turn off other UI themes (such as Microsoft Teams, Moonlit Echoes or Yodayo Tavern) while this one is on. The background image is hidden while the theme is on.</small>
+        </div>
+    </div>
+</div>

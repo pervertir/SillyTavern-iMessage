@@ -1,0 +1,367 @@
+/* The app's controls, menus and dialogs as macOS controls: push buttons, rounded fields with the
+   blue focus ring, blue checkboxes, thin sliders, grouped boxes, alerts and notification banners. */
+
+/* Buttons: white push buttons; the dialog's OK button is the blue default button */
+body.imessage .menu_button {
+    min-height: 22px;
+    padding: 3px 10px;
+    margin: 2px;
+    border: none;
+    border-radius: var(--imsg-radius);
+    background: var(--imsg-button);
+    color: var(--imsg-fg);
+    box-shadow: var(--imsg-shadow-button);
+    font-size: var(--imsg-text);
+    line-height: 16px;
+    filter: none;
+    opacity: 1;
+    transition: none;
+}
+
+body.imessage .menu_button:hover {
+    filter: none;
+    background: var(--imsg-button);
+}
+
+body.imessage .menu_button:active {
+    filter: brightness(0.94);
+}
+
+body.imessage .menu_button.toggleEnabled,
+body.imessage .menu_button.active,
+body.imessage .popup .popup-button-ok {
+    background: var(--imsg-blue);
+    color: #ffffff;
+}
+
+body.imessage .menu_button.redWarningBG,
+body.imessage .menu_button.caution {
+    background: var(--imsg-red);
+    color: #ffffff;
+}
+
+/* icon-only buttons are square */
+body.imessage .menu_button:is(.fa-solid, .fa-regular, .fa-brands) {
+    width: 28px;
+    min-width: 28px;
+    height: 24px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+body.imessage .right_menu_button,
+body.imessage .mes_button {
+    color: var(--imsg-fg-2);
+    filter: none;
+}
+
+/* Text fields */
+body.imessage :is(.text_pole, textarea:not(#send_textarea), select, input[type="text"], input[type="number"], input[type="search"], input[type="password"], input[type="url"], input[type="email"]):not(.imsg-search input) {
+    border: none;
+    border-radius: var(--imsg-radius-sm);
+    background: var(--imsg-field);
+    color: var(--imsg-fg);
+    box-shadow: inset 0 0 0 1px var(--imsg-field-line);
+    font-family: var(--imsg-font);
+    font-size: var(--imsg-text);
+    outline: none;
+    transition: box-shadow 0.1s var(--imsg-ease);
+}
+
+body.imessage :is(.text_pole, textarea:not(#send_textarea), select, input[type="text"], input[type="number"], input[type="search"], input[type="password"], input[type="url"], input[type="email"]):not(.imsg-search input):focus {
+    box-shadow: inset 0 0 0 1px var(--imsg-blue), 0 0 0 3px var(--imsg-focus);
+    outline: none;
+}
+
+body.imessage textarea::placeholder,
+body.imessage input::placeholder {
+    color: var(--imsg-fg-3) !important;
+    opacity: 1;
+}
+
+/* Pop-up buttons */
+body.imessage select {
+    padding-right: 24px;
+    background-color: var(--imsg-button);
+    box-shadow: var(--imsg-shadow-button);
+}
+
+/* Checkboxes: blue fill with a white tick */
+body.imessage input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    flex: none;
+    width: 14px;
+    height: 14px;
+    margin: 0 6px 0 0;
+    border: none;
+    border-radius: 3.5px;
+    background: var(--imsg-button);
+    box-shadow: var(--imsg-shadow-button);
+    cursor: default;
+    position: relative;
+    filter: none;
+}
+
+body.imessage input[type="checkbox"]:checked {
+    background: var(--imsg-blue);
+    box-shadow: none;
+}
+
+body.imessage input[type="checkbox"]::before {
+    content: none;
+}
+
+body.imessage input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: #ffffff;
+    -webkit-mask: var(--imsg-sym-check) center / contain no-repeat;
+    mask: var(--imsg-sym-check) center / contain no-repeat;
+}
+
+body.imessage input[type="radio"] {
+    accent-color: var(--imsg-blue);
+}
+
+/* Sliders: a thin track and a round white knob */
+body.imessage input[type="range"] {
+    accent-color: var(--imsg-blue);
+}
+
+body.imessage input[type="range"] {
+    height: 4px;
+    border: none;
+    border-radius: 2px;
+    background: var(--imsg-line-strong);
+    box-shadow: none;
+    filter: none;
+}
+
+/* the app sets its sliders with !important */
+body.imessage .neo-range-slider {
+    height: 4px !important;
+    border: none !important;
+    border-radius: 2px !important;
+    background: var(--imsg-line-strong) !important;
+    box-shadow: none !important;
+}
+
+body.imessage input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body.imessage input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* The app's own version line */
+body.imessage #version_display {
+    display: none;
+}
+
+/* Section headers and grouped boxes, like System Settings */
+body.imessage :is(.drawer-content, .popup) :is(h3, h4, h5) {
+    color: var(--imsg-fg);
+    font-family: var(--imsg-font);
+    font-weight: 600;
+}
+
+body.imessage .standoutHeader,
+body.imessage #user-settings-block h4 {
+    margin: 12px 0 6px;
+    padding: 0 2px;
+    border: none;
+    background: none;
+    box-shadow: none;
+    color: var(--imsg-fg-2);
+    font-size: var(--imsg-text-sm);
+    font-weight: 600;
+}
+
+body.imessage .inline-drawer {
+    border-color: var(--imsg-line);
+}
+
+body.imessage :is(#extensions_settings, #extensions_settings2) .inline-drawer,
+body.imessage .settingsSectionWrap {
+    margin: 0 0 8px;
+    border: 1px solid var(--imsg-line);
+    border-radius: var(--imsg-radius-md);
+    background: var(--imsg-group-bg);
+}
+
+body.imessage :is(#extensions_settings, #extensions_settings2) .inline-drawer-toggle.inline-drawer-header {
+    min-height: 32px;
+    padding: 4px 10px;
+    border: none;
+    background: none;
+}
+
+body.imessage :is(#extensions_settings, #extensions_settings2) .inline-drawer-content {
+    padding: 4px 10px 10px;
+}
+
+body.imessage .inline-drawer-icon {
+    color: var(--imsg-fg-3);
+}
+
+/* Contacts (the character list) */
+body.imessage :is(.character_select, .group_select, .bogus_folder_select) {
+    border-radius: var(--imsg-radius-md);
+}
+
+body.imessage :is(.character_select, .group_select, .bogus_folder_select):hover {
+    background: var(--imsg-hover);
+}
+
+body.imessage :is(.character_select, .group_select).selected {
+    background: var(--imsg-selected);
+    color: #ffffff;
+}
+
+body.imessage #rm_print_characters_block .avatar,
+body.imessage #rm_print_characters_block .avatar img,
+body.imessage #user_avatar_block .avatar,
+body.imessage #user_avatar_block .avatar img {
+    border-radius: 50%;
+    box-shadow: none;
+    border: none;
+}
+
+body.imessage .tag {
+    border: none;
+    border-radius: 10px;
+    background: var(--imsg-search);
+    color: var(--imsg-fg);
+}
+
+/* The ☰ chat options and the extensions menu: macOS menus */
+body.imessage :is(#options, #extensionsMenu) .options-content,
+body.imessage #extensionsMenu,
+body.imessage .list-group {
+    padding: 5px;
+    border: none;
+    border-radius: 10px;
+    background: var(--imsg-menu);
+    color: var(--imsg-fg);
+    box-shadow: var(--imsg-shadow-menu);
+    backdrop-filter: blur(40px) saturate(1.8);
+    -webkit-backdrop-filter: blur(40px) saturate(1.8);
+}
+
+body.imessage :is(#options, #extensionsMenu) :is(a, .list-group-item) {
+    padding: 3px 10px;
+    border: none;
+    border-radius: 4px;
+    color: var(--imsg-fg);
+    font-size: var(--imsg-text);
+    opacity: 1;
+}
+
+body.imessage :is(#options, #extensionsMenu) :is(a, .list-group-item):hover {
+    background: var(--imsg-blue);
+    color: #ffffff;
+}
+
+body.imessage :is(#options, #extensionsMenu) hr {
+    margin: 5px 10px;
+    border-color: var(--imsg-line-strong);
+}
+
+/* Dialogs: macOS alerts and sheets */
+body.imessage dialog.popup:not(:has(#loader.splash-screen)) {
+    border: none;
+    border-radius: var(--imsg-radius-lg);
+    background: var(--imsg-sheet);
+    color: var(--imsg-fg);
+    box-shadow: var(--imsg-shadow-sheet);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+body.imessage dialog.popup::backdrop {
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: none;
+}
+
+body.imessage .popup .popup-controls {
+    gap: 8px;
+}
+
+body.imessage .popup .popup-controls .menu_button {
+    min-width: 72px;
+}
+
+/* Toasts: macOS notification banners in the top right */
+body.imessage #toast-container > div {
+    padding: 12px 14px 12px 50px;
+    border-radius: 14px;
+    background-color: var(--imsg-menu);
+    color: var(--imsg-fg);
+    box-shadow: var(--imsg-shadow-menu);
+    backdrop-filter: blur(40px) saturate(1.8);
+    -webkit-backdrop-filter: blur(40px) saturate(1.8);
+    opacity: 1;
+    font-family: var(--imsg-font);
+    font-size: var(--imsg-text);
+}
+
+body.imessage #toast-container .toast-title {
+    font-weight: 600;
+}
+
+/* Scrollbars: thin overlay-style */
+body.imessage ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+body.imessage ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 6px;
+    background: var(--imsg-fg-3);
+    background-clip: padding-box;
+}
+
+body.imessage ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* The theme's own settings */
+body.imessage .imsg-setting-row,
+.imsg-setting-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 6px 0;
+}
+
+.imsg-setting-row > label {
+    flex: none;
+}
+
+.imsg-setting-row > :is(select, input) {
+    flex: 1;
+}
+
+.imsg-note {
+    display: block;
+    margin-top: 8px;
+    opacity: 0.7;
+}

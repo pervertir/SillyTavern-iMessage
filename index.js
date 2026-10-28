@@ -1,0 +1,201 @@
+// iMessage theme: toggles the scoped styles in style.css, builds the Messages window
+// (sidebar with the conversation list, conversation header) and a small settings panel.
+
+import { initList, markCurrent, scheduleRefresh } from './list.js';
+import { initMessages, refreshMessages } from './messages.js';
+import { initMonograms } from './monograms.js';
+import { refreshTitle, setDisguise } from './disguise.js';
+import { initShell, refreshHeader, refreshPanelTitles } from './shell.js';
+
+const MODULE_NAME = 'iMessageTheme';
+/** Folder path under scripts/extensions/, e.g. third-party/SillyTavern-iMessage */
+const EXTENSION_FOLDER = new URL('.', import.meta.url).pathname
+    .replace(/^.*\/scripts\/extensions\//, '')
+    .replace(/\/$/, '');
+const BODY_CLASS = 'imessage';
+const MOBILE_QUERY = '(max-width: 1000px)';
+
+const defaultSettings = Object.freeze({
+    enabled: true,
+    /** light, dark or system */
+    appearance: 'system',
+    /** The red, yellow and green window buttons at the top of the sidebar */
+    windowButtons: true,
+    /** "Delivered" / "Read" under your last message */
+    receipts: true,
+    /** The three-dot bubble while a reply is being written */
+    typing: true,
+    recentMax: 50,
+});
+
+const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+function getSettings() {
+    const { extensionSettings } = SillyTavern.getContext();
+    if (!extensionSettings[MODULE_NAME]) {
+        extensionSettings[MODULE_NAME] = structuredClone(defaultSettings);
+    }
+    const settings = extensionSettings[MODULE_NAME];
+    for (const key of Object.keys(defaultSettings)) {
+        if (!Object.hasOwn(settings, key)) {
+            settings[key] = structuredClone(defaultSettings[key]);
+        }
+    }
+    return settings;
+}
+
+function saveSettings() {
+    SillyTavern.getContext().saveSettingsDebounced();
+}
+
+function isDark(settings) {
+    return settings.appearance === 'dark' || (settings.appearance === 'system' && darkQuery.matches);
+}
+
+function applySettings() {
+    const settings = getSettings();
+    const body = document.body;
+    const on = !!settings.enabled;
+    body.classList.toggle(BODY_CLASS, on);
+    document.documentElement.classList.toggle('imsg-html', on);
+    body.classList.toggle('imsg-dark', on && isDark(settings));
+    body.classList.toggle('imsg-lights', !!settings.windowButtons);
+    body.classList.toggle('imsg-receipts', !!settings.receipts);
+    body.classList.toggle('imsg-typing-on', !!settings.typing);
+    setDisguise(on);
+    refreshPanelTitles(on);
+}
+
+/** Phones show one pane at a time: the conversation list, or the open conversation. */
+function showChatOnPhone() {
+    if (window.matchMedia(MOBILE_QUERY).matches) {
+        document.body.classList.add('imsg-m-chat');
+    }
+}
+
+function setAppearance(appearance) {
+    const settings = getSettings();
+    settings.appearance = appearance;
+    applySettings();
+    saveSettings();
+    const select = /** @type {HTMLSelectElement} */ (document.getElementById('imsg_appearance'));
+    if (select) {
+        select.value = appearance;
+    }
+}
+
+function onChatChanged(chatId) {
+    refreshHeader();
+    refreshTitle();
+    markCurrent();
+    if (chatId) {
+        showChatOnPhone();
+    } else {
+        document.body.classList.remove('imsg-m-chat');
+    }
+}
+
+async function renderSettingsPanel() {
+    const { renderExtensionTemplateAsync } = SillyTavern.getContext();
+    const html = await renderExtensionTemplateAsync(EXTENSION_FOLDER, 'settings');
+    const container = document.getElementById('extensions_settings2');
+    if (!container || document.querySelector('.imsg-settings')) {
+        return;
+    }
+    container.insertAdjacentHTML('beforeend', html);
+
+    const settings = getSettings();
+    const field = (id) => /** @type {HTMLInputElement} */ (document.getElementById(id));
+    const enabled = field('imsg_enabled');
+    const appearance = /** @type {HTMLSelectElement} */ (document.getElementById('imsg_appearance'));
+    const windowButtons = field('imsg_window_buttons');
+    const receipts = field('imsg_receipts');
+    const typing = field('imsg_typing');
+    const recentMax = field('imsg_recent_max');
+
+    enabled.checked = settings.enabled;
+    appearance.value = settings.appearance;
+    windowButtons.checked = settings.windowButtons;
+    receipts.checked = settings.receipts;
+    typing.checked = settings.typing;
+    recentMax.value = String(settings.recentMax);
+
+    const bind = (element, key, read, after) => {
+        element.addEventListener('input', () => {
+            settings[key] = read();
+            applySettings();
+            saveSettings();
+            after?.();
+        });
+    };
+    bind(enabled, 'enabled', () => enabled.checked, () => refreshMessages());
+    bind(appearance, 'appearance', () => appearance.value);
+    bind(windowButtons, 'windowButtons', () => windowButtons.checked);
+    bind(receipts, 'receipts', () => receipts.checked);
+    bind(typing, 'typing', () => typing.checked);
+    bind(recentMax, 'recentMax', () => Math.min(500, Math.max(5, Number(recentMax.value) || defaultSettings.recentMax)), () => scheduleRefresh());
+}
+
+async function init() {
+    applySettings();
+    darkQuery.addEventListener('change', applySettings);
+
+    initShell({
+        setAppearance,
+        isDark: () => document.body.classList.contains('imsg-dark'),
+    });
+    const listLoaded = initList({ settings: getSettings, opened: showChatOnPhone });
+    initMessages();
+    initMonograms();
+    applySettings();
+
+    const { eventSource, eventTypes } = SillyTavern.getContext();
+    eventSource.on(eventTypes.CHAT_CHANGED, onChatChanged);
+    eventSource.on(eventTypes.GROUP_UPDATED, refreshHeader);
+    eventSource.on(eventTypes.CHARACTER_EDITED, refreshHeader);
+    eventSource.on(eventTypes.CHARACTER_RENAMED, refreshHeader);
+    eventSource.on(eventTypes.CHARACTER_RENAMED, refreshTitle);
+    eventSource.on(eventTypes.GROUP_UPDATED, refreshTitle);
+    onChatChanged(SillyTavern.getContext().getCurrentChatId());
+    await Promise.race([listLoaded, delay(3000)]);
+    endBoot();
+
+    try {
+        await renderSettingsPanel();
+    } catch (error) {
+        console.error('[iMessage] Could not render the settings panel', error);
+    }
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/** Lifts the blank loading cover once the Messages window has painted. */
+function endBoot() {
+    const body = document.body;
+    if (!body.classList.contains('imsg-booting')) {
+        return;
+    }
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        body.classList.add('imsg-boot-done');
+        setTimeout(() => body.classList.remove('imsg-booting', 'imsg-boot-done'), 250);
+    }));
+}
+
+/** A plain window-colored cover from the moment this code loads, as a Mac app opens. */
+function bootLook() {
+    const settings = SillyTavern.getContext().extensionSettings?.[MODULE_NAME];
+    if (settings?.enabled === false) {
+        return;
+    }
+    document.body.classList.add('imsg-booting');
+    // never leave the cover up if something fails on the way
+    setTimeout(endBoot, 20000);
+    document.body.classList.toggle('imsg-dark', isDark({ ...defaultSettings, ...settings }));
+}
+
+bootLook();
+
+const { eventSource, eventTypes } = SillyTavern.getContext();
+eventSource.on(eventTypes.APP_READY, init);
