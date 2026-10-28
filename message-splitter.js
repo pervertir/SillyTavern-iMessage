@@ -5,7 +5,7 @@
 //   splitMessage(text, options?) => string[]
 //
 // Each part is valid markdown on its own: nothing is cut inside *…*, **…**, _…_, `code`,
-// code fences, quotes ("…", “…”, '…', «…», 「…」), lists, tables, headings or blockquotes.
+// code fences, ||spoilers||, quotes ("…", “…”, '…', «…», 「…」), lists, tables, headings or blockquotes.
 // Paragraphs (blank lines) always start a new part. Inside a paragraph, a part ends after
 // . ! ? … (and runs like ?! !!! ...) or 。！？, never after abbreviations (Mr. e.g. etc.),
 // initials (J. R. R.), decimals, URLs or e-mails, nor an ellipsis that runs on in lower case.
@@ -199,6 +199,21 @@ function toSentences(text) {
             continue;
         }
         if (top === '`') {
+            continue;
+        }
+
+        // ||spoilers|| stay whole (an opening || counts only if it's closed later)
+        if (char === '|' && text[i + 1] === '|') {
+            if (top === '||') {
+                stack.pop();
+                i++;
+                if (!stack.length && endedInside && canEndAfterCloser(text, i + 1)) {
+                    cut(i + 1);
+                }
+            } else if (text.indexOf('||', i + 2) !== -1) {
+                stack.push('||');
+                i++;
+            }
             continue;
         }
 
