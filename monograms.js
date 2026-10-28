@@ -58,7 +58,9 @@ export function isPlaceholder(src) {
 
 /** Initials the way Contacts shows them: first and last word, or one letter for a single word. */
 export function getInitials(name) {
-    const words = String(name ?? '').trim().split(/\s+/).filter(Boolean);
+    // letters and digits only, so "[Unnamed Persona]" gives UP, not [P
+    const words = String(name ?? '').replace(/[^\p{L}\p{N}\s'-]/gu, ' ').trim().split(/\s+/)
+        .map(word => word.replace(/^[^\p{L}\p{N}]+/u, '')).filter(Boolean);
     if (!words.length) {
         return '';
     }

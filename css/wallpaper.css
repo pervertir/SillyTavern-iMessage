@@ -50,7 +50,7 @@ body.imessage.imsg-wall #imsg-empty {
 
 /* the time lines, names, receipts and reply counters sit on the picture: give them a small
    frosted pill so they stay readable */
-body.imessage.imsg-wall #chat .mes[data-imsg-stamp]::before,
+body.imessage.imsg-wall #chat .mes > .imsg-stamp,
 body.imessage.imsg-wall.imsg-receipts #chat .mes[data-imsg-receipt]::after,
 body.imessage.imsg-wall #chat .mes .name_text,
 body.imessage.imsg-wall #chat .mes .swipeRightBlock {

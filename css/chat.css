@@ -146,15 +146,19 @@ body.imessage #chat .mes[is_user="true"] {
 }
 
 /* the time line above a stretch of conversation */
-body.imessage #chat .mes[data-imsg-stamp]::before {
-    content: attr(data-imsg-stamp);
+body.imessage #chat .mes > .imsg-stamp {
+    display: block;
     grid-area: stamp;
     justify-self: center;
     margin: 10px 0 8px;
     color: var(--imsg-label);
     font-size: var(--imsg-text-xs);
     line-height: 13px;
-    font-weight: 500;
+    font-weight: 400;
+}
+
+body.imessage #chat .mes > .imsg-stamp b {
+    font-weight: 600;
 }
 
 /* Delivered / Read under your last message */
@@ -391,18 +395,203 @@ body.imessage #chat .mes :is(.mes_text, .imsg-part) img {
     border-radius: 12px;
 }
 
+/* A reply's thinking: a quiet "Thought for a moment ›" line at the top of the bubble that opens
+   into the thoughts in smaller grey text */
 body.imessage #chat .mes .mes_reasoning_details {
-    margin: 0 0 6px;
-    padding: 4px 8px;
-    border-radius: 10px;
-    background: rgba(127, 127, 127, 0.15);
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 0 4px;
+    padding: 0;
+    border: none;
+    background: none;
     color: inherit;
 }
 
-body.imessage #chat .mes :is(.mes_reasoning, .mes_reasoning_header_title, .mes_reasoning_arrow) {
+body.imessage #chat .mes .mes_reasoning_details[open] {
+    width: auto;
+}
+
+body.imessage #chat .mes .mes_reasoning_summary {
+    padding: 0;
+    gap: 6px;
+}
+
+body.imessage #chat .mes .mes_reasoning_header {
+    gap: 3px;
+    min-height: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: none;
+    cursor: pointer;
+}
+
+body.imessage #chat .mes :is(.mes_reasoning_header_title, .mes_reasoning_arrow) {
+    position: static;
+    color: inherit;
+    font-size: var(--imsg-text-xs);
+    font-weight: 500;
+    opacity: 0.6;
+}
+
+body.imessage #chat .mes .mes_reasoning_arrow {
+    font-size: 9px;
+    transform: rotate(90deg);
+    transition: transform 0.15s var(--imsg-ease);
+}
+
+body.imessage #chat .mes .mes_reasoning_details[open] .mes_reasoning_arrow {
+    transform: rotate(180deg);
+}
+
+body.imessage #chat .mes .mes_reasoning {
+    margin: 4px 0 6px;
+    padding: 0 0 0 9px;
+    border: none;
+    border-left: 2px solid currentColor;
+    border-radius: 0;
+    background: none;
     color: inherit;
     font-size: var(--imsg-text-sm);
-    opacity: 0.8;
+    line-height: 17px;
+    opacity: 0.65;
+}
+
+/* its edit buttons show only while the pointer is on it */
+body.imessage #chat .mes .mes_reasoning_actions {
+    opacity: 0;
+    --imsg-sym-size: 12px;
+}
+
+body.imessage #chat .mes .mes_reasoning_details:hover .mes_reasoning_actions {
+    opacity: 0.7;
+}
+
+/* split into short bubbles, the thinking line sits above them on its own */
+body.imessage #chat .mes.imsg-split:not(:has(.edit_textarea)) .mes_reasoning_details {
+    margin: 0 0 4px 12px;
+    color: var(--imsg-label);
+}
+
+/* Versions: the "‹ 2/3 ›" counter shows only when there's more than one */
+body.imessage #chat .mes:not(.imsg-versions) .swipes-counter {
+    display: none;
+}
+
+/* Only emoji: big, without a bubble */
+body.imessage #chat .mes.imsg-jumbo:not(:has(.edit_textarea)) .mes_block {
+    padding: 0 2px;
+    background: none;
+}
+
+body.imessage #chat .mes.imsg-jumbo:not(:has(.edit_textarea)) .mes_block::before {
+    display: none;
+}
+
+body.imessage #chat .mes.imsg-jumbo .mes_text {
+    font-size: 46px;
+    line-height: 54px;
+    letter-spacing: 0;
+}
+
+/* Pictures: on their own with rounded corners, the words (if any) in a bubble of their own */
+body.imessage #chat .mes.imsg-media:not(:has(.edit_textarea)) .mes_block {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0;
+    background: none;
+}
+
+body.imessage #chat .mes.imsg-media[is_user="true"]:not(:has(.edit_textarea)) .mes_block {
+    align-items: flex-end;
+}
+
+body.imessage #chat .mes.imsg-media:not(:has(.edit_textarea)) .mes_block::before {
+    display: none;
+}
+
+body.imessage #chat .mes.imsg-media:not(.imsg-split, :has(.edit_textarea)) .mes_block > .mes_text:not(:empty, .inline_media) {
+    width: fit-content;
+    max-width: 100%;
+    padding: 7px 12px 8px;
+    box-sizing: border-box;
+    border-radius: var(--imsg-bubble-radius);
+    background: var(--imsg-bubble);
+}
+
+body.imessage #chat .mes.imsg-media .mes_block > .mes_text:empty {
+    display: none;
+}
+
+body.imessage #chat .mes .mes_media_wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+}
+
+body.imessage #chat .mes .mes_media_container {
+    position: relative;
+    max-width: min(300px, 100%);
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: var(--imsg-bubble-radius);
+    background: none;
+    overflow: hidden;
+}
+
+body.imessage #chat .mes .mes_media_container :is(img, video) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    max-height: 360px;
+    height: auto;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    object-fit: cover;
+    box-shadow: none;
+    cursor: zoom-in;
+}
+
+/* zoom, caption and delete: small frosted buttons on the picture while the pointer is on it */
+body.imessage #chat .mes :is(.mes_img_controls, .mes_video_controls) {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    left: auto;
+    display: flex;
+    gap: 4px;
+    width: auto;
+    padding: 0;
+    opacity: 0;
+    transition: opacity 0.15s var(--imsg-ease);
+    z-index: 1;
+}
+
+body.imessage #chat .mes .mes_media_container:hover :is(.mes_img_controls, .mes_video_controls) {
+    opacity: 1;
+}
+
+body.imessage #chat .mes :is(.mes_img_controls, .mes_video_controls) .right_menu_button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    margin: 0;
+    padding: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #ffffff;
+    font-size: 11px;
+    filter: none;
+    opacity: 1;
 }
 
 /* A reply being streamed in starts as "..." or empty (messages.js marks it .imsg-pending): it
@@ -712,4 +901,25 @@ body.imessage.documentstyle #chat .mes .mes_text {
 body.imessage #chat {
     border: none;
     box-shadow: none;
+}
+
+/* Long lines are hard to read: bubbles stop at a comfortable width on wide windows */
+body.imessage #chat .mes .mes_block {
+    max-width: min(100%, 620px);
+}
+
+body.imessage #chat .mes .mes_reasoning_summary {
+    justify-content: flex-start;
+}
+
+body.imessage #chat .mes :is(.mes_img_controls, .mes_video_controls) {
+    background: none;
+    box-shadow: none;
+}
+
+/* no pointer to hover with: a tap on the picture opens it large instead */
+@media (hover: none) {
+    body.imessage #chat .mes :is(.mes_img_controls, .mes_video_controls) {
+        display: none;
+    }
 }

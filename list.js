@@ -245,7 +245,57 @@ export async function refreshList() {
         return entry;
     }).filter(Boolean);
     entries.sort((a, b) => b.lastMes - a.lastMes);
+    entries = onePerContact(entries);
     render();
+}
+
+/**
+ * Messages lists each person or group once. Older conversations with them are in Conversation
+ * History, so the list keeps the open one for a contact, otherwise the latest.
+ */
+function onePerContact(list) {
+    const byContact = new Map();
+    for (const entry of list) {
+        const contact = entry.group ? `g_${entry.group}` : `c_${entry.avatar}`;
+        const kept = byContact.get(contact);
+        if (!kept) {
+            byContact.set(contact, entry);
+        } else {
+            kept.pinned ||= entry.pinned;
+            if (isCurrent(entry)) {
+                byContact.set(contact, { ...entry, pinned: kept.pinned, lastMes: kept.lastMes });
+            }
+        }
+    }
+    return [...byContact.values()].sort((a, b) => b.lastMes - a.lastMes);
+}
+
+/** Deletes a conversation after asking, like Messages' Delete Conversation. */
+async function deleteEntry(entry) {
+    const context = SillyTavern.getContext();
+    const confirmed = await context.callGenericPopup(
+        `<h3>${t('Delete this conversation?')}</h3><p>${t('This conversation will be deleted. This can\'t be undone.')}</p>`,
+        context.POPUP_TYPE.CONFIRM, '', { okButton: t('Delete'), cancelButton: t('Cancel') });
+    if (!confirmed) {
+        return;
+    }
+    try {
+        if (isCurrent(entry)) {
+            await context.executeSlashCommandsWithOptions('/closechat');
+        }
+        if (entry.group) {
+            const { deleteGroupChatByName } = await import('/scripts/group-chats.js');
+            await deleteGroupChatByName(entry.group, entry.fileId);
+        } else {
+            const { deleteCharacterChatByName } = await import('/script.js');
+            const characterId = context.characters.findIndex(x => x.avatar === entry.avatar);
+            await deleteCharacterChatByName(String(characterId), entry.fileId);
+        }
+    } catch (error) {
+        console.error('[iMessage] Could not delete the conversation', error);
+        toastr.error(t('Could not delete that conversation. See the console for details.'));
+    }
+    scheduleRefresh(200);
 }
 
 /** Refreshes after a pause, so a burst of events costs one request. */
@@ -310,6 +360,8 @@ function openRowMenu(anchor, entry, point) {
     toggleMenu(anchor, [
         { label: 'Open', run: () => openEntry(entry) },
         { label: entry.pinned ? 'Unpin' : 'Pin', run: () => togglePin(entry) },
+        {},
+        { label: 'Delete Conversation…', run: () => deleteEntry(entry), danger: true },
     ], point);
 }
 
@@ -353,7 +405,14 @@ function createSidebar() {
 
     const body = document.createElement('div');
     body.className = 'imsg-list-body';
+    // set when a long press opened the menu, so lifting the finger doesn't open the chat too
+    let pressed = false;
     body.addEventListener('click', (event) => {
+        if (pressed) {
+            pressed = false;
+            event.preventDefault();
+            return;
+        }
         const entry = entryOf(event.target);
         if (entry) {
             openEntry(entry);
@@ -381,7 +440,9 @@ function createSidebar() {
             return;
         }
         const touch = event.touches[0];
+        pressed = false;
         pressTimer = setTimeout(() => {
+            pressed = true;
             openRowMenu(/** @type {HTMLElement} */ (event.target).closest('.imsg-row, .imsg-pin'), entry, { x: touch.clientX, y: touch.clientY });
         }, 500);
     }, { passive: true });

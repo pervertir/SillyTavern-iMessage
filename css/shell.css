@@ -10,7 +10,9 @@
 #imsg-empty,
 #imsg-menu,
 #imsg-typing,
-.imsg-panel-head {
+.imsg-panel-head,
+.imsg-stamp,
+.imsg-dots {
     display: none;
 }
 

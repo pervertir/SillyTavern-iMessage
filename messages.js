@@ -25,22 +25,57 @@ function toMoment(value) {
     return time?.isValid?.() ? time : null;
 }
 
-/** The time line Messages puts above a stretch of conversation. */
+/** The time line Messages puts above a stretch of conversation: a bold day, then the time. */
 export function formatStamp(time) {
     const now = toMoment(Date.now());
     if (time.isSame(now, 'day')) {
-        return `${t('Today')} ${time.format('LT')}`;
+        return { day: t('Today'), time: time.format('LT') };
     }
     if (time.isSame(now.clone().subtract(1, 'day'), 'day')) {
-        return `${t('Yesterday')} ${time.format('LT')}`;
+        return { day: t('Yesterday'), time: time.format('LT') };
     }
     if (now.diff(time, 'days') < 7) {
-        return time.format('dddd LT');
+        return { day: time.format('dddd'), time: time.format('LT') };
     }
     if (time.isSame(now, 'year')) {
-        return time.format('ddd, MMM D [at] LT');
+        return { day: time.format('ddd, MMM D'), time: time.format('[at] LT') };
     }
-    return time.format('ll [at] LT');
+    return { day: time.format('ll'), time: time.format('[at] LT') };
+}
+
+/** Puts the time line at the top of a message, or takes it away. */
+function setStamp(mes, stamp) {
+    let line = mes.querySelector(':scope > .imsg-stamp');
+    if (!stamp) {
+        line?.remove();
+        delete mes.dataset.imsgStamp;
+        return;
+    }
+    const text = `${stamp.day} ${stamp.time}`;
+    mes.dataset.imsgStamp = text;
+    if (line?.dataset.text === text) {
+        return;
+    }
+    if (!line) {
+        line = document.createElement('div');
+        line.className = 'imsg-stamp';
+        mes.prepend(line);
+    }
+    line.dataset.text = text;
+    const day = document.createElement('b');
+    day.textContent = stamp.day;
+    line.replaceChildren(day, ` ${stamp.time}`);
+}
+
+/** Only emoji, three at most: Messages shows them big, without a bubble. */
+function isJumboEmoji(text) {
+    if (typeof text !== 'string' || text.length > 40) {
+        return false;
+    }
+    const compact = text.replace(/\s+/g, '');
+    const count = (compact.match(/\p{Extended_Pictographic}|\p{Regional_Indicator}{2}/gu) || []).length;
+    const rest = compact.replace(/\p{Extended_Pictographic}|\p{Regional_Indicator}|[\u200d\ufe0f\u{1F3FB}-\u{1F3FF}]/gu, '');
+    return count > 0 && count <= 3 && rest === '';
 }
 
 /** Who a message is from, for telling runs apart: you, a named character, or a system note. */
@@ -67,11 +102,7 @@ function markAll() {
     let previous = null;
     for (const row of rows) {
         const gap = !previous || !row.time || !previous.time || row.time.diff(previous.time) > STAMP_GAP_MS;
-        if (gap && row.time) {
-            row.mes.dataset.imsgStamp = formatStamp(row.time);
-        } else {
-            delete row.mes.dataset.imsgStamp;
-        }
+        setStamp(row.mes, gap && row.time ? formatStamp(row.time) : null);
         row.first = !previous || previous.sender !== row.sender || !!row.mes.dataset.imsgStamp;
         if (previous) {
             previous.last = row.first;
@@ -84,6 +115,9 @@ function markAll() {
 
     for (const row of rows) {
         markPending(row.mes, row.message);
+        row.mes.classList.toggle('imsg-versions', (row.message?.swipes?.length ?? 0) > 1);
+        row.mes.classList.toggle('imsg-jumbo', isJumboEmoji(row.message?.mes));
+        row.mes.classList.toggle('imsg-media', !!row.mes.querySelector('.mes_media_wrapper > *'));
     }
 
     let lastYours = null;
@@ -190,6 +224,13 @@ export function initMessages() {
     const chatElement = document.getElementById('chat');
     if (chatElement) {
         new MutationObserver(refreshMessages).observe(chatElement, { childList: true });
+        // a click on a picture opens it large, like its zoom button
+        chatElement.addEventListener('click', (event) => {
+            const target = /** @type {HTMLElement} */ (event.target);
+            if (document.body.classList.contains('imessage') && target.matches?.('.mes_media_container :is(img, video)')) {
+                target.closest('.mes_media_container')?.querySelector('.mes_media_enlarge')?.click();
+            }
+        });
     }
     for (const type of [eventTypes.GENERATION_ENDED, eventTypes.GENERATION_STOPPED, eventTypes.CHAT_CHANGED]) {
         eventSource.on(type, () => {
