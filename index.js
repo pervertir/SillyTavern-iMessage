@@ -9,6 +9,7 @@ import { refreshTitle, setDisguise } from './disguise.js';
 import { initShell, openDrawer, refreshHeader, refreshPanelTitles } from './shell.js';
 import { askToNotify, initAlerts, previewSound } from './alerts.js';
 import { initKeys } from './keys.js';
+import { initFeatures } from './features.js';
 
 const MODULE_NAME = 'iMessageTheme';
 /** Folder path under scripts/extensions/, e.g. third-party/SillyTavern-iMessage */
@@ -214,6 +215,7 @@ async function init() {
     initMonograms();
     initAlerts({ settings: getSettings });
     initKeys();
+    initFeatures();
     applySettings();
 
     const { eventSource, eventTypes } = SillyTavern.getContext();

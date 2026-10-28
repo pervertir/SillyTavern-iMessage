@@ -5,6 +5,7 @@
 // the existing .mes elements; CSS draws them. Long replies split into short bubbles in split.js.
 
 import { splitAll } from './split.js';
+import { decorate } from './features.js';
 
 /** A new time line once this much time has passed between two messages */
 const STAMP_GAP_MS = 60 * 60 * 1000;
@@ -135,6 +136,10 @@ function markAll() {
         lastYours.mes.dataset.imsgReceipt = answered ? t('Read') : t('Delivered');
     }
     splitAll(rows.map((row) => row.mes));
+    // after the split, so a tapback lands on the first short bubble
+    for (const row of rows) {
+        decorate(row.mes, row.message);
+    }
 }
 
 /** A reply that's started but has no words yet ("..." while streaming starts) shows as typing dots. */
