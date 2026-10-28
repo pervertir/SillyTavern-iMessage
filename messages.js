@@ -6,6 +6,7 @@
 
 import { splitAll } from './split.js';
 import { decorate } from './features.js';
+import { showImages } from './images.js';
 
 /** A new time line once this much time has passed between two messages */
 const STAMP_GAP_MS = 60 * 60 * 1000;
@@ -138,6 +139,7 @@ function markAll() {
     splitAll(rows.map((row) => row.mes));
     // after the split, so a tapback lands on the first short bubble
     for (const row of rows) {
+        showImages(row.mes, row.message);
         decorate(row.mes, row.message);
     }
 }

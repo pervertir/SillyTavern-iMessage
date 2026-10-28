@@ -10,6 +10,7 @@ import { initShell, openDrawer, refreshHeader, refreshPanelTitles } from './shel
 import { askToNotify, initAlerts, previewSound } from './alerts.js';
 import { initKeys } from './keys.js';
 import { initFeatures } from './features.js';
+import { initImages } from './images.js';
 
 const MODULE_NAME = 'iMessageTheme';
 /** Folder path under scripts/extensions/, e.g. third-party/SillyTavern-iMessage */
@@ -32,6 +33,8 @@ const defaultSettings = Object.freeze({
     recentMax: 50,
     /** Long replies as several short bubbles, split at the ends of sentences */
     splitReplies: true,
+    /** Image links in messages show as the pictures themselves */
+    imageLinks: true,
     /** The background picked in Backgrounds, behind the conversation */
     wallpaper: false,
     /** Blur on the background, in pixels */
@@ -135,6 +138,7 @@ async function renderSettingsPanel() {
     const typing = field('imsg_typing');
     const recentMax = field('imsg_recent_max');
     const splitReplies = field('imsg_split');
+    const imageLinks = field('imsg_image_links');
     const wallpaper = field('imsg_wallpaper');
     const wallpaperBlur = field('imsg_wallpaper_blur');
     const wallpaperDim = field('imsg_wallpaper_dim');
@@ -156,6 +160,7 @@ async function renderSettingsPanel() {
     typing.checked = settings.typing;
     recentMax.value = String(settings.recentMax);
     splitReplies.checked = settings.splitReplies;
+    imageLinks.checked = settings.imageLinks;
     wallpaper.checked = settings.wallpaper;
     wallpaperBlur.value = String(settings.wallpaperBlur);
     wallpaperDim.value = String(settings.wallpaperDim);
@@ -182,6 +187,8 @@ async function renderSettingsPanel() {
         resetSplits();
         refreshMessages();
     });
+    // turning it off redraws the messages, so the links come back as text
+    bind(imageLinks, 'imageLinks', () => imageLinks.checked, () => SillyTavern.getContext().reloadCurrentChat());
     bind(wallpaper, 'wallpaper', () => wallpaper.checked, showValues);
     bind(wallpaperBlur, 'wallpaperBlur', () => Number(wallpaperBlur.value), showValues);
     bind(wallpaperDim, 'wallpaperDim', () => Number(wallpaperDim.value), showValues);
@@ -216,6 +223,7 @@ async function init() {
     initAlerts({ settings: getSettings });
     initKeys();
     initFeatures();
+    initImages({ settings: getSettings });
     applySettings();
 
     const { eventSource, eventTypes } = SillyTavern.getContext();

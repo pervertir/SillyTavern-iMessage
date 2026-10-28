@@ -228,3 +228,135 @@ body.imessage #form_sheld.dragover #send_form {
     background: color-mix(in srgb, var(--imsg-blue) 10%, var(--imsg-field));
     box-shadow: inset 0 0 0 1.5px var(--imsg-blue), 0 0 0 4px var(--imsg-focus);
 }
+
+/* Pictures from image links: each its own rounded bubble at the picture's own shape */
+body.imessage #chat .mes .imsg-photos {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-width: 100%;
+}
+
+body.imessage #chat .mes[is_user="true"] .imsg-photos {
+    align-items: flex-end;
+}
+
+body.imessage #chat .mes .imsg-photo {
+    display: block;
+    width: fit-content;
+    max-width: min(320px, 100%);
+    min-width: 60px;
+    min-height: 60px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: var(--imsg-bubble-radius);
+    background: var(--imsg-bubble);
+    overflow: hidden;
+    cursor: zoom-in;
+}
+
+body.imessage #chat .mes .imsg-photo.imsg-photo-loaded {
+    min-width: 0;
+    min-height: 0;
+    background: none;
+}
+
+body.imessage #chat .mes .imsg-photo img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 420px;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    object-fit: contain;
+}
+
+body.imessage #chat .mes .imsg-photo:focus-visible {
+    outline: 3px solid var(--imsg-focus);
+    outline-offset: 2px;
+}
+
+/* a picture that couldn't load stays a link, in a bubble */
+body.imessage #chat .mes .imsg-photo-failed {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    padding: 7px 12px 8px;
+    box-sizing: border-box;
+    border-radius: var(--imsg-bubble-radius);
+    background: var(--imsg-bubble);
+    color: inherit;
+    text-decoration: underline;
+    overflow-wrap: anywhere;
+}
+
+body.imessage #chat .mes .imsg-part.imsg-part-empty,
+body.imessage #chat .mes.imsg-photo-only:not(.imsg-split) .mes_block > .mes_text {
+    display: none;
+}
+
+/* the full-size viewer */
+#imsg-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 56px 16px 16px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    animation: imsg-viewer-in 0.18s ease-out;
+}
+
+#imsg-viewer > img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
+#imsg-viewer .imsg-viewer-bar {
+    position: absolute;
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    left: 16px;
+    right: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font: 500 15px/20px -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+}
+
+#imsg-viewer .imsg-viewer-bar :is(a, button) {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    font: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#imsg-viewer .imsg-viewer-bar button {
+    font-weight: 600;
+}
+
+#imsg-viewer .imsg-viewer-bar :is(a, button):hover {
+    background: rgba(255, 255, 255, 0.24);
+}
+
+@keyframes imsg-viewer-in {
+    from { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #imsg-viewer {
+        animation: none;
+    }
+}

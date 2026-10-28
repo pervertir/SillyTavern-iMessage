@@ -1,8 +1,9 @@
 // Keyboard shortcuts, as a Mac app has them (Ctrl in place of ⌘ elsewhere):
-// ⌘F or ⌘K search conversations, ⌥⌘N new message, ⌘, settings, Esc closes the open sheet.
+// ⌘F or ⌘K search conversations, ⌥⌘N new message, ⌃⌘S hide or show the sidebar, ⌘, settings,
+// Esc closes the open sheet.
 // The app's own ↑ (edit your last message) keeps working.
 
-import { closeDrawers, newMessage, openDrawer } from './shell.js';
+import { closeDrawers, newMessage, openDrawer, toggleSidebar } from './shell.js';
 
 function isMac() {
     return /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
@@ -30,6 +31,12 @@ function onKeyDown(event) {
     if (command && event.altKey && event.code === 'KeyN') {
         event.preventDefault();
         newMessage();
+        return;
+    }
+    // ⌃⌘S on a Mac, as in Messages; Ctrl+Shift+S elsewhere
+    if (event.code === 'KeyS' && (isMac() ? event.metaKey && event.ctrlKey : event.ctrlKey && event.shiftKey) && !event.altKey) {
+        event.preventDefault();
+        toggleSidebar();
         return;
     }
     if (command && !event.altKey && key === ',') {

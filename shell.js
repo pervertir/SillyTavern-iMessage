@@ -120,6 +120,12 @@ function appItems() {
 }
 
 /** New Message: pick someone from Contacts. */
+/** Hides or shows the conversation list. With no conversation open there is nothing else to
+ * show, so the list stays. */
+export function toggleSidebar(hide = !document.body.classList.contains('imsg-side-hidden')) {
+    document.body.classList.toggle('imsg-side-hidden', hide && !document.body.classList.contains('imsg-no-chat'));
+}
+
 export function newMessage() {
     openDrawer('rightNavHolder');
     document.getElementById('rm_button_characters')?.click();
@@ -250,7 +256,7 @@ export function buildSidebarToolbar() {
             clickOption('option_close_chat');
             document.body.classList.remove('imsg-m-chat');
         }),
-        light('imsg-light-min', 'Hide sidebar', () => document.body.classList.toggle('imsg-side-hidden')),
+        light('imsg-light-min', 'Hide sidebar', () => toggleSidebar(true)),
         light('imsg-light-full', 'Enter full screen', () => {
             if (document.fullscreenElement) {
                 document.exitFullscreen?.();
@@ -321,7 +327,7 @@ function createHeader() {
     actions.append(video, info);
 
     const showSide = symbolButton('imsg-show-side', 'Show sidebar', 'sidebar');
-    showSide.addEventListener('click', () => document.body.classList.remove('imsg-side-hidden'));
+    showSide.addEventListener('click', () => toggleSidebar(false));
 
     head.append(back, showSide, who, actions);
     sheld.prepend(head);
@@ -394,6 +400,10 @@ export function refreshHeader() {
     const group = context.groupId ? context.groups.find(x => String(x.id) === String(context.groupId)) : null;
     const character = !group && context.characterId !== undefined ? context.characters[context.characterId] : null;
     document.body.classList.toggle('imsg-no-chat', !(group || character));
+    if (!(group || character)) {
+        // closing the conversation brings the list back, so the screen is never empty
+        toggleSidebar(false);
+    }
     document.body.classList.toggle('imsg-group', !!group);
 
     if (group) {

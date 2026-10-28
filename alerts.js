@@ -3,6 +3,8 @@
 // away, and a system notification if you've allowed them. The sounds are made here with Web Audio,
 // so no sound files ship with the theme.
 
+import { imageLabel, withoutImages } from './images.js';
+
 const RECEIVED_SKIP = new Set(['first_message', 'command', 'extension']);
 
 let getSettings = () => ({ sounds: true, soundVolume: 50, notify: false });
@@ -110,7 +112,8 @@ function notify(message, messageId) {
     const { characters, characterId, getThumbnailUrl } = context();
     const character = characters[characterId];
     const avatar = message.force_avatar || (character ? getThumbnailUrl('avatar', character.avatar) : undefined);
-    const body = String(message.mes ?? '').replace(/<[^>]*>/g, '').replace(/[*_~`#>]+/g, '').replace(/\s+/g, ' ').trim().slice(0, 160);
+    const { text, count } = withoutImages(message.mes);
+    const body = (text.replace(/<[^>]*>/g, '').replace(/[*_~`#>]+/g, '').replace(/\s+/g, ' ').trim().slice(0, 160)) || (count ? imageLabel(count) : '');
     try {
         const notification = new Notification(message.name || 'Messages', { body, icon: avatar, tag: `imsg-${messageId}` });
         notification.addEventListener('click', () => {

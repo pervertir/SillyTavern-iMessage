@@ -2,6 +2,7 @@
 // conversation (the same list as the app's welcome screen) with its last message and time.
 // Pins are the app's own pinned chats, so pinning here and on the welcome screen is one list.
 
+import { imageLabel, withoutImages } from './images.js';
 import { monogramizeAll } from './monograms.js';
 import { buildGroupAvatar, buildSidebarToolbar, clickOption, toggleMenu } from './shell.js';
 
@@ -48,13 +49,16 @@ function togglePin(entry) {
 
 /** Plain one-line preview of the last message, without markup. */
 function toPreview(text) {
+    const { text: words, count } = withoutImages(text);
     const div = document.createElement('div');
-    div.innerHTML = SillyTavern.libs.DOMPurify.sanitize(String(text ?? ''), { ALLOWED_TAGS: [] });
-    return (div.textContent || '')
+    div.innerHTML = SillyTavern.libs.DOMPurify.sanitize(words, { ALLOWED_TAGS: [] });
+    const plain = (div.textContent || '')
         .replace(/[*_~`#>]+/g, '')
         .replace(/\s+/g, ' ')
         .trim()
         .slice(0, 200);
+    // a picture with no words reads "Image", as in Messages
+    return plain || (count ? imageLabel(count) : '');
 }
 
 /** A sidebar time: the clock today, Yesterday, the weekday this week, else the short date. */
