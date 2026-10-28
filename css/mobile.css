@@ -310,7 +310,7 @@
         padding: 7px 13px 8px;
     }
 
-    body.imessage #chat .mes .mes_text {
+    body.imessage #chat .mes :is(.mes_text, .imsg-part) {
         line-height: 22px;
         letter-spacing: -0.02em;
     }

@@ -1,0 +1,78 @@
+/* Short messages (split.js): a long reply's own bubble steps aside and each sentence group is a
+   bubble of its own, close together like a run, with the tail on the last one showing. While the
+   message is being edited it goes back to one bubble around the editor. */
+
+body.imessage #chat .mes.imsg-split:not(:has(.edit_textarea)) .mes_block {
+    padding: 0;
+    background: none;
+}
+
+body.imessage #chat .mes.imsg-split:not(:has(.edit_textarea)) .mes_block::before,
+body.imessage #chat .mes.imsg-split:not(:has(.edit_textarea)) .mes_block > .mes_text {
+    display: none;
+}
+
+body.imessage #chat .mes.imsg-split:has(.edit_textarea) .imsg-parts {
+    display: none;
+}
+
+body.imessage #chat .imsg-parts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+body.imessage #chat .mes .imsg-parts > .imsg-part {
+    position: relative;
+    z-index: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 7px 12px 8px;
+    border-radius: var(--imsg-bubble-radius);
+    background: var(--imsg-bubble);
+}
+
+body.imessage #chat .imsg-part[hidden] {
+    display: none;
+}
+
+body.imessage #chat .mes.imsg-last .imsg-part.imsg-tail::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -7px;
+    width: 20px;
+    height: 20px;
+    z-index: -1;
+    background: var(--imsg-bubble);
+    -webkit-mask: var(--imsg-tail) center / 100% 100% no-repeat;
+    mask: var(--imsg-tail) center / 100% 100% no-repeat;
+}
+
+/* the dots while the next bubble is on its way */
+body.imessage #chat .mes .imsg-parts > .imsg-part-typing {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 34px;
+    padding: 0 14px;
+}
+
+body.imessage #chat .imsg-part-typing span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.3;
+    animation: imsg-dot 1.2s ease-in-out infinite;
+}
+
+body.imessage #chat .imsg-part-typing span:nth-child(2) { animation-delay: 0.2s; }
+body.imessage #chat .imsg-part-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@media screen and (max-width: 1000px) {
+    body.imessage #chat .mes .imsg-parts > .imsg-part {
+        padding: 7px 13px 8px;
+    }
+}

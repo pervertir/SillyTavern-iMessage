@@ -314,7 +314,7 @@ body.imessage #chat .mes[is_system="true"]:not(.smallSysMes) .mes_block {
 }
 
 /* Message text */
-body.imessage #chat .mes .mes_text {
+body.imessage #chat .mes :is(.mes_text, .imsg-part) {
     padding: 0;
     margin: 0;
     color: inherit;
@@ -327,40 +327,40 @@ body.imessage #chat .mes .mes_text {
     text-shadow: none;
 }
 
-body.imessage #chat .mes .mes_text :is(p, li, span, font) {
+body.imessage #chat .mes :is(.mes_text, .imsg-part) :is(p, li, span, font) {
     color: inherit;
 }
 
-body.imessage #chat .mes .mes_text p {
+body.imessage #chat .mes :is(.mes_text, .imsg-part) p {
     margin: 0 0 8px;
 }
 
-body.imessage #chat .mes .mes_text p:last-child {
+body.imessage #chat .mes :is(.mes_text, .imsg-part) p:last-child {
     margin-bottom: 0;
 }
 
-body.imessage #chat .mes .mes_text :is(em, i) {
+body.imessage #chat .mes :is(.mes_text, .imsg-part) :is(em, i) {
     color: inherit;
     opacity: 0.75;
 }
 
-body.imessage #chat .mes .mes_text :is(q, q *, strong, b, u) {
+body.imessage #chat .mes :is(.mes_text, .imsg-part) :is(q, q *, strong, b, u) {
     color: inherit;
 }
 
-body.imessage #chat .mes .mes_text a {
+body.imessage #chat .mes :is(.mes_text, .imsg-part) a {
     color: inherit;
     text-decoration: underline;
 }
 
-body.imessage #chat .mes .mes_text blockquote {
+body.imessage #chat .mes :is(.mes_text, .imsg-part) blockquote {
     margin: 4px 0 8px;
     padding: 0 0 0 10px;
     border-left: 2px solid currentColor;
     opacity: 0.85;
 }
 
-body.imessage #chat .mes .mes_text code {
+body.imessage #chat .mes :is(.mes_text, .imsg-part) code {
     padding: 1px 4px;
     border-radius: 4px;
     background: rgba(127, 127, 127, 0.18);
@@ -369,25 +369,25 @@ body.imessage #chat .mes .mes_text code {
     font-size: 12.5px;
 }
 
-body.imessage #chat .mes .mes_text pre {
+body.imessage #chat .mes :is(.mes_text, .imsg-part) pre {
     margin: 4px 0 8px;
     border-radius: var(--imsg-radius-md);
     background: rgba(127, 127, 127, 0.15);
     overflow-x: auto;
 }
 
-body.imessage #chat .mes .mes_text pre code {
+body.imessage #chat .mes :is(.mes_text, .imsg-part) pre code {
     display: block;
     padding: 8px 10px;
     background: none;
 }
 
-body.imessage #chat .mes .mes_text hr {
+body.imessage #chat .mes :is(.mes_text, .imsg-part) hr {
     border-color: currentColor;
     opacity: 0.3;
 }
 
-body.imessage #chat .mes .mes_text img {
+body.imessage #chat .mes :is(.mes_text, .imsg-part) img {
     border-radius: 12px;
 }
 

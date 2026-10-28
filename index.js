@@ -3,6 +3,7 @@
 
 import { initList, markCurrent, scheduleRefresh } from './list.js';
 import { initMessages, refreshMessages } from './messages.js';
+import { initSplit, resetSplits } from './split.js';
 import { initMonograms } from './monograms.js';
 import { refreshTitle, setDisguise } from './disguise.js';
 import { initShell, openDrawer, refreshHeader, refreshPanelTitles } from './shell.js';
@@ -26,6 +27,8 @@ const defaultSettings = Object.freeze({
     /** The three-dot bubble while a reply is being written */
     typing: true,
     recentMax: 50,
+    /** Long replies as several short bubbles, split at the ends of sentences */
+    splitReplies: true,
     /** The background picked in Backgrounds, behind the conversation */
     wallpaper: false,
     /** Blur on the background, in pixels */
@@ -68,6 +71,7 @@ function applySettings() {
     body.classList.toggle('imsg-lights', !!settings.windowButtons);
     body.classList.toggle('imsg-receipts', !!settings.receipts);
     body.classList.toggle('imsg-typing-on', !!settings.typing);
+    body.classList.toggle('imsg-split-on', !!settings.splitReplies);
     body.classList.toggle('imsg-wall', on && !!settings.wallpaper);
     body.style.setProperty('--imsg-wall-blur', `${Number(settings.wallpaperBlur) || 0}px`);
     body.style.setProperty('--imsg-wall-dim', `${Number(settings.wallpaperDim) || 0}%`);
@@ -121,6 +125,7 @@ async function renderSettingsPanel() {
     const receipts = field('imsg_receipts');
     const typing = field('imsg_typing');
     const recentMax = field('imsg_recent_max');
+    const splitReplies = field('imsg_split');
     const wallpaper = field('imsg_wallpaper');
     const wallpaperBlur = field('imsg_wallpaper_blur');
     const wallpaperDim = field('imsg_wallpaper_dim');
@@ -136,6 +141,7 @@ async function renderSettingsPanel() {
     receipts.checked = settings.receipts;
     typing.checked = settings.typing;
     recentMax.value = String(settings.recentMax);
+    splitReplies.checked = settings.splitReplies;
     wallpaper.checked = settings.wallpaper;
     wallpaperBlur.value = String(settings.wallpaperBlur);
     wallpaperDim.value = String(settings.wallpaperDim);
@@ -155,6 +161,10 @@ async function renderSettingsPanel() {
     bind(receipts, 'receipts', () => receipts.checked);
     bind(typing, 'typing', () => typing.checked);
     bind(recentMax, 'recentMax', () => Math.min(500, Math.max(5, Number(recentMax.value) || defaultSettings.recentMax)), () => scheduleRefresh());
+    bind(splitReplies, 'splitReplies', () => splitReplies.checked, () => {
+        resetSplits();
+        refreshMessages();
+    });
     bind(wallpaper, 'wallpaper', () => wallpaper.checked, showValues);
     bind(wallpaperBlur, 'wallpaperBlur', () => Number(wallpaperBlur.value), showValues);
     bind(wallpaperDim, 'wallpaperDim', () => Number(wallpaperDim.value), showValues);
@@ -170,6 +180,7 @@ async function init() {
         isDark: () => document.body.classList.contains('imsg-dark'),
     });
     const listLoaded = initList({ settings: getSettings, opened: showChatOnPhone });
+    initSplit();
     initMessages();
     initMonograms();
     applySettings();

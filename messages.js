@@ -2,7 +2,9 @@
 // sender sit close together with the tail on the last one, a centered time line starts each
 // stretch of conversation, "Delivered" or "Read" sits under your last message, and a typing
 // bubble shows while a reply is being written. Everything here is classes and data attributes on
-// the existing .mes elements; CSS draws them.
+// the existing .mes elements; CSS draws them. Long replies split into short bubbles in split.js.
+
+import { splitAll } from './split.js';
 
 /** A new time line once this much time has passed between two messages */
 const STAMP_GAP_MS = 60 * 60 * 1000;
@@ -94,6 +96,7 @@ function markAll() {
         const answered = rows.indexOf(lastYours) < rows.length - 1;
         lastYours.mes.dataset.imsgReceipt = answered ? t('Read') : t('Delivered');
     }
+    splitAll(rows.map((row) => row.mes));
 }
 
 /** Re-marks the chat on the next frame, so a burst of events costs one pass. */
@@ -146,7 +149,8 @@ export function initMessages() {
     for (const type of [
         eventTypes.CHARACTER_MESSAGE_RENDERED, eventTypes.USER_MESSAGE_RENDERED, eventTypes.MESSAGE_SWIPED,
         eventTypes.MESSAGE_UPDATED, eventTypes.MESSAGE_EDITED, eventTypes.MESSAGE_DELETED, eventTypes.CHAT_CHANGED,
-        eventTypes.MORE_MESSAGES_LOADED, eventTypes.GROUP_UPDATED,
+        eventTypes.MORE_MESSAGES_LOADED, eventTypes.GROUP_UPDATED, eventTypes.GENERATION_ENDED,
+        eventTypes.GENERATION_STOPPED,
     ]) {
         eventSource.on(type, refreshMessages);
     }
