@@ -23,7 +23,7 @@ A SillyTavern extension that makes the whole app look and work like Messages on 
   | Response Settings | AI Response Configuration |
   | Connections | API Connections |
   | Formatting | AI Response Formatting |
-  | World Info | World Info |
+  | World Info | The theme's own World Info window (below) |
   | Settings | User Settings |
   | Backgrounds | The theme's own Backgrounds window (below) |
   | Extensions | Extensions |
@@ -33,6 +33,7 @@ A SillyTavern extension that makes the whole app look and work like Messages on 
   Each SillyTavern menu opens as a Mac sheet with its name in the title bar and a blue Done button.
 - **Contacts.** A Contacts-style window in place of SillyTavern's character list and editor: search, tag chips, Favorites, Groups and A to Z with a letter index on the left, the selected contact's card on the right (picture, about line, Message, New, History and Favorite, description, first message, export, duplicate, delete). Edit opens a native form for every card field, other first messages and the advanced prompts. The + menu makes a new contact or group, or imports a card from a file or a link. Groups get their own form for members (add, mute, reorder), who answers next and how cards are combined. On a phone it fills the screen and the card slides over the list.
 - **Backgrounds.** A photo-library window: My Backgrounds, This Chat and your folders in the sidebar, the pictures in a grid. Click to use one (for this chat if it has its own, everywhere otherwise); right-click or ⋯ to use it for this chat only, use it everywhere, rename, add to a folder, make it a folder cover or delete it. + adds pictures or a folder.
+- **World Info.** Laid out like Notes: your lorebooks in the sidebar (with where each is on: every chat, this chat or the character), the open book's entries beside them, and the entry editor on the right. Each entry has its title, an on switch, when it's used (keywords, always, or vector search), its content with a token count, where it goes in the prompt, and an Advanced section for timing, groups, recursion and triggers. Scan Settings holds the global options. Right-click a book or entry for the rest.
 - **My Card.** Your personas, at the top of Contacts: the one in use with Lock to Chat, Default, Edit and New, your description, and your other personas to switch to. Edit covers the name, title, picture, description and where the description goes in the prompt.
 - **Header.** "To: Name", with the video button (new conversation) and the ⓘ button (Details, Conversation History, New Conversation, Close Conversation). On a phone it's the back chevron, the contact's picture with their name under it, and the video button.
 - **Bubbles.** Theirs are grey on the left, yours blue on the right. Messages in a row from the same person sit close together, with the tail only on the last one. A centered time line (`Today 9:41 AM`, `Yesterday 9:41 AM`, `Monday 9:41 AM`, `Wed, Oct 21 at 9:41 AM`) starts each stretch of conversation after an hour's gap. `Delivered` sits under your last message until there's a reply, then `Read`.

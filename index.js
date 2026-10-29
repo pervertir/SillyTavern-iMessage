@@ -14,6 +14,7 @@ import { initImages } from './images.js';
 import { initCustomize, openCustomize } from './customize.js';
 import { initContacts } from './contacts.js';
 import { initBackgrounds, openBackgrounds } from './backgrounds.js';
+import { initWorldInfo } from './worldinfo.js';
 import { registerTheme } from './theme-exclusive.js';
 
 const MODULE_NAME = 'iMessageTheme';
@@ -277,6 +278,7 @@ async function init() {
     initImages({ settings: getSettings });
     initContacts();
     initBackgrounds();
+    initWorldInfo();
     initCustomize({
         settings: getSettings,
         save: saveSettings,
