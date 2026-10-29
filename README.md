@@ -100,3 +100,11 @@ SillyTavern 1.19.0 or newer.
 ## License
 
 MIT
+
+## Development
+
+Before every push, run the leak check against a test SillyTavern with this extension installed. It makes sure that with the theme switched off nothing of it is left in SillyTavern's page: no elements, classes, attributes or style variables, and no Messages title, icon or "iMessage" placeholder. It also turns the theme on, off and on again.
+
+```sh
+node tests/leak-check.js http://127.0.0.1:8000/
+```

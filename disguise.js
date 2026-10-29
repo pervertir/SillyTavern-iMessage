@@ -41,9 +41,9 @@ export function refreshTitle() {
 
 export function setDisguise(enabled) {
     const textarea = document.getElementById('send_textarea');
-    // the app icon, for notification banners
-    document.documentElement.style.setProperty('--imsg-app-icon', `url("${ICON}")`);
     if (enabled) {
+        // the app icon, for notification banners
+        document.documentElement.style.setProperty('--imsg-app-icon', `url("${ICON}")`);
         remember();
         active = true;
         refreshTitle();
@@ -57,6 +57,10 @@ export function setDisguise(enabled) {
             }
         }
         return;
+    }
+    document.documentElement.style.removeProperty('--imsg-app-icon');
+    if (!document.documentElement.getAttribute('style')) {
+        document.documentElement.removeAttribute('style');
     }
     if (!active || !original) {
         return;
