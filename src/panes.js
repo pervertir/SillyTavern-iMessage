@@ -1,51 +1,16 @@
-// A System Settings-style window for one of the app's own panels: its sections in a sidebar,
-// each with a colored tile, and the open section on the right. The section's controls are the
-// app's own, borrowed (host.js) while the section is open, so they keep their handlers and values.
-//
-// Settings, Connections, Formatting and Response Settings are each a list of sections (settings.js).
+// Generic System Settings-style window for ST's own panels: sections in a sidebar, the open
+// section on the right. Its controls are ST's, borrowed with host.js while the section is open.
+// The section lists live in settings.js.
 
 import { toggleMenu } from './shell.js';
 import { host, releaseAll } from './host.js';
 import { onStop } from './power.js';
+import { button, element, glyph, isPhone, overlayOpen, t } from './dom.js';
 
 const TILE_COLORS = ['#0a84ff', '#30b0c7', '#34c759', '#ff9f0a', '#ff375f', '#bf5af2', '#5e5ce6', '#8e8e93', '#64d2ff', '#ac8e68'];
 
 /** The window that's open: its definition and where it's at */
 let open = null;
-
-function context() {
-    return SillyTavern.getContext();
-}
-
-function t(text) {
-    return context().translate(text);
-}
-
-function element(tag, className, text) {
-    const node = document.createElement(tag);
-    if (className) {
-        node.className = className;
-    }
-    if (text !== undefined) {
-        node.textContent = text;
-    }
-    return node;
-}
-
-function button(className, label, run) {
-    const node = element('button', className, label === undefined ? undefined : t(label));
-    node.type = 'button';
-    if (run) {
-        node.addEventListener('click', run);
-    }
-    return node;
-}
-
-function glyph(symbol) {
-    const node = element('i', 'imsg-sym');
-    node.style.setProperty('--imsg-glyph', `var(--imsg-sym-${symbol})`);
-    return node;
-}
 
 /** A rounded colored square with a symbol, as System Settings shows its panes. */
 export function tile(section, big = false) {
@@ -190,7 +155,7 @@ function close() {
 }
 
 function onKey(event) {
-    if (event.key !== 'Escape' || document.querySelector('dialog.popup[open]') || document.getElementById('imsg-menu')?.hidden === false) {
+    if (event.key !== 'Escape' || overlayOpen()) {
         return;
     }
     // Esc inside one of the borrowed fields stays with the field
@@ -200,7 +165,7 @@ function onKey(event) {
         return;
     }
     event.stopPropagation();
-    if (open?.level > 0 && matchMedia('(max-width: 1000px)').matches) {
+    if (open?.level > 0 && isPhone()) {
         open.level = 0;
         render();
     } else {
@@ -216,7 +181,7 @@ function onKey(event) {
  */
 export function openPanes(def, start = null) {
     close();
-    const phone = matchMedia('(max-width: 1000px)').matches;
+    const phone = isPhone();
     open = { def, key: start, level: start || !phone ? 1 : 0, needle: '' };
 
     const root = element('div', `imsg-cn imsg-ext imsg-set ${def.className ?? ''}`);

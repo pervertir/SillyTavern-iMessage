@@ -29,17 +29,15 @@ body.imessage #nonQRFormItems {
     column-gap: 0;
     padding: 0;
     font-size: 16px;
-}
-
-/* Only the field and its send arrow show. The + and emoji buttons stay in place but out of
-   sight, so their menus (opened from the header's ⓘ menu) still appear beside the box. */
-/* the field: one oval around the text and the send arrow */
-body.imessage #nonQRFormItems {
+    /* the field: one oval around the text and the send arrow */
     position: relative;
     border: 1px solid var(--imsg-field-line);
     border-radius: 17px;
     background: var(--imsg-window);
 }
+
+/* Only the field and its send arrow show. The + and emoji buttons stay in place but out of
+   sight, so their menus (opened from the header's ⓘ menu) still appear beside the box. */
 
 body.imessage #leftSendForm {
     position: absolute;

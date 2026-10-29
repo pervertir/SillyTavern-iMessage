@@ -1,107 +1,107 @@
 <div class="imsg-settings">
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
-            <b>iMessage Theme</b>
+            <b data-i18n="iMessage Theme">iMessage Theme</b>
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
         <div class="inline-drawer-content">
             <label class="checkbox_label" for="imsg_enabled">
                 <input id="imsg_enabled" type="checkbox" />
-                <span>Enable theme</span>
+                <span data-i18n="Enable theme">Enable theme</span>
             </label>
-            <small class="imsg-note">Turning it on switches off any other theme extension.</small>
+            <small class="imsg-note" data-i18n="Turning it on switches off any other theme extension.">Turning it on switches off any other theme extension.</small>
 
             <label class="checkbox_label" for="imsg_pause_user_theme">
                 <input id="imsg_pause_user_theme" type="checkbox" />
-                <span>Pause my Custom CSS and UI theme</span>
+                <span data-i18n="Pause my Custom CSS and UI theme">Pause my Custom CSS and UI theme</span>
             </label>
-            <small class="imsg-note">While the theme is on, your Custom CSS and UI theme colors are set aside, untouched, and come back when it's off.</small>
+            <small class="imsg-note" data-i18n="While the theme is on, your Custom CSS and UI theme colors are set aside, untouched, and come back when it's off.">While the theme is on, your Custom CSS and UI theme colors are set aside, untouched, and come back when it's off.</small>
 
             <div class="imsg-setting-row">
-                <label for="imsg_appearance">Appearance</label>
+                <label for="imsg_appearance" data-i18n="Appearance">Appearance</label>
                 <select id="imsg_appearance" class="text_pole">
-                    <option value="system">Auto (follow the system)</option>
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
+                    <option value="system" data-i18n="Auto (follow the system)">Auto (follow the system)</option>
+                    <option value="light" data-i18n="Light">Light</option>
+                    <option value="dark" data-i18n="Dark">Dark</option>
                 </select>
             </div>
 
-            <div id="imsg_customize" class="menu_button" role="button" tabindex="0">Customize…</div>
-            <small class="imsg-note">Colors, text, bubbles (blur, opacity, acrylic), spacing, what's shown, motion and your own CSS, with a live preview.</small>
+            <div id="imsg_customize" class="menu_button" role="button" tabindex="0" data-i18n="Customize…">Customize…</div>
+            <small class="imsg-note" data-i18n="Colors, text, bubbles (blur, opacity, acrylic), spacing, what's shown, motion and your own CSS, with a live preview.">Colors, text, bubbles (blur, opacity, acrylic), spacing, what's shown, motion and your own CSS, with a live preview.</small>
 
             <label class="checkbox_label" for="imsg_window_buttons">
                 <input id="imsg_window_buttons" type="checkbox" />
-                <span>Show the window buttons (close, minimize, full screen)</span>
+                <span data-i18n="Show the window buttons (close, minimize, full screen)">Show the window buttons (close, minimize, full screen)</span>
             </label>
 
             <label class="checkbox_label" for="imsg_receipts">
                 <input id="imsg_receipts" type="checkbox" />
-                <span>Show Delivered and Read</span>
+                <span data-i18n="Show Delivered and Read">Show Delivered and Read</span>
             </label>
 
             <label class="checkbox_label" for="imsg_typing">
                 <input id="imsg_typing" type="checkbox" />
-                <span>Show the typing bubble while a reply is written</span>
+                <span data-i18n="Show the typing bubble while a reply is written">Show the typing bubble while a reply is written</span>
             </label>
 
             <label class="checkbox_label" for="imsg_split">
                 <input id="imsg_split" type="checkbox" />
-                <span>Split long replies into short messages</span>
+                <span data-i18n="Split long replies into short messages">Split long replies into short messages</span>
             </label>
 
             <label class="checkbox_label" for="imsg_image_links">
                 <input id="imsg_image_links" type="checkbox" />
-                <span>Show image links as pictures</span>
+                <span data-i18n="Show image links as pictures">Show image links as pictures</span>
             </label>
-            <small class="imsg-note">Pictures from links in messages load even when Forbid External Media is on.</small>
+            <small class="imsg-note" data-i18n="Pictures from links in messages load even when Forbid External Media is on.">Pictures from links in messages load even when Forbid External Media is on.</small>
 
             <div class="imsg-setting-row">
-                <label for="imsg_recent_max">Conversations in the list</label>
+                <label for="imsg_recent_max" data-i18n="Conversations in the list">Conversations in the list</label>
                 <input id="imsg_recent_max" class="text_pole" type="number" min="5" max="500" step="5" />
             </div>
 
             <label class="checkbox_label" for="imsg_wallpaper">
                 <input id="imsg_wallpaper" type="checkbox" />
-                <span>Show a background behind the conversation</span>
+                <span data-i18n="Show a background behind the conversation">Show a background behind the conversation</span>
             </label>
 
             <div id="imsg_wallpaper_options" class="imsg-wallpaper-options">
                 <div class="imsg-setting-row">
-                    <label for="imsg_wallpaper_blur">Blur</label>
+                    <label for="imsg_wallpaper_blur" data-i18n="Blur">Blur</label>
                     <input id="imsg_wallpaper_blur" type="range" min="0" max="40" step="1" />
                     <span id="imsg_wallpaper_blur_value" class="imsg-value"></span>
                 </div>
                 <div class="imsg-setting-row">
-                    <label for="imsg_wallpaper_dim">Fade</label>
+                    <label for="imsg_wallpaper_dim" data-i18n="Fade">Fade</label>
                     <input id="imsg_wallpaper_dim" type="range" min="0" max="90" step="5" />
                     <span id="imsg_wallpaper_dim_value" class="imsg-value"></span>
                 </div>
-                <div id="imsg_wallpaper_pick" class="menu_button" role="button" tabindex="0">Choose Background…</div>
+                <div id="imsg_wallpaper_pick" class="menu_button" role="button" tabindex="0" data-i18n="Choose Background…">Choose Background…</div>
             </div>
 
             <label class="checkbox_label" for="imsg_sounds">
                 <input id="imsg_sounds" type="checkbox" />
-                <span>Play sounds when you send and when a reply arrives</span>
+                <span data-i18n="Play sounds when you send and when a reply arrives">Play sounds when you send and when a reply arrives</span>
             </label>
 
             <div id="imsg_sound_options" class="imsg-wallpaper-options">
                 <div class="imsg-setting-row">
-                    <label for="imsg_sound_volume">Volume</label>
+                    <label for="imsg_sound_volume" data-i18n="Volume">Volume</label>
                     <input id="imsg_sound_volume" type="range" min="0" max="100" step="5" />
                     <span id="imsg_sound_volume_value" class="imsg-value"></span>
                 </div>
                 <div class="imsg-setting-row">
-                    <div id="imsg_sound_send" class="menu_button" role="button" tabindex="0">Play Send</div>
-                    <div id="imsg_sound_receive" class="menu_button" role="button" tabindex="0">Play Reply</div>
+                    <div id="imsg_sound_send" class="menu_button" role="button" tabindex="0" data-i18n="Play Send">Play Send</div>
+                    <div id="imsg_sound_receive" class="menu_button" role="button" tabindex="0" data-i18n="Play Reply">Play Reply</div>
                 </div>
             </div>
 
             <label class="checkbox_label" for="imsg_notify">
                 <input id="imsg_notify" type="checkbox" />
-                <span>Notify me of replies while the tab is in the background</span>
+                <span data-i18n="Notify me of replies while the tab is in the background">Notify me of replies while the tab is in the background</span>
             </label>
 
-            <small class="imsg-note">Shortcuts: ⌘F search, ⌥⌘N new message, ⌃⌘S hide or show the list (Ctrl+Shift+S elsewhere), ⌘, settings, Esc closes a sheet, ↑ edits your last message (Ctrl in place of ⌘ on Windows and Linux).</small>
+            <small class="imsg-note" data-i18n="Shortcuts: ⌘F search, ⌥⌘N new message, ⌃⌘S hide or show the list (Ctrl+Shift+S elsewhere), ⌘, settings, Esc closes a sheet, ↑ edits your last message (Ctrl in place of ⌘ on Windows and Linux).">Shortcuts: ⌘F search, ⌥⌘N new message, ⌃⌘S hide or show the list (Ctrl+Shift+S elsewhere), ⌘, settings, Esc closes a sheet, ↑ edits your last message (Ctrl in place of ⌘ on Windows and Linux).</small>
 
             <small class="imsg-note">Turn off other UI themes (such as Microsoft Teams, Moonlit Echoes or Yodayo Tavern) while this one is on. The background is hidden unless you turn it on above; pick it in Backgrounds.</small>
         </div>

@@ -110,6 +110,17 @@ MIT
 
 ## Development
 
+```
+index.js           entry point: settings, boot cover, wiring
+settings.html      the block in SillyTavern's Extensions panel
+style.css          imports css/, every rule scoped to body.imessage
+src/               one module per part of the window (list, messages, contacts, settings…)
+src/shared/        files copied unchanged between our themes
+tests/             leak check
+```
+
+Code follows SillyTavern's ESLint config (`npx eslint` from a SillyTavern checkout).
+
 Before every push, run the leak check against a test SillyTavern with this extension installed. It makes sure that with the theme switched off nothing of it is left in SillyTavern's page: no elements, classes, attributes or style variables, and no Messages title, icon or "iMessage" placeholder. It also turns the theme on, off and on again.
 
 ```sh

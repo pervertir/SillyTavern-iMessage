@@ -337,7 +337,7 @@ body.imessage #chat .mes.imsg-photo-only:not(.imsg-split) .mes_block > .mes_text
     border: none;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.14);
-    color: #fff;
+    color: #ffffff;
     font: inherit;
     text-decoration: none;
     cursor: pointer;

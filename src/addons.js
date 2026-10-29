@@ -1,14 +1,12 @@
-// Extensions, laid out like System Settings: every extension with settings in the sidebar, each
-// with its own colored tile, and its settings on the right. Manage lists everything installed,
-// with a switch to turn each on or off, and Install adds one from a link.
-//
-// An extension's settings are its own page, so they're borrowed (host.js) rather than redrawn:
-// they keep working exactly as the extension wrote them, styled like the rest of the theme.
+// Extensions window, laid out like System Settings: one pane per extension with settings, plus
+// Manage (enable, disable, remove, install from URL). Each extension's settings block is moved in
+// with host.js rather than redrawn, so it keeps its own handlers.
 
+import * as ext from '../../../../extensions.js';
 import { toggleMenu } from './shell.js';
 import { host, releaseAll } from './host.js';
 import { onStop } from './power.js';
-import * as ext from '../../../extensions.js';
+import { button, context, element, escapeHtml, glyph, isPhone, overlayOpen, t } from './dom.js';
 
 const ROOT_ID = 'imsg-extensions';
 const MANAGE = '__manage__';
@@ -16,40 +14,6 @@ const TILE_COLORS = ['#0a84ff', '#30b0c7', '#34c759', '#ff9f0a', '#ff375f', '#bf
 
 let view = { key: MANAGE, level: 0, needle: '' };
 let needsReload = false;
-
-function context() {
-    return SillyTavern.getContext();
-}
-
-function t(text) {
-    return context().translate(text);
-}
-
-function element(tag, className, text) {
-    const node = document.createElement(tag);
-    if (className) {
-        node.className = className;
-    }
-    if (text !== undefined) {
-        node.textContent = text;
-    }
-    return node;
-}
-
-function button(className, label, run) {
-    const node = element('button', className, label === undefined ? undefined : t(label));
-    node.type = 'button';
-    if (run) {
-        node.addEventListener('click', run);
-    }
-    return node;
-}
-
-function glyph(symbol) {
-    const node = element('i', 'imsg-sym');
-    node.style.setProperty('--imsg-glyph', `var(--imsg-sym-${symbol})`);
-    return node;
-}
 
 function hash(text) {
     let value = 0;
@@ -131,12 +95,6 @@ async function remove(item) {
     if (ok === ctx.POPUP_RESULT.AFFIRMATIVE) {
         await ext.deleteExtension(item.name.replace(/^third-party/, ''));
     }
-}
-
-function escapeHtml(text) {
-    const node = element('span');
-    node.textContent = text;
-    return node.innerHTML;
 }
 
 // ── Drawing ──
@@ -287,7 +245,7 @@ function close() {
 }
 
 function onKey(event) {
-    if (event.key !== 'Escape' || document.querySelector('dialog.popup[open]') || document.getElementById('imsg-menu')?.hidden === false) {
+    if (event.key !== 'Escape' || overlayOpen()) {
         return;
     }
     // Esc inside an extension's own field stays with the field
@@ -297,7 +255,7 @@ function onKey(event) {
         return;
     }
     event.stopPropagation();
-    if (view.level > 0 && matchMedia('(max-width: 1000px)').matches) {
+    if (view.level > 0 && isPhone()) {
         view = { ...view, level: 0 };
         render();
     } else {
@@ -308,7 +266,7 @@ function onKey(event) {
 /** Opens Extensions, on an extension's settings when its title is given. */
 export function openExtensions(title = null) {
     close();
-    const phone = matchMedia('(max-width: 1000px)').matches;
+    const phone = isPhone();
     view = { key: title ? `p:${title}` : MANAGE, level: title || !phone ? 1 : 0, needle: '' };
 
     const root = element('div', 'imsg-cn imsg-ext');

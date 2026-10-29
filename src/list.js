@@ -1,27 +1,25 @@
-// The Messages sidebar: search, pinned conversations as large pictures, then every recent
-// conversation (the same list as the app's welcome screen) with its last message and time.
-// Pins are the app's own pinned chats, so pinning here and on the welcome screen is one list.
+// Conversation sidebar: search, pinned chats as large avatars, then recent chats (the same list
+// as ST's welcome screen) with a preview and time. Pins are ST's own pinned chats.
 
+import { deleteCharacterChatByName } from '../../../../../script.js';
+import { deleteGroupChatByName } from '../../../../group-chats.js';
 import { imageLabel, withoutImages } from './images.js';
 import { monogramizeAll } from './monograms.js';
 import { buildGroupAvatar, buildSidebarToolbar, clickOption, toggleMenu } from './shell.js';
+import { getSettings } from './config.js';
 import { events, onStart, whenOn } from './power.js';
+import { glyph, t } from './dom.js';
 
 const SIDEBAR_ID = 'imsg-sidebar';
 /** The app's own pinned chats, kept in account storage by welcome-screen.js */
 const PINNED_KEY = 'pinnedChats';
 
-let getSettings = () => ({ recentMax: 50 });
 /** @type {Array<object>} */
 let entries = [];
 let filterText = '';
 let requestId = 0;
 let refreshTimer = 0;
 let onOpen = () => {};
-
-function t(text) {
-    return SillyTavern.getContext().translate(text);
-}
 
 function getPinState() {
     try {
@@ -294,10 +292,8 @@ async function deleteEntry(entry) {
             await context.executeSlashCommandsWithOptions('/closechat');
         }
         if (entry.group) {
-            const { deleteGroupChatByName } = await import('/scripts/group-chats.js');
             await deleteGroupChatByName(entry.group, entry.fileId);
         } else {
-            const { deleteCharacterChatByName } = await import('/script.js');
             const characterId = context.characters.findIndex(x => x.avatar === entry.avatar);
             await deleteCharacterChatByName(String(characterId), entry.fileId);
         }
@@ -397,9 +393,7 @@ function createSidebar() {
 
     const search = document.createElement('label');
     search.className = 'imsg-search';
-    const glass = document.createElement('i');
-    glass.className = 'imsg-sym';
-    glass.style.setProperty('--imsg-glyph', 'var(--imsg-sym-search)');
+    const glass = glyph('search');
     const input = document.createElement('input');
     input.type = 'search';
     input.placeholder = t('Search');
@@ -473,12 +467,10 @@ function createSidebar() {
 
 /**
  * @param {object} options
- * @param {() => object} options.settings Returns the theme settings
  * @param {() => void} options.opened Called once a conversation from the list is open
  * @returns {Promise<void>} Resolves once the list has its first conversations.
  */
-export function initList({ settings, opened }) {
-    getSettings = settings;
+export function initList({ opened }) {
     onOpen = opened;
     let loaded = Promise.resolve();
     onStart(() => {

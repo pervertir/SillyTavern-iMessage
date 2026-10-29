@@ -120,12 +120,6 @@ body.imessage :is(.drawer-content, .popup, .imsg-host) .menu_button:is(.fa-solid
     color: var(--imsg-fg);
 }
 
-body.imessage :is(.drawer-content, .popup, .imsg-host) .menu_button:is(.redWarningBG, .red_button):is(.fa-solid, .fa-regular) {
-    background: none;
-    box-shadow: none;
-    color: var(--imsg-red);
-}
-
 /* text buttons with an icon: the icon smaller and quieter than the words */
 body.imessage :is(.drawer-content, .popup, .imsg-host) .menu_button.menu_button_icon {
     gap: 5px;

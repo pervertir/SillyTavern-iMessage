@@ -1,6 +1,6 @@
-// Messages shows a contact without a photo as their initials on a grey disc. The app copies its
-// default pictures into new characters and personas, so a placeholder is found by how it looks:
-// a tiny version of the picture is compared with a tiny version of the defaults.
+// Contacts without a picture get initials on a grey disc. ST copies its default avatar into new
+// characters and personas, so placeholders are detected by comparing a tiny downscaled copy of
+// the picture with the defaults.
 
 import { events, onStart, whenOn } from './power.js';
 

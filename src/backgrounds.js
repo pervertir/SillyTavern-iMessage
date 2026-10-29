@@ -1,13 +1,11 @@
-// Backgrounds, as a photo library: your backgrounds, this conversation's own, and your folders in
-// a sidebar, the pictures in a grid beside it. A click uses a picture, as the app does (for this
-// conversation when it has its own background, everywhere otherwise); right-click or ⋯ for the rest.
-//
-// The app keeps its own Backgrounds panel, hidden. This window reads what it shows and asks it to
-// do the work, so locking, folders and uploads behave exactly as they always have.
+// Backgrounds window, laid out like Photos: sources and folders in a sidebar, a picture grid
+// beside it. ST's own Backgrounds panel stays in the page, hidden; this window reads from it and
+// clicks its tiles, so locking, folders and uploads keep ST's behavior.
 
+import { background_settings, getBackgroundPath } from '../../../../backgrounds.js';
 import { events, onStop } from './power.js';
 import { toggleMenu } from './shell.js';
-import { background_settings } from '../../../backgrounds.js';
+import { button, context, element, glyph, isPhone, overlayOpen, t } from './dom.js';
 
 const ROOT_ID = 'imsg-backgrounds';
 const ALL = 'all';
@@ -18,40 +16,6 @@ let view = { source: ALL, needle: '', picked: false };
 let folderMap = {};
 let observer = null;
 let redrawTimer = 0;
-
-function context() {
-    return SillyTavern.getContext();
-}
-
-function t(text) {
-    return context().translate(text);
-}
-
-function element(tag, className, text) {
-    const node = document.createElement(tag);
-    if (className) {
-        node.className = className;
-    }
-    if (text !== undefined) {
-        node.textContent = text;
-    }
-    return node;
-}
-
-function button(className, label, run) {
-    const node = element('button', className, label === undefined ? undefined : t(label));
-    node.type = 'button';
-    if (run) {
-        node.addEventListener('click', run);
-    }
-    return node;
-}
-
-function glyph(symbol) {
-    const node = element('i', 'imsg-sym');
-    node.style.setProperty('--imsg-glyph', `var(--imsg-sym-${symbol})`);
-    return node;
-}
 
 // ── The app's hidden panel ──
 
@@ -102,6 +66,8 @@ function readPictures() {
             name: name.replace(/\.[^.]+$/, ''),
             url: urlOf(tile),
             thumb: custom ? file : context().getThumbnailUrl('bg', file),
+            // the thumbnail is 160px wide, too soft for a tile on a high-density screen
+            full: custom ? null : getBackgroundPath(file),
         };
     });
     return { system: read('bg_menu_content', false), chat: read('bg_custom_content', true) };
@@ -234,6 +200,9 @@ function buildTile(picture) {
     img.loading = 'lazy';
     img.decoding = 'async';
     img.src = picture.thumb;
+    if (picture.full) {
+        img.srcset = `${picture.thumb} 1x, ${picture.full} 2x`;
+    }
     frame.append(img);
     if (current) {
         const badge = element('span', 'imsg-bg-badge');
@@ -335,12 +304,12 @@ function close() {
 }
 
 function onKey(event) {
-    if (event.key !== 'Escape' || document.querySelector('dialog.popup[open]') || document.getElementById('imsg-menu')?.hidden === false) {
+    if (event.key !== 'Escape' || overlayOpen()) {
         return;
     }
     event.stopPropagation();
     const root = document.getElementById(ROOT_ID);
-    if (view.picked && matchMedia('(max-width: 1000px)').matches) {
+    if (view.picked && isPhone()) {
         view.picked = false;
         render();
     } else if (root) {

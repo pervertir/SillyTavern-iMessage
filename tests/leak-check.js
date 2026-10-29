@@ -1,3 +1,4 @@
+/* eslint-env node */
 // Leak check: with the theme switched off, nothing of it may be left in SillyTavern's page.
 // Run before every push against a test SillyTavern with this extension installed:
 //   node tests/leak-check.js [http://127.0.0.1:8000/]

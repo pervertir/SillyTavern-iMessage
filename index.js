@@ -1,75 +1,40 @@
-// iMessage theme: toggles the scoped styles in style.css, builds the Messages window
-// (sidebar with the conversation list, conversation header) and a small settings panel.
+// iMessage theme for SillyTavern. Every style is scoped to body.imessage (style.css); the
+// modules in src/ build the Messages window and its native panels while the theme is on.
 
-import { initList, markCurrent, scheduleRefresh } from './list.js';
-import { initMessages, refreshMessages } from './messages.js';
-import { initSplit, resetSplits } from './split.js';
-import { initMonograms } from './monograms.js';
-import { refreshTitle, setDisguise } from './disguise.js';
-import { initShell, openDrawer, refreshHeader, refreshPanelTitles } from './shell.js';
-import { askToNotify, initAlerts, previewSound } from './alerts.js';
-import { initKeys } from './keys.js';
-import { initFeatures } from './features.js';
-import { initImages } from './images.js';
-import { initCustomize, openCustomize } from './customize.js';
-import { initContacts } from './contacts.js';
-import { initBackgrounds, openBackgrounds } from './backgrounds.js';
-import { initWorldInfo } from './worldinfo.js';
-import { registerTheme } from './theme-exclusive.js';
-import { events, isOn, startTheme, stopTheme } from './power.js';
+import { MODULE_NAME, defaultSettings, getSettings, isDark, onSystemAppearanceChange, saveSettings } from './src/config.js';
+import { isPhone } from './src/dom.js';
+import { renderPanel, setSetting, showSetting } from './src/panel.js';
+import { events, isOn, startTheme, stopTheme } from './src/power.js';
+import { registerTheme } from './src/shared/theme-exclusive.js';
+import { initAlerts } from './src/alerts.js';
+import { initBackgrounds, openBackgrounds } from './src/backgrounds.js';
+import { initContacts } from './src/contacts.js';
+import { initCustomize, openCustomize } from './src/customize.js';
+import { refreshTitle, setDisguise } from './src/disguise.js';
+import { initFeatures } from './src/features.js';
+import { initImages } from './src/images.js';
+import { initKeys } from './src/keys.js';
+import { initList, markCurrent, scheduleRefresh } from './src/list.js';
+import { initMessages, refreshMessages } from './src/messages.js';
+import { initMonograms } from './src/monograms.js';
+import { initShell, refreshHeader, refreshPanelTitles } from './src/shell.js';
+import { initSplit, resetSplits } from './src/split.js';
+import { initWorldInfo } from './src/worldinfo.js';
 
-const MODULE_NAME = 'iMessageTheme';
 /** Folder path under scripts/extensions/, e.g. third-party/SillyTavern-iMessage */
 const EXTENSION_FOLDER = new URL('.', import.meta.url).pathname
     .replace(/^.*\/scripts\/extensions\//, '')
     .replace(/\/$/, '');
 const BODY_CLASS = 'imessage';
-const MOBILE_QUERY = '(max-width: 1000px)';
+const BOOT_TIMEOUT_MS = 20000;
 
-const defaultSettings = Object.freeze({
-    enabled: true,
-    /** light, dark or system */
-    appearance: 'system',
-    /** The red, yellow and green window buttons at the top of the sidebar */
-    windowButtons: true,
-    /** "Delivered" / "Read" under your last message */
-    receipts: true,
-    /** The three-dot bubble while a reply is being written */
-    typing: true,
-    recentMax: 50,
-    /** Long replies as several short bubbles, split at the ends of sentences */
-    splitReplies: true,
-    /** Image links in messages show as the pictures themselves */
-    imageLinks: true,
-    /** The background picked in Backgrounds, behind the conversation */
-    wallpaper: false,
-    /** Blur on the background, in pixels */
-    wallpaperBlur: 12,
-    /** How much the window color is laid over the background, in percent */
-    wallpaperDim: 30,
-    /** A soft sound when you send and when a reply arrives */
-    sounds: true,
-    /** Sound volume, in percent */
-    soundVolume: 50,
-    /** A system notification for replies that arrive while the tab is in the background */
-    notify: false,
-    /** Your Custom CSS and UI theme are set aside while the theme is on (theme-exclusive.js) */
-    pauseUserTheme: true,
-    /** Customize: theme variables, switches and your own CSS (customize.js) */
-    customize: { tokens: {}, flags: {}, css: '' },
-});
-
-/** The theme settings field for each setting Customize can change */
-const SETTING_FIELDS = {
-    windowButtons: 'imsg_window_buttons',
-    receipts: 'imsg_receipts',
-    typing: 'imsg_typing',
-    splitReplies: 'imsg_split',
-    imageLinks: 'imsg_image_links',
-    wallpaper: 'imsg_wallpaper',
-    wallpaperBlur: 'imsg_wallpaper_blur',
-    wallpaperDim: 'imsg_wallpaper_dim',
-    sounds: 'imsg_sounds',
+/** Body classes that follow a setting while the theme is on */
+const SETTING_CLASSES = {
+    'imsg-lights': 'windowButtons',
+    'imsg-receipts': 'receipts',
+    'imsg-typing-on': 'typing',
+    'imsg-split-on': 'splitReplies',
+    'imsg-wall': 'wallpaper',
 };
 
 /** The one-theme-at-a-time helper shared by our themes */
@@ -78,30 +43,6 @@ let exclusive = null;
 /** Whether the theme's parts are in the page */
 let running = false;
 
-const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-function getSettings() {
-    const { extensionSettings } = SillyTavern.getContext();
-    if (!extensionSettings[MODULE_NAME]) {
-        extensionSettings[MODULE_NAME] = structuredClone(defaultSettings);
-    }
-    const settings = extensionSettings[MODULE_NAME];
-    for (const key of Object.keys(defaultSettings)) {
-        if (!Object.hasOwn(settings, key)) {
-            settings[key] = structuredClone(defaultSettings[key]);
-        }
-    }
-    return settings;
-}
-
-function saveSettings() {
-    SillyTavern.getContext().saveSettingsDebounced();
-}
-
-function isDark(settings) {
-    return settings.appearance === 'dark' || (settings.appearance === 'system' && darkQuery.matches);
-}
-
 function applySettings() {
     const settings = getSettings();
     const body = document.body;
@@ -109,44 +50,33 @@ function applySettings() {
     body.classList.toggle(BODY_CLASS, on);
     document.documentElement.classList.toggle('imsg-html', on);
     body.classList.toggle('imsg-dark', on && isDark(settings));
-    body.classList.toggle('imsg-lights', on && !!settings.windowButtons);
-    body.classList.toggle('imsg-receipts', on && !!settings.receipts);
-    body.classList.toggle('imsg-typing-on', on && !!settings.typing);
-    body.classList.toggle('imsg-split-on', on && !!settings.splitReplies);
-    body.classList.toggle('imsg-wall', on && !!settings.wallpaper);
+    for (const [name, key] of Object.entries(SETTING_CLASSES)) {
+        body.classList.toggle(name, on && !!settings[key]);
+    }
     if (on) {
         body.style.setProperty('--imsg-wall-blur', `${Number(settings.wallpaperBlur) || 0}px`);
         body.style.setProperty('--imsg-wall-dim', `${Number(settings.wallpaperDim) || 0}%`);
     }
     setDisguise(on);
     refreshPanelTitles(on);
-    // the parts of the theme in the page are built as it turns on and taken away as it turns off
     if (on !== running) {
         running = on;
-        if (on) {
-            startTheme();
-        } else {
-            stopTheme();
-        }
+        on ? startTheme() : stopTheme();
     }
 }
 
 /** Phones show one pane at a time: the conversation list, or the open conversation. */
 function showChatOnPhone() {
-    if (window.matchMedia(MOBILE_QUERY).matches) {
+    if (isPhone()) {
         document.body.classList.add('imsg-m-chat');
     }
 }
 
 function setAppearance(appearance) {
-    const settings = getSettings();
-    settings.appearance = appearance;
+    getSettings().appearance = appearance;
     applySettings();
     saveSettings();
-    const select = /** @type {HTMLSelectElement} */ (document.getElementById('imsg_appearance'));
-    if (select) {
-        select.value = appearance;
-    }
+    showSetting('appearance', appearance);
 }
 
 function onChatChanged(chatId) {
@@ -163,99 +93,12 @@ function onChatChanged(chatId) {
     }
 }
 
-async function renderSettingsPanel() {
-    const { renderExtensionTemplateAsync } = SillyTavern.getContext();
-    const html = await renderExtensionTemplateAsync(EXTENSION_FOLDER, 'settings');
-    const container = document.getElementById('extensions_settings2');
-    if (!container || document.querySelector('.imsg-settings')) {
-        return;
-    }
-    container.insertAdjacentHTML('beforeend', html);
-
-    const settings = getSettings();
-    const field = (id) => /** @type {HTMLInputElement} */ (document.getElementById(id));
-    const enabled = field('imsg_enabled');
-    const pauseUserTheme = field('imsg_pause_user_theme');
-    const appearance = /** @type {HTMLSelectElement} */ (document.getElementById('imsg_appearance'));
-    const windowButtons = field('imsg_window_buttons');
-    const receipts = field('imsg_receipts');
-    const typing = field('imsg_typing');
-    const recentMax = field('imsg_recent_max');
-    const splitReplies = field('imsg_split');
-    const imageLinks = field('imsg_image_links');
-    const wallpaper = field('imsg_wallpaper');
-    const wallpaperBlur = field('imsg_wallpaper_blur');
-    const wallpaperDim = field('imsg_wallpaper_dim');
-    const sounds = field('imsg_sounds');
-    const soundVolume = field('imsg_sound_volume');
-    const notify = field('imsg_notify');
-    const showValues = () => {
-        document.getElementById('imsg_sound_volume_value').textContent = `${settings.soundVolume}%`;
-        document.getElementById('imsg_sound_options').classList.toggle('imsg-off', !settings.sounds);
-        document.getElementById('imsg_wallpaper_blur_value').textContent = `${settings.wallpaperBlur}px`;
-        document.getElementById('imsg_wallpaper_dim_value').textContent = `${settings.wallpaperDim}%`;
-        document.getElementById('imsg_wallpaper_options').classList.toggle('imsg-off', !settings.wallpaper);
-    };
-
-    enabled.checked = settings.enabled;
-    pauseUserTheme.checked = settings.pauseUserTheme !== false;
-    appearance.value = settings.appearance;
-    windowButtons.checked = settings.windowButtons;
-    receipts.checked = settings.receipts;
-    typing.checked = settings.typing;
-    recentMax.value = String(settings.recentMax);
-    splitReplies.checked = settings.splitReplies;
-    imageLinks.checked = settings.imageLinks;
-    wallpaper.checked = settings.wallpaper;
-    wallpaperBlur.value = String(settings.wallpaperBlur);
-    wallpaperDim.value = String(settings.wallpaperDim);
-    sounds.checked = settings.sounds;
-    soundVolume.value = String(settings.soundVolume);
-    notify.checked = settings.notify;
-    showValues();
-
-    const bind = (element, key, read, after) => {
-        element.addEventListener('input', () => {
-            settings[key] = read();
-            applySettings();
-            saveSettings();
-            after?.();
-        });
-    };
-    bind(enabled, 'enabled', () => enabled.checked, () => {
-        refreshMessages();
-        settings.enabled ? exclusive?.activated() : exclusive?.changed();
-    });
-    bind(pauseUserTheme, 'pauseUserTheme', () => pauseUserTheme.checked, () => exclusive?.changed());
-    bind(appearance, 'appearance', () => appearance.value);
-    bind(windowButtons, 'windowButtons', () => windowButtons.checked);
-    bind(receipts, 'receipts', () => receipts.checked);
-    bind(typing, 'typing', () => typing.checked);
-    bind(recentMax, 'recentMax', () => Math.min(500, Math.max(5, Number(recentMax.value) || defaultSettings.recentMax)), () => scheduleRefresh());
-    bind(splitReplies, 'splitReplies', () => splitReplies.checked, () => {
-        resetSplits();
-        refreshMessages();
-    });
-    // turning it off redraws the messages, so the links come back as text
-    bind(imageLinks, 'imageLinks', () => imageLinks.checked, () => SillyTavern.getContext().reloadCurrentChat());
-    bind(wallpaper, 'wallpaper', () => wallpaper.checked, showValues);
-    bind(wallpaperBlur, 'wallpaperBlur', () => Number(wallpaperBlur.value), showValues);
-    bind(wallpaperDim, 'wallpaperDim', () => Number(wallpaperDim.value), showValues);
-    document.getElementById('imsg_wallpaper_pick').addEventListener('click', () => openBackgrounds());
-    document.getElementById('imsg_customize').addEventListener('click', () => openCustomize());
-    bind(sounds, 'sounds', () => sounds.checked, showValues);
-    bind(soundVolume, 'soundVolume', () => Number(soundVolume.value), showValues);
-    soundVolume.addEventListener('change', () => previewSound('receive'));
-    document.getElementById('imsg_sound_send').addEventListener('click', () => previewSound('send'));
-    document.getElementById('imsg_sound_receive').addEventListener('click', () => previewSound('receive'));
-    bind(notify, 'notify', () => notify.checked, async () => {
-        if (settings.notify && !(await askToNotify())) {
-            settings.notify = false;
-            notify.checked = false;
-            saveSettings();
-            toastr.info('Allow notifications for this site in your browser to get them.', 'Notifications are blocked');
-        }
-    });
+function disable() {
+    getSettings().enabled = false;
+    applySettings();
+    showSetting('enabled', false);
+    saveSettings();
+    refreshMessages();
 }
 
 async function init() {
@@ -264,73 +107,65 @@ async function init() {
         id: 'imessage',
         name: 'iMessage',
         folder: 'SillyTavern-iMessage',
-        settingsKey: 'iMessageTheme',
-        bodyClass: 'imessage',
+        settingsKey: MODULE_NAME,
+        bodyClass: BODY_CLASS,
         isEnabled: () => !!getSettings().enabled,
-        disable: () => {
-            getSettings().enabled = false;
-            applySettings();
-            const box = /** @type {HTMLInputElement} */ (document.getElementById('imsg_enabled'));
-            if (box) {
-                box.checked = false;
-            }
-            saveSettings();
-            refreshMessages();
-        },
+        disable,
         pauseUserTheme: () => getSettings().pauseUserTheme !== false,
     });
-    darkQuery.addEventListener('change', applySettings);
+    onSystemAppearanceChange(applySettings);
 
     initShell({
         setAppearance,
         isDark: () => document.body.classList.contains('imsg-dark'),
         customize: () => openCustomize(),
     });
-    const listLoaded = initList({ settings: getSettings, opened: showChatOnPhone });
+    const listLoaded = initList({ opened: showChatOnPhone });
     initSplit();
     initMessages();
     initMonograms();
-    initAlerts({ settings: getSettings });
+    initAlerts();
     initKeys();
     initFeatures();
-    initImages({ settings: getSettings });
+    initImages();
     initContacts();
     initBackgrounds();
     initWorldInfo();
-    initCustomize({
-        settings: getSettings,
-        save: saveSettings,
-        // a setting changed in Customize goes through its own field, so both stay in step
-        setSetting: (key, value) => {
-            const input = /** @type {HTMLInputElement} */ (document.getElementById(SETTING_FIELDS[key]));
-            if (!input) {
-                return;
-            }
-            if (input.type === 'checkbox') {
-                input.checked = !!value;
-            } else {
-                input.value = String(value);
-            }
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-        },
-        pickBackground: () => openBackgrounds(),
-    });
+    initCustomize({ setSetting, pickBackground: () => openBackgrounds() });
     applySettings();
 
-    const { eventTypes } = SillyTavern.getContext();
+    const { eventTypes, getCurrentChatId } = SillyTavern.getContext();
     const eventSource = events();
     eventSource.on(eventTypes.CHAT_CHANGED, onChatChanged);
-    eventSource.on(eventTypes.GROUP_UPDATED, refreshHeader);
-    eventSource.on(eventTypes.CHARACTER_EDITED, refreshHeader);
-    eventSource.on(eventTypes.CHARACTER_RENAMED, refreshHeader);
-    eventSource.on(eventTypes.CHARACTER_RENAMED, refreshTitle);
-    eventSource.on(eventTypes.GROUP_UPDATED, refreshTitle);
-    onChatChanged(SillyTavern.getContext().getCurrentChatId());
+    for (const type of [eventTypes.GROUP_UPDATED, eventTypes.CHARACTER_EDITED, eventTypes.CHARACTER_RENAMED]) {
+        eventSource.on(type, refreshHeader);
+    }
+    for (const type of [eventTypes.CHARACTER_RENAMED, eventTypes.GROUP_UPDATED]) {
+        eventSource.on(type, refreshTitle);
+    }
+    onChatChanged(getCurrentChatId());
     await Promise.race([listLoaded, delay(3000)]);
     endBoot();
 
     try {
-        await renderSettingsPanel();
+        await renderPanel({
+            folder: EXTENSION_FOLDER,
+            apply: applySettings,
+            after: {
+                enabled: () => {
+                    refreshMessages();
+                    getSettings().enabled ? exclusive?.activated() : exclusive?.changed();
+                },
+                pauseUserTheme: () => exclusive?.changed(),
+                recentMax: () => scheduleRefresh(),
+                splitReplies: () => {
+                    resetSplits();
+                    refreshMessages();
+                },
+                // turning it off redraws the messages, so the links come back as text
+                imageLinks: () => SillyTavern.getContext().reloadCurrentChat(),
+            },
+        });
     } catch (error) {
         console.error('[iMessage] Could not render the settings panel', error);
     }
@@ -340,7 +175,7 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/** Lifts the blank loading cover once the Messages window has painted. */
+/** Lifts the loading cover once the Messages window has painted. */
 function endBoot() {
     const body = document.body;
     if (!body.classList.contains('imsg-booting')) {
@@ -352,15 +187,14 @@ function endBoot() {
     }));
 }
 
-/** A plain window-colored cover from the moment this code loads, as a Mac app opens. */
+/** A plain window-colored cover from the moment this code loads, so ST's own UI never flashes. */
 function bootLook() {
     const settings = SillyTavern.getContext().extensionSettings?.[MODULE_NAME];
     if (settings?.enabled === false) {
         return;
     }
     document.body.classList.add('imsg-booting');
-    // never leave the cover up if something fails on the way
-    setTimeout(endBoot, 20000);
+    setTimeout(endBoot, BOOT_TIMEOUT_MS);
     document.body.classList.toggle('imsg-dark', isDark({ ...defaultSettings, ...settings }));
 }
 

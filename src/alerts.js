@@ -1,21 +1,16 @@
-// What a messaging app does when a message comes and goes: a soft sound when you send and when a
-// reply arrives, a blue dot and a count in the tab title for replies that came while you were
-// away, and a system notification if you've allowed them. The sounds are made here with Web Audio,
-// so no sound files ship with the theme.
+// Send/receive sounds (synthesized with Web Audio, no audio files), an unread count in the tab
+// title while the tab is in the background, and optional system notifications.
 
+import { getSettings } from './config.js';
 import { events, whenOn } from './power.js';
 import { imageLabel, withoutImages } from './images.js';
+import { context } from './dom.js';
 
 const RECEIVED_SKIP = new Set(['first_message', 'command', 'extension']);
 
-let getSettings = () => ({ sounds: true, soundVolume: 50, notify: false });
 let audio = null;
 /** Replies that arrived while the tab was in the background */
 let unseen = 0;
-
-function context() {
-    return SillyTavern.getContext();
-}
 
 function audioContext() {
     if (!audio) {
@@ -138,7 +133,7 @@ export async function askToNotify() {
 }
 
 function onReceived(messageId, type) {
-    if (!document.body.classList.contains('imessage') || RECEIVED_SKIP.has(type)) {
+    if (RECEIVED_SKIP.has(type)) {
         return;
     }
     const message = context().chat[Number(messageId)];
@@ -160,15 +155,10 @@ function onSeen() {
     }
 }
 
-export function initAlerts({ settings }) {
-    getSettings = settings;
+export function initAlerts() {
     const { eventTypes } = context();
     const eventSource = events();
-    eventSource.on(eventTypes.MESSAGE_SENT, () => {
-        if (document.body.classList.contains('imessage')) {
-            playSend();
-        }
-    });
+    eventSource.on(eventTypes.MESSAGE_SENT, playSend);
     eventSource.on(eventTypes.MESSAGE_RECEIVED, onReceived);
     document.addEventListener('visibilitychange', whenOn(onSeen));
     window.addEventListener('focus', whenOn(onSeen));

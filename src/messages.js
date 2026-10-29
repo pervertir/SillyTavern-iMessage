@@ -1,13 +1,12 @@
-// Messages' conversation rhythm on top of the app's own messages: runs of bubbles from the same
-// sender sit close together with the tail on the last one, a centered time line starts each
-// stretch of conversation, "Delivered" or "Read" sits under your last message, and a typing
-// bubble shows while a reply is being written. Everything here is classes and data attributes on
-// the existing .mes elements; CSS draws them. Long replies split into short bubbles in split.js.
+// Conversation layout on ST's own .mes elements: grouped runs with the tail on the last bubble,
+// time separators, Delivered/Read and the typing bubble. Only classes and data attributes are
+// added here; CSS does the drawing. Splitting long replies lives in split.js.
 
 import { events, isOn, onStart, whenOn } from './power.js';
 import { splitAll } from './split.js';
 import { decorate } from './features.js';
 import { showImages } from './images.js';
+import { t } from './dom.js';
 
 /** A new time line once this much time has passed between two messages */
 const STAMP_GAP_MS = 60 * 60 * 1000;
@@ -17,10 +16,6 @@ const TYPING_TIMEOUT_MS = 5 * 60 * 1000;
 
 let frame = 0;
 let typingTimer = 0;
-
-function t(text) {
-    return SillyTavern.getContext().translate(text);
-}
 
 function toMoment(value) {
     const { timestampToMoment } = SillyTavern.getContext();
@@ -77,7 +72,7 @@ function isJumboEmoji(text) {
     }
     const compact = text.replace(/\s+/g, '');
     const count = (compact.match(/\p{Extended_Pictographic}|\p{Regional_Indicator}{2}/gu) || []).length;
-    const rest = compact.replace(/\p{Extended_Pictographic}|\p{Regional_Indicator}|[\u200d\ufe0f\u{1F3FB}-\u{1F3FF}]/gu, '');
+    const rest = compact.replace(/\p{Extended_Pictographic}|\p{Regional_Indicator}|\u200d|\ufe0f|[\u{1F3FB}-\u{1F3FF}]/gu, '');
     return count > 0 && count <= 3 && rest === '';
 }
 
@@ -255,7 +250,7 @@ export function initMessages() {
         // a click on a picture opens it large, like its zoom button
         chatElement.addEventListener('click', (event) => {
             const target = /** @type {HTMLElement} */ (event.target);
-            if (document.body.classList.contains('imessage') && target.matches?.('.mes_media_container :is(img, video)')) {
+            if (isOn() && target.matches?.('.mes_media_container :is(img, video)')) {
                 target.closest('.mes_media_container')?.querySelector('.mes_media_enlarge')?.click();
             }
         });

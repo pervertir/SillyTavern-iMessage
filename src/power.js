@@ -1,6 +1,6 @@
-// On and off. While the theme is off nothing of it touches the app's page: every handler it hangs
-// on the app is gated on the theme being on, the parts it builds into the page are built when it
-// turns on, and turning it off takes away everything it added.
+// Theme on/off lifecycle. While off, nothing of the theme is in the page: handlers are gated with
+// whenOn/events(), page parts are built in onStart callbacks, and stopTheme() removes every
+// element, class and data attribute the theme added.
 
 const starters = [];
 const stoppers = [];
