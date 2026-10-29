@@ -63,3 +63,25 @@ export function nearBottom(scroller, distance) {
 export function within(event, selector) {
     return Boolean(/** @type {Element} */ (event.target).closest?.(selector));
 }
+
+/** How wide SillyTavern makes avatar and persona thumbnails (thumbnails.dimensions in its config.yaml) */
+const THUMBNAIL_WIDTH = 96;
+
+/**
+ * Shows a character's or persona's picture sharp at any size and screen density: the browser takes
+ * the small thumbnail while it covers the box, and the original picture once it would be stretched.
+ * @param {HTMLImageElement} img
+ * @param {'avatar'|'persona'} type
+ * @param {string} file The avatar's file name
+ * @param {number} size The box's width in CSS pixels
+ * @param {number} [phoneSize] Its width in the phone layout, when different
+ */
+export function setPicture(img, type, file, size, phoneSize = size) {
+    const thumbnail = context().getThumbnailUrl(type, file);
+    const original = `/${type === 'persona' ? 'User Avatars' : 'characters'}/${encodeURIComponent(file)}`;
+    img.src = thumbnail;
+    img.sizes = phoneSize === size ? `${size}px` : `${PHONE_QUERY} ${phoneSize}px, ${size}px`;
+    // the original's real width doesn't matter, only that it's the larger one
+    img.srcset = `${thumbnail} ${THUMBNAIL_WIDTH}w, ${original} ${THUMBNAIL_WIDTH * 8}w`;
+    img.addEventListener('error', () => img.removeAttribute('srcset'), { once: true });
+}

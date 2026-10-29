@@ -9,10 +9,13 @@ import { openExtensions } from './addons.js';
 import { openConnections, openFormatting, openResponseSettings, openSettings } from './settings.js';
 import { buildMonogram, monogramize } from './monograms.js';
 import { events, onStart, whenOn } from './power.js';
-import { button, glyph, t } from './dom.js';
+import { button, glyph, setPicture, t } from './dom.js';
 
 const HEADER_ID = 'imsg-head';
 const MENU_ID = 'imsg-menu';
+/** The header picture's size in CSS pixels (shell.css, and mobile.css on a phone) */
+const HEAD_AVATAR = 40;
+const HEAD_AVATAR_PHONE = 50;
 
 /** The app's menus, named the way a Mac app would list them, in its own order */
 const PANELS = [
@@ -371,8 +374,13 @@ function openInfoMenu(anchor) {
     ]);
 }
 
-/** A group's picture: up to three of its members' pictures in a cluster, as Messages shows a group. */
-export function buildGroupAvatar(group) {
+/**
+ * A group's picture: up to three of its members' pictures in a cluster, as Messages shows a group.
+ * @param {object} group
+ * @param {number} [size] The cluster's width in CSS pixels
+ * @param {number} [phoneSize] Its width in the phone layout
+ */
+export function buildGroupAvatar(group, size = 40, phoneSize = size) {
     const context = SillyTavern.getContext();
     const cluster = document.createElement('span');
     cluster.className = 'imsg-cluster';
@@ -390,7 +398,9 @@ export function buildGroupAvatar(group) {
         const img = document.createElement('img');
         img.alt = '';
         img.loading = 'lazy';
-        img.src = context.getThumbnailUrl('avatar', character.avatar);
+        // with one member the face fills the cluster, with more it's two thirds or less
+        const share = members.length > 1 ? 0.66 : 1;
+        setPicture(img, 'avatar', character.avatar, Math.ceil(size * share), Math.ceil(phoneSize * share));
         face.append(img);
         cluster.append(face);
         monogramize(img, character.name);
@@ -421,12 +431,12 @@ export function refreshHeader() {
     document.body.classList.toggle('imsg-group', !!group);
 
     if (group) {
-        avatar.append(buildGroupAvatar(group));
+        avatar.append(buildGroupAvatar(group, HEAD_AVATAR, HEAD_AVATAR_PHONE));
         name.textContent = group.name;
     } else if (character) {
         const img = document.createElement('img');
         img.alt = '';
-        img.src = context.getThumbnailUrl('avatar', character.avatar);
+        setPicture(img, 'avatar', character.avatar, HEAD_AVATAR, HEAD_AVATAR_PHONE);
         avatar.append(img);
         name.textContent = character.name;
         monogramize(img, character.name);
@@ -531,7 +541,7 @@ function clusterGroupRows() {
             return;
         }
         avatar.querySelector(':scope > .imsg-cluster')?.remove();
-        avatar.append(buildGroupAvatar(group));
+        avatar.append(buildGroupAvatar(group, 50));
         avatar.dataset.imsgCluster = key;
     });
 }

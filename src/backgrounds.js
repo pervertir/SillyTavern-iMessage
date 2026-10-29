@@ -5,7 +5,7 @@
 import { background_settings, getBackgroundPath } from '../../../../backgrounds.js';
 import { events, onStop } from './power.js';
 import { toggleMenu } from './shell.js';
-import { button, context, element, glyph, isPhone, overlayOpen, t } from './dom.js';
+import { PHONE_QUERY, button, context, element, glyph, isPhone, overlayOpen, t } from './dom.js';
 
 const ROOT_ID = 'imsg-backgrounds';
 const ALL = 'all';
@@ -66,7 +66,6 @@ function readPictures() {
             name: name.replace(/\.[^.]+$/, ''),
             url: urlOf(tile),
             thumb: custom ? file : context().getThumbnailUrl('bg', file),
-            // the thumbnail is 160px wide, too soft for a tile on a high-density screen
             full: custom ? null : getBackgroundPath(file),
         };
     });
@@ -201,7 +200,11 @@ function buildTile(picture) {
     img.decoding = 'async';
     img.src = picture.thumb;
     if (picture.full) {
-        img.srcset = `${picture.thumb} 1x, ${picture.full} 2x`;
+        // the thumbnail (160 by 90) covers a 16:10 tile only up to 144px wide, and tiles are wider
+        // than that, so the browser takes the original as soon as it lays the tile out
+        img.sizes = `auto, ${PHONE_QUERY} 50vw, 240px`;
+        img.srcset = `${picture.thumb} 144w, ${picture.full} 1920w`;
+        img.addEventListener('error', () => img.removeAttribute('srcset'), { once: true });
     }
     frame.append(img);
     if (current) {

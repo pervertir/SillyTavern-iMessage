@@ -8,7 +8,7 @@ import { monogramizeAll } from './monograms.js';
 import { buildGroupAvatar, buildSidebarToolbar, clickOption, toggleMenu } from './shell.js';
 import { getSettings } from './config.js';
 import { events, onStart, whenOn } from './power.js';
-import { glyph, t } from './dom.js';
+import { glyph, setPicture, t } from './dom.js';
 
 const SIDEBAR_ID = 'imsg-sidebar';
 /** The app's own pinned chats, kept in account storage by welcome-screen.js */
@@ -91,15 +91,23 @@ function isCurrent(entry) {
     return context.characters[context.characterId]?.avatar === entry.avatar;
 }
 
-function buildAvatar(entry) {
+/** Picture sizes in CSS pixels, on a computer and on a phone (shell.css, mobile.css) */
+const ROW_AVATAR = [40, 46];
+const PIN_AVATAR = [62, 78];
+
+function buildAvatar(entry, [size, phoneSize]) {
     const avatar = document.createElement('span');
     avatar.className = 'imsg-avatar';
     if (entry.group) {
         const group = SillyTavern.getContext().groups.find(x => x.id === entry.group);
-        avatar.append(buildGroupAvatar(group ?? { name: entry.name }));
+        avatar.append(buildGroupAvatar(group ?? { name: entry.name }, size, phoneSize));
     } else {
         const img = document.createElement('img');
-        img.src = entry.thumb;
+        if (entry.picture) {
+            setPicture(img, 'avatar', entry.picture, size, phoneSize);
+        } else {
+            img.src = '';
+        }
         img.alt = '';
         img.loading = 'lazy';
         img.decoding = 'async';
@@ -137,7 +145,7 @@ function buildRow(entry) {
     typing.append(document.createElement('span'), document.createElement('span'), document.createElement('span'));
     text.append(top, preview, typing);
 
-    row.append(buildAvatar(entry), text);
+    row.append(buildAvatar(entry, ROW_AVATAR), text);
     return row;
 }
 
@@ -152,7 +160,7 @@ function buildPin(entry) {
     const name = document.createElement('span');
     name.className = 'imsg-pin-name';
     name.textContent = entry.name;
-    pin.append(buildAvatar(entry), name);
+    pin.append(buildAvatar(entry, PIN_AVATAR), name);
     return pin;
 }
 
@@ -242,7 +250,7 @@ export async function refreshList() {
             title: `${character?.name || group?.name || ''}: ${fileId}`,
             avatar: chat.avatar || '',
             group: chat.group || '',
-            thumb: character ? context.getThumbnailUrl('avatar', character.avatar) : '',
+            picture: character?.avatar ?? '',
             fileId,
             fileName: chat.file_name,
             preview: toPreview(chat.mes),

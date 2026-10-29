@@ -48,7 +48,7 @@ export async function openContactCard() {
     const card = element('div', 'imsg-card');
     const picture = element('div', 'imsg-card-picture imsg-avatar');
     if (group) {
-        picture.append(buildGroupAvatar(group));
+        picture.append(buildGroupAvatar(group, 108));
     } else {
         const img = element('img');
         img.alt = '';
