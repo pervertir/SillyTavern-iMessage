@@ -13,6 +13,7 @@ import { initFeatures } from './features.js';
 import { initImages } from './images.js';
 import { initCustomize, openCustomize } from './customize.js';
 import { initContacts } from './contacts.js';
+import { initBackgrounds, openBackgrounds } from './backgrounds.js';
 import { registerTheme } from './theme-exclusive.js';
 
 const MODULE_NAME = 'iMessageTheme';
@@ -221,7 +222,7 @@ async function renderSettingsPanel() {
     bind(wallpaper, 'wallpaper', () => wallpaper.checked, showValues);
     bind(wallpaperBlur, 'wallpaperBlur', () => Number(wallpaperBlur.value), showValues);
     bind(wallpaperDim, 'wallpaperDim', () => Number(wallpaperDim.value), showValues);
-    document.getElementById('imsg_wallpaper_pick').addEventListener('click', () => openDrawer('backgrounds-button'));
+    document.getElementById('imsg_wallpaper_pick').addEventListener('click', () => openBackgrounds());
     document.getElementById('imsg_customize').addEventListener('click', () => openCustomize());
     bind(sounds, 'sounds', () => sounds.checked, showValues);
     bind(soundVolume, 'soundVolume', () => Number(soundVolume.value), showValues);
@@ -275,6 +276,7 @@ async function init() {
     initFeatures();
     initImages({ settings: getSettings });
     initContacts();
+    initBackgrounds();
     initCustomize({
         settings: getSettings,
         save: saveSettings,
@@ -291,7 +293,7 @@ async function init() {
             }
             input.dispatchEvent(new Event('input', { bubbles: true }));
         },
-        pickBackground: () => openDrawer('backgrounds-button'),
+        pickBackground: () => openBackgrounds(),
     });
     applySettings();
 

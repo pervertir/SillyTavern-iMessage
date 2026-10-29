@@ -4,6 +4,7 @@
 
 import { openContactCard } from './card.js';
 import { openContacts, openMyCard } from './contacts.js';
+import { openBackgrounds } from './backgrounds.js';
 import { buildMonogram, monogramize } from './monograms.js';
 
 const HEADER_ID = 'imsg-head';
@@ -26,6 +27,7 @@ const PANELS = [
 const NATIVE = {
     rightNavHolder: () => openContacts(),
     'persona-management-button': () => openMyCard(),
+    'backgrounds-button': () => openBackgrounds(),
 };
 
 let shellOptions = { setAppearance: (_appearance) => {}, isDark: () => false };

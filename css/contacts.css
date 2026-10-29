@@ -979,3 +979,183 @@ body.imessage .imsg-cn-row.imsg-cn-current .imsg-cn-me-text small {
     color: inherit;
     opacity: 0.8;
 }
+
+/* ── Backgrounds: the same window, with a photo grid ── */
+
+body.imessage .imsg-bg .imsg-cn-window {
+    width: min(1040px, calc(100vw - 48px));
+    height: min(700px, calc(100dvh - 48px));
+    grid-template-columns: 240px 1fr;
+}
+
+body.imessage .imsg-bg-source-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 22px;
+    color: var(--imsg-blue);
+    --imsg-sym-size: 17px;
+}
+
+body.imessage .imsg-cn-row.imsg-cn-current .imsg-bg-source-icon {
+    color: inherit;
+}
+
+body.imessage .imsg-bg-source {
+    min-height: 32px;
+}
+
+body.imessage .imsg-bg-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    flex: none;
+    padding: 0 20px 10px;
+    font-size: var(--imsg-text-sm);
+    color: var(--imsg-fg-2);
+}
+
+body.imessage .imsg-bg-link {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--imsg-blue);
+    font: inherit;
+    cursor: default;
+}
+
+body.imessage .imsg-bg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+    align-content: start;
+    gap: 18px 14px;
+    flex: 1;
+    min-height: 0;
+    padding: 4px 20px 24px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+}
+
+body.imessage .imsg-bg-grid > .imsg-cn-empty {
+    grid-column: 1 / -1;
+    height: auto;
+    padding-top: 120px;
+}
+
+body.imessage .imsg-bg-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--imsg-fg);
+    font: inherit;
+    text-align: center;
+    cursor: default;
+}
+
+body.imessage .imsg-bg-frame {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--imsg-group-bg);
+    box-shadow: 0 0 0 0.5px var(--imsg-line);
+    transition: box-shadow 0.15s var(--imsg-ease), transform 0.15s var(--imsg-ease);
+}
+
+body.imessage .imsg-bg-frame > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+body.imessage .imsg-bg-tile:hover .imsg-bg-frame {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 0.5px var(--imsg-line), 0 6px 18px rgba(0, 0, 0, 0.16);
+}
+
+body.imessage .imsg-bg-tile.imsg-bg-current .imsg-bg-frame {
+    box-shadow: 0 0 0 3px var(--imsg-blue), 0 0 0 4.5px var(--imsg-window);
+}
+
+body.imessage .imsg-bg-badge {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--imsg-blue);
+    color: #fff;
+    box-shadow: 0 0 0 1.5px #fff;
+    --imsg-sym-size: 12px;
+}
+
+body.imessage .imsg-bg-more {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    opacity: 0;
+    backdrop-filter: blur(8px);
+    transition: opacity 0.12s;
+    --imsg-sym-size: 15px;
+}
+
+body.imessage .imsg-bg-tile:hover .imsg-bg-more,
+body.imessage .imsg-bg-more.imsg-pressed {
+    opacity: 1;
+}
+
+body.imessage .imsg-bg-name {
+    overflow: hidden;
+    font-size: var(--imsg-text-sm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--imsg-fg-2);
+}
+
+body.imessage .imsg-bg-tile.imsg-bg-current .imsg-bg-name {
+    color: var(--imsg-fg);
+    font-weight: 600;
+}
+
+@media screen and (max-width: 1000px) {
+    body.imessage .imsg-bg .imsg-cn-window {
+        width: 100%;
+        height: 100dvh;
+    }
+
+    body.imessage .imsg-bg-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px 10px;
+        padding: 4px 14px calc(24px + env(safe-area-inset-bottom));
+    }
+
+    body.imessage .imsg-bg-more {
+        opacity: 1;
+    }
+
+    body.imessage .imsg-bg-status {
+        padding: 0 14px 10px;
+    }
+}
