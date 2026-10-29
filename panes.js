@@ -121,7 +121,8 @@ function renderSide(side) {
 
 function paneBar(title) {
     const bar = element('header', 'imsg-cn-pane-bar');
-    const back = button('imsg-cn-back', open.def.title, () => {
+    // as on iOS, a long title gives way to Back so it doesn't run into the pane's own title
+    const back = button('imsg-cn-back', open.def.title.length > 12 ? 'Back' : open.def.title, () => {
         open.level = 0;
         render();
     });
