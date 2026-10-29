@@ -918,7 +918,7 @@ function renderGroupForm(pane, item) {
     behaviour.append(labelled('Who answers next', strategy), labelled('Cards in the prompt', mode), selfBox);
     form.append(behaviour);
 
-    const save = button('imsg-cn-save', 'Done');
+    const save = button('imsg-cn-save', group ? 'Done' : 'Create');
     save.type = 'submit';
     const cancel = button('imsg-cn-cancel', 'Cancel', () => {
         view.mode = 'card';
