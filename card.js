@@ -3,7 +3,8 @@
 // app's character editor.
 
 import { monogramize } from './monograms.js';
-import { buildGroupAvatar, clickOption, openDrawer } from './shell.js';
+import { buildGroupAvatar, clickOption } from './shell.js';
+import { deleteCurrentContact, openContacts, openCurrentContact } from './contacts.js';
 
 const DESCRIPTION_LIMIT = 220;
 
@@ -61,7 +62,7 @@ export async function openContactCard() {
     const group = context.groupId ? context.groups.find(x => String(x.id) === String(context.groupId)) : null;
     const character = !group && context.characterId !== undefined ? context.characters[context.characterId] : null;
     if (!group && !character) {
-        openDrawer('rightNavHolder');
+        openContacts();
         return;
     }
 
@@ -100,24 +101,18 @@ export async function openContactCard() {
         action('Message', 'send', then(() => document.getElementById('send_textarea')?.focus())),
         action('New', 'compose', then(() => clickOption('option_start_new_chat'))),
         action('History', 'arrow-clockwise', then(() => clickOption('option_select_chat'))),
-        action('Edit', 'pencil', then(() => openDrawer('rightNavHolder'))),
+        action('Edit', 'pencil', then(() => openCurrentContact({ edit: true }))),
     );
     card.append(actions);
 
     const list = element('div', 'imsg-card-list');
     if (group) {
         list.append(
-            row('Delete Group…', then(() => {
-                openDrawer('rightNavHolder');
-                setTimeout(() => document.getElementById('rm_group_delete')?.click(), 50);
-            }), true),
+            row('Delete Group…', then(deleteCurrentContact), true),
         );
     } else {
         list.append(
-            row('Delete Contact…', then(() => {
-                openDrawer('rightNavHolder');
-                setTimeout(() => document.querySelector('#rm_ch_create_block #delete_button, div#delete_button')?.click(), 50);
-            }), true),
+            row('Delete Contact…', then(deleteCurrentContact), true),
         );
     }
     card.append(list);

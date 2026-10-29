@@ -12,6 +12,7 @@ import { initKeys } from './keys.js';
 import { initFeatures } from './features.js';
 import { initImages } from './images.js';
 import { initCustomize, openCustomize } from './customize.js';
+import { initContacts } from './contacts.js';
 
 const MODULE_NAME = 'iMessageTheme';
 /** Folder path under scripts/extensions/, e.g. third-party/SillyTavern-iMessage */
@@ -242,6 +243,7 @@ async function init() {
     initKeys();
     initFeatures();
     initImages({ settings: getSettings });
+    initContacts();
     initCustomize({
         settings: getSettings,
         save: saveSettings,

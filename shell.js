@@ -3,6 +3,7 @@
 // empty pane while no conversation is open.
 
 import { openContactCard } from './card.js';
+import { openContacts } from './contacts.js';
 import { buildMonogram, monogramize } from './monograms.js';
 
 const HEADER_ID = 'imsg-head';
@@ -119,16 +120,15 @@ function appItems() {
     return root ? itemsFrom(root, root.querySelectorAll('.list-group-item')) : [];
 }
 
-/** New Message: pick someone from Contacts. */
 /** Hides or shows the conversation list. With no conversation open there is nothing else to
  * show, so the list stays. */
 export function toggleSidebar(hide = !document.body.classList.contains('imsg-side-hidden')) {
     document.body.classList.toggle('imsg-side-hidden', hide && !document.body.classList.contains('imsg-no-chat'));
 }
 
+/** New Message: pick someone from Contacts. */
 export function newMessage() {
-    openDrawer('rightNavHolder');
-    document.getElementById('rm_button_characters')?.click();
+    openContacts({ pick: true });
 }
 
 function closeMenu() {
@@ -227,7 +227,8 @@ function appMenuItems() {
     return [
         { label: 'New Message', run: newMessage },
         {},
-        ...PANELS.filter(({ id }) => document.getElementById(id)).map(({ id, label }) => ({ label, run: () => openDrawer(id) })),
+        // Contacts is the theme's own window, not the app's character panel
+        ...PANELS.filter(({ id }) => document.getElementById(id)).map(({ id, label }) => ({ label, run: id === 'rightNavHolder' ? () => openContacts() : () => openDrawer(id) })),
         {},
         { label: 'Light Mode', checked: !dark, run: () => shellOptions.setAppearance('light') },
         { label: 'Dark Mode', checked: dark, run: () => shellOptions.setAppearance('dark') },
