@@ -71,7 +71,16 @@ body.imessage.imsg-wall.imsg-group #chat .mes.imsg-first:not([is_user="true"], .
 }
 
 body.imessage.imsg-wall #chat .mes .swipeRightBlock {
-    padding: 0 4px;
+    padding: 0 4px 0 26px;
+}
+
+body.imessage.imsg-wall #chat .mes .swipe_left {
+    margin-left: 4px;
+}
+
+body.imessage.imsg-wall #chat .mes[is_user="true"] .swipe_left {
+    margin-right: 56px;
+    margin-left: 0;
 }
 
 /* The theme's settings for it */

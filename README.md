@@ -20,17 +20,17 @@ A SillyTavern extension that makes the whole app look and work like Messages on 
   | Menu item | Opens |
   |---|---|
   | New Message | A "To:" picker of your contacts and groups |
-  | Response Settings | AI Response Configuration |
-  | Connections | API Connections |
-  | Formatting | AI Response Formatting |
+  | Response Settings | The theme's own Response Settings window |
+  | Connections | The theme's own Connections window |
+  | Formatting | The theme's own Formatting window |
   | World Info | The theme's own World Info window (below) |
-  | Settings | User Settings |
+  | Settings | The theme's own Settings window |
   | Backgrounds | The theme's own Backgrounds window (below) |
-  | Extensions | Extensions |
+  | Extensions | The theme's own Extensions window |
   | Personas | My Card in Contacts (below) |
   | Contacts | The theme's own Contacts window (below) |
 
-  Each SillyTavern menu opens as a Mac sheet with its name in the title bar and a blue Done button.
+  Settings, Connections, Formatting, Response Settings and Extensions open as System Settings-style windows: their sections in a sidebar with colored icons and search, the open section on the right, with SillyTavern's own controls laid out as grouped rows. Connections lists each kind of API, marks the one in use, and has Use for Replies on the others.
 - **Contacts.** A Contacts-style window in place of SillyTavern's character list and editor: search, tag chips, Favorites, Groups and A to Z with a letter index on the left, the selected contact's card on the right (picture, about line, Message, New, History and Favorite, description, first message, export, duplicate, delete). Edit opens a native form for every card field, other first messages and the advanced prompts. The + menu makes a new contact or group, or imports a card from a file or a link. Groups get their own form for members (add, mute, reorder), who answers next and how cards are combined. On a phone it fills the screen and the card slides over the list.
 - **Backgrounds.** A photo-library window: My Backgrounds, This Chat and your folders in the sidebar, the pictures in a grid. Click to use one (for this chat if it has its own, everywhere otherwise); right-click or ⋯ to use it for this chat only, use it everywhere, rename, add to a folder, make it a folder cover or delete it. + adds pictures or a folder.
 - **World Info.** Laid out like Notes: your lorebooks in the sidebar (with where each is on: every chat, this chat or the character), the open book's entries beside them, and the entry editor on the right. Each entry has its title, an on switch, when it's used (keywords, always, or vector search), its content with a token count, where it goes in the prompt, and an Advanced section for timing, groups, recursion and triggers. Scan Settings holds the global options. Right-click a book or entry for the rest.

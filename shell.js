@@ -7,6 +7,7 @@ import { openContacts, openMyCard } from './contacts.js';
 import { openBackgrounds } from './backgrounds.js';
 import { openWorldInfo } from './worldinfo.js';
 import { openExtensions } from './addons.js';
+import { openConnections, openFormatting, openResponseSettings, openSettings } from './settings.js';
 import { buildMonogram, monogramize } from './monograms.js';
 
 const HEADER_ID = 'imsg-head';
@@ -32,6 +33,10 @@ const NATIVE = {
     'backgrounds-button': () => openBackgrounds(),
     'WI-SP-button': () => openWorldInfo(),
     'extensions-settings-button': () => openExtensions(),
+    'user-settings-button': () => openSettings(),
+    'sys-settings-button': () => openConnections(),
+    'advanced-formatting-button': () => openFormatting(),
+    'ai-config-button': () => openResponseSettings(),
 };
 
 let shellOptions = { setAppearance: (_appearance) => {}, isDark: () => false };

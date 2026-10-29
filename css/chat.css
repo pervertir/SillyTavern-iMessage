@@ -874,12 +874,21 @@ body.imessage #chat .mes .swipeRightBlock {
     pointer-events: auto;
 }
 
+/* the right arrow's block spans the whole "‹ 1/3 ›" (it leaves room for the left arrow, which
+   sits over its start), so the control reads as one piece, and one pill over a background */
 body.imessage #chat .mes .swipeRightBlock {
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
     gap: 2px;
-    margin-left: 22px;
+    margin-left: 0;
+    padding-left: 22px;
+}
+
+body.imessage #chat .mes .swipe_left {
+    position: relative;
+    inset: auto;
+    z-index: 1;
 }
 
 body.imessage #chat .mes .swipe_left,
@@ -887,8 +896,12 @@ body.imessage #chat .mes .swipe_right {
     width: 20px;
     height: 20px;
     border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: var(--imsg-label);
     font-size: 11px;
+    line-height: 1;
     opacity: 1;
     filter: none;
     text-shadow: none;
@@ -905,15 +918,23 @@ body.imessage #chat .mes .swipes-counter {
     min-width: 0;
     padding: 0;
     margin: 0;
+    min-width: 28px;
+    justify-content: center;
     color: var(--imsg-label);
     font-size: var(--imsg-text-xs);
     line-height: 13px;
     font-weight: 500;
+    text-align: center;
 }
 
 body.imessage #chat .mes[is_user="true"] .swipe_left,
 body.imessage #chat .mes[is_user="true"] .swipeRightBlock {
     justify-self: end;
+}
+
+/* on your side the block ends at the right: the left arrow sits at its start (22 + 28 + 2 + 20) */
+body.imessage #chat .mes[is_user="true"] .swipe_left {
+    margin-right: 52px;
 }
 
 /* only the last message swipes, unless Swipe All Messages is on */

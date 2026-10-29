@@ -1,0 +1,98 @@
+/* Settings, Connections, Formatting and Response Settings (panes.js): the app's own controls,
+   borrowed into System Settings-style panes and laid out as grouped rows. */
+
+body.imessage .imsg-set-show {
+    display: block !important;
+}
+
+body.imessage .imsg-set-notitle > .imsg-hosted:first-child > h4:first-child {
+    display: none;
+}
+
+body.imessage .imsg-set-host {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+body.imessage .imsg-set-host .imsg-hosted {
+    width: auto;
+    margin: 0;
+}
+
+body.imessage .imsg-set-host label.checkbox_label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 34px;
+    margin: 0;
+    padding: 5px 0;
+}
+
+body.imessage .imsg-set-host label.checkbox_label > input[type="checkbox"] {
+    order: 9;
+    margin: 0 0 0 auto;
+}
+
+body.imessage .imsg-set-host label.checkbox_label :is(small, span) {
+    font-size: 13px;
+    color: var(--imsg-fg);
+}
+
+body.imessage .imsg-set-host :is(label.checkbox_label, .imsg-hosted) + label.checkbox_label {
+    box-shadow: inset 0 0.5px 0 var(--imsg-line);
+}
+
+body.imessage .imsg-set-host h4 {
+    margin: 14px 0 4px;
+    padding: 0;
+    border: none;
+    background: none;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--imsg-fg-2);
+}
+
+body.imessage .imsg-set-host > .imsg-hosted:first-child > h4:first-child,
+body.imessage .imsg-set-host > h4.imsg-hosted:first-child {
+    margin-top: 0;
+}
+
+body.imessage .imsg-set .imsg-ext-banner {
+    margin-bottom: 2px;
+}
+
+/* the prompt list has its own section in Response Settings */
+body.imessage .imsg-set-host[data-section="advanced"] .range-block:has(> #completion_prompt_manager) {
+    display: none;
+}
+
+body.imessage .imsg-set-host :is(label, .flex-container) > small {
+    font-size: 13px;
+    color: var(--imsg-fg);
+}
+
+body.imessage .imsg-set-host .menu_button,
+body.imessage .imsg-set-host .menu_button small {
+    font-size: 13px;
+}
+
+/* the app's faint-white text colors, made to read on the theme's light and dark panes */
+body.imessage .imsg-host {
+    --white20a: color-mix(in srgb, var(--imsg-fg) 20%, transparent);
+    --white30a: color-mix(in srgb, var(--imsg-fg) 30%, transparent);
+    --white50a: color-mix(in srgb, var(--imsg-fg) 50%, transparent);
+    --white60a: color-mix(in srgb, var(--imsg-fg) 60%, transparent);
+    --white70a: color-mix(in srgb, var(--imsg-fg) 70%, transparent);
+}
+
+/* options that sit side by side keep their switch before the name */
+body.imessage .imsg-set-host .flex-container:not(.flexFlowColumn) > label.checkbox_label {
+    min-height: 0;
+    box-shadow: none;
+}
+
+body.imessage .imsg-set-host .flex-container:not(.flexFlowColumn) > label.checkbox_label > input[type="checkbox"] {
+    order: 0;
+    margin: 0;
+}

@@ -3,7 +3,8 @@
 // Esc closes the open sheet.
 // The app's own ↑ (edit your last message) keeps working.
 
-import { closeDrawers, newMessage, openDrawer, toggleSidebar } from './shell.js';
+import { closeDrawers, newMessage, toggleSidebar } from './shell.js';
+import { openSettings } from './settings.js';
 
 function isMac() {
     return /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
@@ -41,7 +42,7 @@ function onKeyDown(event) {
     }
     if (command && !event.altKey && key === ',') {
         event.preventDefault();
-        openDrawer('user-settings-button');
+        openSettings();
         return;
     }
     // Esc closes an open sheet, unless a dialog, menu or field is handling it

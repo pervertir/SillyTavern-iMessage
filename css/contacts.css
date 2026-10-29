@@ -1661,3 +1661,7 @@ body.imessage .imsg-ext-host :is(img, video, canvas, table, textarea, select, in
 body.imessage .imsg-ext-host :is(button, .menu_button) {
     white-space: nowrap;
 }
+
+body.imessage .imsg-ext-body > * {
+    flex: none;
+}
