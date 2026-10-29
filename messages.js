@@ -96,6 +96,11 @@ function markAll() {
     if (!chatElement) {
         return;
     }
+    // the typing bubble stays below the message that was just sent, which the app adds after it
+    const typing = document.getElementById(TYPING_ID);
+    if (typing && !typing.hidden && typing !== chatElement.lastElementChild) {
+        chatElement.append(typing);
+    }
     const { chat } = SillyTavern.getContext();
     const rows = [...chatElement.querySelectorAll(':scope > .mes[mesid]')].map((mes) => {
         const message = chat[Number(mes.getAttribute('mesid'))];

@@ -286,6 +286,7 @@ body.imessage #chat .mes .ch_name > * {
 }
 
 body.imessage #chat .mes .ch_name .timestamp,
+body.imessage #chat .mes .ch_name .timestamp-icon,
 body.imessage #chat .mes .ch_name .mes_ghost {
     display: none;
 }
@@ -1106,4 +1107,35 @@ body.imessage.imsg-unread .imsg-row.imsg-selected::before {
     margin-top: -4px;
     border-radius: 50%;
     background: #ffffff;
+}
+
+/* Where the app's memory of the conversation starts. The app marks it with a dotted line, also on
+   the first message when the whole conversation fits, where it says nothing. Only a real cut shows,
+   as a quiet line like the time stamps. */
+body.imessage #chat .mes.lastInContext {
+    border-top: none !important;
+}
+
+body.imessage #chat .mes ~ .mes.lastInContext {
+    position: relative;
+    padding-top: calc(var(--imsg-mes-gap) + 30px);
+}
+
+body.imessage #chat .mes ~ .mes.lastInContext::before {
+    content: "Older messages aren't remembered";
+    position: absolute;
+    top: 8px;
+    left: 16px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--imsg-label);
+    font-size: var(--imsg-text-xs);
+    line-height: 14px;
+    white-space: nowrap;
+    background:
+        linear-gradient(var(--imsg-line), var(--imsg-line)) left center / calc(50% - 110px) 0.5px no-repeat,
+        linear-gradient(var(--imsg-line), var(--imsg-line)) right center / calc(50% - 110px) 0.5px no-repeat;
+    justify-content: center;
 }
