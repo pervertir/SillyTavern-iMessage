@@ -139,7 +139,7 @@ function paneBar(title, right) {
 
 function reloadBanner() {
     const banner = element('div', 'imsg-ext-banner');
-    banner.append(element('span', '', t('Reload to finish turning extensions on or off.')), button('imsg-ext-reload', 'Reload', () => location.reload()));
+    banner.append(element('span', '', t('The page reloads when you close Extensions, to finish turning them on or off.')), button('imsg-ext-reload', 'Reload Now', () => location.reload()));
     return banner;
 }
 
@@ -242,6 +242,10 @@ function close() {
     releaseAll();
     document.getElementById(ROOT_ID)?.remove();
     document.removeEventListener('keydown', onKey, true);
+    // as ST's own Manage Extensions does: the changes are saved, a reload applies them
+    if (needsReload) {
+        location.reload();
+    }
 }
 
 function onKey(event) {

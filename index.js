@@ -43,6 +43,9 @@ let exclusive = null;
 /** Whether the theme's parts are in the page */
 let running = false;
 
+/** Whether init() has run, i.e. this code was already in use before an update */
+let initialized = false;
+
 function applySettings() {
     const settings = getSettings();
     const body = document.body;
@@ -102,6 +105,7 @@ function disable() {
 }
 
 async function init() {
+    initialized = true;
     applySettings();
     exclusive = registerTheme({
         id: 'imessage',
@@ -169,6 +173,19 @@ async function init() {
     } catch (error) {
         console.error('[iMessage] Could not render the settings panel', error);
     }
+}
+
+/**
+ * ST calls this after updating the extension (manifest "hooks"). The running code is the old
+ * version, so the page reloads once to load the new one. An update made while the page loads,
+ * before init(), already loads the new code and needs no reload.
+ */
+export function onUpdate() {
+    if (!initialized || !getSettings().enabled) {
+        return;
+    }
+    toastr.info(SillyTavern.getContext().translate('Loading the new version…'), 'iMessage Theme');
+    setTimeout(() => location.reload(), 1500);
 }
 
 function delay(ms) {
