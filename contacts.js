@@ -7,7 +7,9 @@
 // delete.
 
 import { monogramize, buildMonogram } from './monograms.js';
-import { buildGroupAvatar, clickOption, openDrawer, toggleMenu } from './shell.js';
+import { buildGroupAvatar, clickOption, toggleMenu } from './shell.js';
+import * as personas from '../../../personas.js';
+import { default_user_avatar, setUserName } from '../../../../script.js';
 
 const ROOT_ID = 'imsg-contacts';
 const ABOUT_LIMIT = 160;
@@ -102,6 +104,10 @@ function find(key) {
     if (!key) {
         return null;
     }
+    if (key.startsWith('p:')) {
+        const avatar = key.slice(2);
+        return avatar in (context().powerUserSettings.personas ?? {}) ? { persona: avatar } : null;
+    }
     if (key.startsWith('g:')) {
         const group = groups.find((x) => String(x.id) === key.slice(2));
         return group ? { group } : null;
@@ -123,6 +129,9 @@ function tagsOf(key) {
 }
 
 function picture(item, size) {
+    if (item.persona) {
+        return personaPicture(item.persona, size);
+    }
     const holder = element('span', 'imsg-avatar imsg-cn-pic');
     holder.style.setProperty('--imsg-cn-pic', `${size}px`);
     if (item.group) {
@@ -396,9 +405,8 @@ function section(title, items, id) {
 
 function myCard() {
     const ctx = context();
-    const selected = document.querySelector('#user_avatar_block .avatar-container.selected');
-    const avatar = selected?.getAttribute('data-avatar-id') || selected?.getAttribute('imgfile');
-    const row = button('imsg-cn-row imsg-cn-me');
+    const avatar = personas.user_avatar;
+    const row = button(`imsg-cn-row imsg-cn-me${view.key?.startsWith('p:') ? ' imsg-cn-current' : ''}`);
     const holder = element('span', 'imsg-avatar imsg-cn-pic');
     holder.style.setProperty('--imsg-cn-pic', '44px');
     if (avatar) {
@@ -413,10 +421,7 @@ function myCard() {
     const text = element('span', 'imsg-cn-me-text');
     text.append(element('b', '', ctx.name1 ?? t('You')), element('small', '', t('My Card')));
     row.append(holder, text);
-    row.addEventListener('click', () => {
-        close();
-        openDrawer('persona-management-button');
-    });
+    row.addEventListener('click', () => select(`p:${avatar}`));
     return row;
 }
 
@@ -995,6 +1000,287 @@ function paneBar(title, primary, secondary) {
     return bar;
 }
 
+// ── My Card: your personas ──
+
+const POSITIONS = [
+    [0, 'With the description (in the prompt)'],
+    [2, 'Before the Author’s Note'],
+    [3, 'After the Author’s Note'],
+    [4, 'In the conversation, at a depth'],
+    [9, 'Nowhere (not sent)'],
+];
+const ROLES = [
+    [0, 'System'],
+    [1, 'User'],
+    [2, 'Assistant'],
+];
+
+function powerUser() {
+    return context().powerUserSettings;
+}
+
+function personaName(avatar) {
+    return powerUser().personas?.[avatar] ?? avatar;
+}
+
+function personaPicture(avatar, size) {
+    const holder = element('span', 'imsg-avatar imsg-cn-pic');
+    holder.style.setProperty('--imsg-cn-pic', `${size}px`);
+    const img = element('img');
+    img.alt = '';
+    img.loading = 'lazy';
+    img.src = size > 64 ? `/User Avatars/${encodeURIComponent(avatar)}` : context().getThumbnailUrl('persona', avatar);
+    if (size > 64) {
+        img.addEventListener('error', () => { img.src = context().getThumbnailUrl('persona', avatar); }, { once: true });
+    }
+    holder.append(img);
+    monogramize(img, personaName(avatar));
+    return holder;
+}
+
+/** Every persona, the one in use first, then by name. */
+function allPersonas() {
+    const current = personas.user_avatar;
+    return Object.keys(powerUser().personas ?? {}).sort((a, b) => (b === current) - (a === current) || personaName(a).localeCompare(personaName(b), undefined, { sensitivity: 'base' }));
+}
+
+async function usePersona(avatar) {
+    await personas.setUserAvatar(avatar, { toastPersonaNameChange: false });
+    render();
+}
+
+async function toggleChatLock() {
+    await personas.setPersonaLockState(!personas.isPersonaLocked('chat'), 'chat');
+    render();
+}
+
+function toggleDefault(avatar) {
+    const settings = powerUser();
+    settings.default_persona = settings.default_persona === avatar ? null : avatar;
+    context().saveSettingsDebounced();
+    render();
+}
+
+async function uploadPersonaPicture(avatar, file) {
+    const ctx = context();
+    const form = new FormData();
+    form.append('avatar', file, file.name || 'avatar.png');
+    form.append('overwrite_name', avatar);
+    const response = await fetch('/api/avatars/upload', {
+        method: 'POST',
+        headers: ctx.getRequestHeaders({ omitContentType: true }),
+        cache: 'no-cache',
+        body: form,
+    });
+    if (!response.ok) {
+        throw new Error(response.statusText);
+    }
+    await fetch(`/User Avatars/${encodeURIComponent(avatar)}`, { cache: 'reload' }).catch(() => {});
+    await fetch(ctx.getThumbnailUrl('persona', avatar), { cache: 'reload' }).catch(() => {});
+}
+
+async function deletePersona(avatar) {
+    const ctx = context();
+    const ok = await ctx.callGenericPopup(
+        `<h3>${t('Delete')} ${escapeHtml(personaName(avatar))}?</h3><p>${t('Their picture and description go too. This can’t be undone.')}</p>`,
+        ctx.POPUP_TYPE.CONFIRM, '', { okButton: t('Delete'), cancelButton: t('Cancel') },
+    );
+    if (ok !== ctx.POPUP_RESULT.AFFIRMATIVE) {
+        return;
+    }
+    await ctx.executeSlashCommandsWithOptions(`/persona-delete persona=${slashValue(avatar)} silent=true`, { handleParserErrors: true, handleExecutionErrors: true });
+    view.key = `p:${personas.user_avatar}`;
+    view.mode = 'card';
+    render();
+}
+
+function renderPersonaCard(pane, avatar) {
+    const settings = powerUser();
+    const descriptor = settings.persona_descriptions?.[avatar] ?? {};
+    const current = avatar === personas.user_avatar;
+    const isDefault = settings.default_persona === avatar;
+    const card = element('div', 'imsg-cn-card');
+    card.append(personaPicture(avatar, 112), element('h2', 'imsg-cn-name', personaName(avatar)));
+    const notes = [descriptor.title, current ? t('In use') : '', isDefault ? t('Default') : ''].filter(Boolean);
+    if (notes.length) {
+        card.append(element('p', 'imsg-cn-about', notes.join(' · ')));
+    }
+
+    const actions = element('div', 'imsg-card-actions');
+    if (current) {
+        const locked = personas.isPersonaLocked('chat');
+        actions.append(action(locked ? 'Unlock Chat' : 'Lock to Chat', 'lock', toggleChatLock, locked));
+    } else {
+        actions.append(action('Use', 'check', () => usePersona(avatar)));
+    }
+    actions.append(
+        action('Default', isDefault ? 'star-fill' : 'star', () => toggleDefault(avatar), isDefault),
+        action('Edit', 'pencil', () => {
+            view.mode = 'edit';
+            render();
+        }),
+        action('New', 'plus', () => {
+            view.key = 'new:p';
+            render();
+        }),
+    );
+    card.append(actions);
+
+    const about = infoBlock('About Me', descriptor.description ?? '');
+    if (about) {
+        card.append(about);
+    } else {
+        card.append(element('p', 'imsg-cn-by', t('No description yet. Edit to tell them who you are.')));
+    }
+
+    const others = allPersonas().filter((x) => x !== avatar);
+    if (others.length) {
+        const list = element('div', 'imsg-cn-members');
+        list.append(element('h4', '', t('My Other Cards')));
+        for (const other of others) {
+            const row = button('imsg-cn-member', undefined, () => select(`p:${other}`));
+            row.append(personaPicture(other, 28), element('span', '', personaName(other)));
+            if (other === personas.user_avatar) {
+                row.append(element('small', '', t('In use')));
+            }
+            list.append(row);
+        }
+        card.append(list);
+    }
+
+    const rows = element('div', 'imsg-card-list');
+    rows.append(listRow('Delete Persona…', () => deletePersona(avatar), true));
+    card.append(rows);
+    pane.replaceChildren(paneBar(t('My Card'), button('imsg-cn-edit', 'Edit', () => {
+        view.mode = 'edit';
+        render();
+    })), card);
+}
+
+function renderPersonaForm(pane, avatar) {
+    const settings = powerUser();
+    const descriptor = avatar ? settings.persona_descriptions?.[avatar] ?? {} : {};
+    let photo = null;
+    const form = element('form', 'imsg-cn-form');
+    form.noValidate = true;
+    form.append(pictureEditor(avatar ? { persona: avatar } : null, (file) => { photo = file; }));
+    const name = formField('Name', avatar ? personaName(avatar) : '');
+    name.input.placeholder = t('Name');
+    name.input.autocomplete = 'off';
+    form.append(name.box);
+
+    const box = element('fieldset', 'imsg-cn-group');
+    const title = formField('Title', descriptor.title ?? '', { hint: 'Shown under your name only.' });
+    const description = formField('About Me', descriptor.description ?? '', { rows: 8, hint: 'Who you are, sent with the conversation.' });
+    const position = element('select');
+    for (const [value, label] of POSITIONS) {
+        const option = element('option', '', t(label));
+        option.value = String(value);
+        position.append(option);
+    }
+    position.value = String(descriptor.position ?? 0);
+    const positionBox = element('label', 'imsg-cn-field');
+    positionBox.append(element('span', 'imsg-cn-field-label', t('Where it goes')), position);
+    const depth = formField('Depth', String(descriptor.depth ?? 2), { type: 'number', hint: 'How many messages from the end.' });
+    depth.input.min = '0';
+    const role = element('select');
+    for (const [value, label] of ROLES) {
+        const option = element('option', '', t(label));
+        option.value = String(value);
+        role.append(option);
+    }
+    role.value = String(descriptor.role ?? 0);
+    const roleBox = element('label', 'imsg-cn-field');
+    roleBox.append(element('span', 'imsg-cn-field-label', t('Sent as')), role);
+    const showDepth = () => {
+        const atDepth = position.value === '4';
+        depth.box.hidden = !atDepth;
+        roleBox.hidden = !atDepth;
+    };
+    position.addEventListener('change', showDepth);
+    showDepth();
+    box.append(title.box, description.box, positionBox, depth.box, roleBox);
+    form.append(box);
+
+    const save = button('imsg-cn-save', 'Done');
+    save.type = 'submit';
+    const cancel = button('imsg-cn-cancel', 'Cancel', () => {
+        view.mode = 'card';
+        if (!avatar) {
+            view.key = `p:${personas.user_avatar}`;
+        }
+        render();
+    });
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const newName = name.input.value.trim();
+        if (!newName) {
+            name.input.focus();
+            toastr.warning(t('A persona needs a name.'));
+            return;
+        }
+        save.disabled = true;
+        const values = {
+            description: description.input.value,
+            title: title.input.value.trim(),
+            position: Number(position.value),
+            depth: Math.max(0, Number(depth.input.value) || 0),
+            role: Number(role.value),
+        };
+        try {
+            const key = avatar ? await updatePersona(avatar, newName, values, photo) : await createPersona(newName, values, photo);
+            view.key = `p:${key}`;
+            view.mode = 'card';
+            render();
+        } catch (error) {
+            toastr.error(String(error.message ?? error), t('Couldn’t save'));
+        } finally {
+            save.disabled = false;
+        }
+    });
+    pane.replaceChildren(paneBar(avatar ? t('Edit My Card') : t('New Persona'), save, cancel), form);
+    pane.querySelector('.imsg-cn-pane-bar .imsg-cn-save')?.addEventListener('click', () => form.requestSubmit());
+    name.input.focus();
+}
+
+async function updatePersona(avatar, newName, values, photo) {
+    const ctx = context();
+    const settings = powerUser();
+    const descriptor = settings.persona_descriptions[avatar] ??= { lorebook: '', connections: [] };
+    Object.assign(descriptor, values);
+    const oldName = settings.personas[avatar];
+    settings.personas[avatar] = newName;
+    if (avatar === personas.user_avatar) {
+        if (newName !== ctx.name1) {
+            setUserName(newName, { toastPersonaNameChange: false });
+        }
+        settings.persona_description = values.description;
+        settings.persona_description_position = values.position;
+        settings.persona_description_depth = values.depth;
+        settings.persona_description_role = values.role;
+        personas.setPersonaDescription();
+    }
+    ctx.saveSettingsDebounced();
+    if (oldName !== newName) {
+        await ctx.eventSource.emit(ctx.eventTypes.PERSONA_RENAMED, { avatarId: avatar, oldName, newName });
+    }
+    if (photo) {
+        await uploadPersonaPicture(avatar, photo);
+    }
+    await personas.getUserAvatars(true, avatar);
+    return avatar;
+}
+
+async function createPersona(newName, values, photo) {
+    // a unique file name, as the app makes one
+    const avatar = `${Date.now()}-${newName.replace(/[^a-zA-Z0-9]/g, '')}.png`;
+    await personas.initPersona(avatar, newName, values.description, values.title, { position: values.position, depth: values.depth, role: values.role });
+    const file = photo ?? new File([await (await fetch(default_user_avatar)).blob()], 'avatar.png', { type: 'image/png' });
+    await uploadPersonaPicture(avatar, file);
+    await personas.getUserAvatars(true, avatar);
+    return avatar;
+}
+
 // ── The window ──
 
 function select(key) {
@@ -1012,13 +1298,17 @@ function render() {
     renderTags(root.querySelector('.imsg-cn-tags'));
     renderList(root.querySelector('.imsg-cn-scroll'), root.querySelector('.imsg-cn-index'));
     const pane = root.querySelector('.imsg-cn-detail');
-    const item = view.key && view.key !== 'new:c' && view.key !== 'new:g' ? find(view.key) : null;
+    const item = view.key && !view.key.startsWith('new:') ? find(view.key) : null;
     if (view.key && !item && !view.key.startsWith('new:')) {
         view.key = null;
     }
     root.classList.toggle('imsg-cn-has-detail', !!view.key);
     if (view.key === 'new:c') {
         renderCharacterForm(pane, null);
+    } else if (view.key === 'new:p') {
+        renderPersonaForm(pane, null);
+    } else if (item?.persona) {
+        view.mode === 'edit' ? renderPersonaForm(pane, item.persona) : renderPersonaCard(pane, item.persona);
     } else if (view.key === 'new:g') {
         renderGroupForm(pane, null);
     } else if (item && view.mode === 'edit') {
@@ -1130,6 +1420,11 @@ export function openContacts({ pick = false, key = null, edit = false } = {}) {
     }
 }
 
+/** Opens Contacts on My Card, the persona in use. */
+export function openMyCard() {
+    openContacts({ key: `p:${personas.user_avatar}` });
+}
+
 /** Opens the card (or the Edit form) of the open conversation's contact or group. */
 export function openCurrentContact({ edit = false } = {}) {
     const ctx = context();
@@ -1150,7 +1445,7 @@ export function deleteCurrentContact() {
 export function initContacts() {
     const { eventSource, eventTypes } = context();
     // the list keeps up with imports, deletes and edits made anywhere
-    for (const type of [eventTypes.CHARACTER_PAGE_LOADED, eventTypes.CHARACTER_DELETED, eventTypes.GROUP_UPDATED, eventTypes.CHARACTER_EDITED]) {
+    for (const type of [eventTypes.CHARACTER_PAGE_LOADED, eventTypes.CHARACTER_DELETED, eventTypes.GROUP_UPDATED, eventTypes.CHARACTER_EDITED, eventTypes.PERSONA_CHANGED, eventTypes.PERSONA_DELETED]) {
         if (type) {
             eventSource.on(type, () => {
                 const root = document.getElementById(ROOT_ID);

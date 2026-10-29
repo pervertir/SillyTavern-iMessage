@@ -27,11 +27,12 @@ A SillyTavern extension that makes the whole app look and work like Messages on 
   | Settings | User Settings |
   | Backgrounds | Backgrounds |
   | Extensions | Extensions |
-  | Personas | Persona Management |
+  | Personas | My Card in Contacts (below) |
   | Contacts | The theme's own Contacts window (below) |
 
   Each SillyTavern menu opens as a Mac sheet with its name in the title bar and a blue Done button.
 - **Contacts.** A Contacts-style window in place of SillyTavern's character list and editor: search, tag chips, Favorites, Groups and A to Z with a letter index on the left, the selected contact's card on the right (picture, about line, Message, New, History and Favorite, description, first message, export, duplicate, delete). Edit opens a native form for every card field, other first messages and the advanced prompts. The + menu makes a new contact or group, or imports a card from a file or a link. Groups get their own form for members (add, mute, reorder), who answers next and how cards are combined. On a phone it fills the screen and the card slides over the list.
+- **My Card.** Your personas, at the top of Contacts: the one in use with Lock to Chat, Default, Edit and New, your description, and your other personas to switch to. Edit covers the name, title, picture, description and where the description goes in the prompt.
 - **Header.** "To: Name", with the video button (new conversation) and the ⓘ button (Details, Conversation History, New Conversation, Close Conversation). On a phone it's the back chevron, the contact's picture with their name under it, and the video button.
 - **Bubbles.** Theirs are grey on the left, yours blue on the right. Messages in a row from the same person sit close together, with the tail only on the last one. A centered time line (`Today 9:41 AM`, `Yesterday 9:41 AM`, `Monday 9:41 AM`, `Wed, Oct 21 at 9:41 AM`) starts each stretch of conversation after an hour's gap. `Delivered` sits under your last message until there's a reply, then `Read`.
 - **Typing bubble.** The three-dot bubble shows while a reply is being written, and a streamed reply shows the dots until its first words arrive.

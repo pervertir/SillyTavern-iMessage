@@ -974,3 +974,8 @@ body.imessage .imsg-cn.imsg-cn-picking .imsg-cn-detail {
         font-size: 11px;
     }
 }
+
+body.imessage .imsg-cn-row.imsg-cn-current .imsg-cn-me-text small {
+    color: inherit;
+    opacity: 0.8;
+}

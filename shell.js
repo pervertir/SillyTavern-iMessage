@@ -3,7 +3,7 @@
 // empty pane while no conversation is open.
 
 import { openContactCard } from './card.js';
-import { openContacts } from './contacts.js';
+import { openContacts, openMyCard } from './contacts.js';
 import { buildMonogram, monogramize } from './monograms.js';
 
 const HEADER_ID = 'imsg-head';
@@ -21,6 +21,12 @@ const PANELS = [
     { id: 'persona-management-button', content: 'PersonaManagement', label: 'Personas' },
     { id: 'rightNavHolder', content: 'right-nav-panel', label: 'Contacts' },
 ];
+
+/** Menus the theme draws itself */
+const NATIVE = {
+    rightNavHolder: () => openContacts(),
+    'persona-management-button': () => openMyCard(),
+};
 
 let shellOptions = { setAppearance: (_appearance) => {}, isDark: () => false };
 
@@ -227,8 +233,8 @@ function appMenuItems() {
     return [
         { label: 'New Message', run: newMessage },
         {},
-        // Contacts is the theme's own window, not the app's character panel
-        ...PANELS.filter(({ id }) => document.getElementById(id)).map(({ id, label }) => ({ label, run: id === 'rightNavHolder' ? () => openContacts() : () => openDrawer(id) })),
+        // Contacts and Personas are the theme's own window, not the app's panels
+        ...PANELS.filter(({ id }) => document.getElementById(id)).map(({ id, label }) => ({ label, run: NATIVE[id] ?? (() => openDrawer(id)) })),
         {},
         { label: 'Light Mode', checked: !dark, run: () => shellOptions.setAppearance('light') },
         { label: 'Dark Mode', checked: dark, run: () => shellOptions.setAppearance('dark') },
