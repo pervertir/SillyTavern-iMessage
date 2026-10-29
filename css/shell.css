@@ -727,3 +727,48 @@ body.imessage .imsg-panel-head .imsg-done:active {
 body.imessage :is([id^="dsc-"], [id^="mst-"], [id^="yt-"]):not(style, link, script) {
     display: none !important;
 }
+
+/* SillyTavern's own "back" controls (a list icon or a long arrow) as an iOS back button:
+   a chevron and the screen it goes back to */
+body.imessage :is(#rm_button_characters, #rm_button_back, #rm_button_back_from_group):not([style*="display: none"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    width: auto !important;
+    min-width: 0 !important;
+    height: 28px !important;
+    margin: 0 !important;
+    padding: 0 8px 0 2px !important;
+    border: none !important;
+    border-radius: var(--imsg-radius-md);
+    background: none !important;
+    box-shadow: none !important;
+    color: var(--imsg-blue) !important;
+    font-family: var(--imsg-font) !important;
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    line-height: 1 !important;
+    text-shadow: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+}
+
+body.imessage :is(#rm_button_characters, #rm_button_back, #rm_button_back_from_group):hover {
+    background: var(--imsg-hover) !important;
+}
+
+body.imessage :is(#rm_button_characters, #rm_button_back, #rm_button_back_from_group)::before {
+    content: "" !important;
+    display: block;
+    width: 15px;
+    height: 15px;
+    background-color: currentColor;
+    -webkit-mask: var(--imsg-sym-chevron-left) center / contain no-repeat;
+    mask: var(--imsg-sym-chevron-left) center / contain no-repeat;
+}
+
+body.imessage :is(#rm_button_characters, #rm_button_back, #rm_button_back_from_group)::after {
+    content: "Contacts";
+    font-family: var(--imsg-font);
+    font-weight: 400;
+}
