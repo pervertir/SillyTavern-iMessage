@@ -721,3 +721,9 @@ body.imessage .imsg-panel-head .imsg-done {
 body.imessage .imsg-panel-head .imsg-done:active {
     background: var(--imsg-blue-pressed);
 }
+
+/* Parts our other themes (Discord, Teams, Yodayo) may have left in the page while switched off,
+   such as Discord's buttons beside the send button: hidden while this theme is on */
+body.imessage :is([id^="dsc-"], [id^="mst-"], [id^="yt-"]):not(style, link, script) {
+    display: none !important;
+}
