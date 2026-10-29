@@ -5,6 +5,7 @@
 
 /* Header */
 body.imessage #imsg-head {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1138,4 +1139,21 @@ body.imessage #chat .mes ~ .mes.lastInContext::before {
         linear-gradient(var(--imsg-line), var(--imsg-line)) left center / calc(50% - 110px) 0.5px no-repeat,
         linear-gradient(var(--imsg-line), var(--imsg-line)) right center / calc(50% - 110px) 0.5px no-repeat;
     justify-content: center;
+}
+
+/* The app fills the text box with green while a request waits in a queue (AI Horde). The box stays
+   clear; the progress shows as a thin blue bar under the header (messages.js). */
+body.imessage #send_textarea {
+    background: transparent !important;
+}
+
+body.imessage #imsg-head > .imsg-progress {
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: var(--imsg-progress, 0%);
+    height: 2px;
+    background: var(--imsg-blue);
+    transition: width 0.4s var(--imsg-ease);
+    pointer-events: none;
 }

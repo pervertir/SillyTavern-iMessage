@@ -268,4 +268,45 @@ export function initMessages() {
         });
     }
     onStart(refreshMessages);
+    onStart(watchProgress);
+}
+
+/**
+ * The app shows how far along a queued request is (AI Horde) by filling the text box with green.
+ * Here it's the thin blue bar under the conversation's header, as Messages shows a send.
+ */
+let progressWatcher = null;
+
+function watchProgress() {
+    const field = document.getElementById('send_textarea');
+    if (!field || progressWatcher) {
+        return;
+    }
+    progressWatcher = new MutationObserver(whenOn(showProgress));
+    progressWatcher.observe(field, { attributes: true, attributeFilter: ['style'] });
+    showProgress();
+}
+
+function showProgress() {
+    const head = document.getElementById('imsg-head');
+    const field = document.getElementById('send_textarea');
+    if (!head || !field) {
+        return;
+    }
+    const match = field.style.background.match(/([\d.]+)%/);
+    const progress = match ? Math.min(100, Number(match[1])) : 0;
+    let bar = head.querySelector(':scope > .imsg-progress');
+    if (!progress) {
+        bar?.remove();
+        return;
+    }
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.className = 'imsg-progress';
+        bar.setAttribute('role', 'progressbar');
+        bar.setAttribute('aria-label', t('Waiting in the queue'));
+        head.append(bar);
+    }
+    bar.style.setProperty('--imsg-progress', `${progress}%`);
+    bar.setAttribute('aria-valuenow', String(Math.round(progress)));
 }
