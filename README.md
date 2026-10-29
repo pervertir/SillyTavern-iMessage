@@ -7,9 +7,16 @@ A SillyTavern extension that makes the whole app look and work like Messages on 
 ![Desktop, dark](.github/desktop-dark.jpg)
 
 <p>
-  <img src=".github/phone-list.jpg" width="260" alt="Phone: the conversation list">
-  <img src=".github/phone-chat.jpg" width="260" alt="Phone: a group conversation">
+  <img src=".github/phone-list.jpg" width="240" alt="Phone: the conversation list">
+  <img src=".github/phone-chat.jpg" width="240" alt="Phone: a group conversation">
+  <img src=".github/phone-dark.jpg" width="240" alt="Phone: a conversation in dark mode">
 </p>
+
+Every SillyTavern panel opens as its own Mac-style window, such as Contacts and Settings:
+
+![Contacts](.github/contacts.jpg)
+
+![Settings](.github/settings.jpg)
 
 ## What it changes
 
