@@ -1,16 +1,13 @@
-// Contacts, as the Contacts app does it: a searchable list (favorites, groups, then A to Z with a
-// letter index) beside the selected contact's card, and an Edit form in place of the app's
-// character editor. New Message uses the same list to pick who to write to.
-//
-// Everything is drawn here; the app is only asked to do the work: its character and group API
-// for saving, its own functions for opening a conversation, its slash commands for duplicate and
-// delete.
+// Contacts window: a searchable list (favorites, groups, A to Z with a letter index) beside the
+// selected contact's card and an edit form, for characters, groups and personas. New Message uses
+// the same list as a picker. Saving goes through ST's own API, functions and slash commands.
 
+import * as personas from '../../../../personas.js';
+import { default_user_avatar, setUserName } from '../../../../../script.js';
 import { events, onStop } from './power.js';
 import { monogramize, buildMonogram } from './monograms.js';
 import { buildGroupAvatar, clickOption, toggleMenu } from './shell.js';
-import * as personas from '../../../personas.js';
-import { default_user_avatar, setUserName } from '../../../../script.js';
+import { button, context, element, escapeHtml, glyph, isPhone, overlayOpen, t } from './dom.js';
 
 const ROOT_ID = 'imsg-contacts';
 const ABOUT_LIMIT = 160;
@@ -46,40 +43,6 @@ const GENERATION_MODES = [
 
 /** What's on screen: the selection, the mode and the search */
 let view = { key: null, mode: 'card', pick: false, needle: '', tag: null };
-
-function context() {
-    return SillyTavern.getContext();
-}
-
-function t(text) {
-    return context().translate(text);
-}
-
-function element(tag, className, text) {
-    const node = document.createElement(tag);
-    if (className) {
-        node.className = className;
-    }
-    if (text !== undefined) {
-        node.textContent = text;
-    }
-    return node;
-}
-
-function button(className, label, run) {
-    const node = element('button', className, label === undefined ? undefined : t(label));
-    node.type = 'button';
-    if (run) {
-        node.addEventListener('click', run);
-    }
-    return node;
-}
-
-function glyph(symbol) {
-    const node = element('i', 'imsg-sym');
-    node.style.setProperty('--imsg-glyph', `var(--imsg-sym-${symbol})`);
-    return node;
-}
 
 /** Plain text, without markup or macros, cut to a length. */
 function plain(text, limit) {
@@ -324,12 +287,6 @@ async function deleteContact(item) {
     view.key = null;
     view.mode = 'card';
     await reloadAll();
-}
-
-function escapeHtml(text) {
-    const node = element('span');
-    node.textContent = text;
-    return node.innerHTML;
 }
 
 async function saveGroup(group) {
@@ -1329,14 +1286,14 @@ function close() {
 }
 
 function onKey(event) {
-    if (event.key !== 'Escape' || document.querySelector('dialog.popup[open]') || document.getElementById('imsg-menu')?.hidden === false) {
+    if (event.key !== 'Escape' || overlayOpen()) {
         return;
     }
     event.stopPropagation();
     const root = document.getElementById(ROOT_ID);
     if (view.mode === 'edit' || view.key?.startsWith('new:')) {
         root?.querySelector('.imsg-cn-pane-bar .imsg-cn-cancel')?.click();
-    } else if (root?.classList.contains('imsg-cn-has-detail') && matchMedia('(max-width: 1000px)').matches) {
+    } else if (root?.classList.contains('imsg-cn-has-detail') && isPhone()) {
         view.key = null;
         render();
     } else {

@@ -1,10 +1,10 @@
-// Short messages: a long reply shows as several bubbles, split at the ends of sentences
-// (message-splitter.js). The chat keeps it as one message, so edit, swipes, regenerate and the
-// prompt are unchanged; only the display is split. A new reply that wasn't streamed comes in
-// bubble by bubble, with the typing dots between.
+// Long replies display as several short bubbles split at sentence ends (shared/message-splitter.js).
+// The chat still stores one message, so edit, swipe and regenerate are unaffected. A reply that
+// wasn't streamed is revealed bubble by bubble with the typing dots in between.
 
 import { events } from './power.js';
-import { splitMessage } from './message-splitter.js';
+import { nearBottom } from './dom.js';
+import { splitMessage } from './shared/message-splitter.js';
 
 const BOX_CLASS = 'imsg-parts';
 const PART_CLASS = 'imsg-part';
@@ -13,6 +13,8 @@ const TYPING_CLASS = 'imsg-part-typing';
 const REVEAL_BASE_MS = 450;
 const REVEAL_PER_CHAR_MS = 30;
 const REVEAL_MAX_MS = 2200;
+/** Within this many pixels of the bottom, the chat follows a reply as it's revealed */
+const FOLLOW_DISTANCE = 200;
 
 /** Splitting state of each message element: the text it was split from, and a running reveal */
 const state = new WeakMap();
@@ -50,7 +52,7 @@ function stopReveal(mes) {
 /** Puts the tail on the last bubble that's showing. */
 function markTail(box) {
     const shown = [...box.children].filter((child) => !child.hidden);
-    box.querySelectorAll(`:scope > .imsg-tail`).forEach((child) => child.classList.remove('imsg-tail'));
+    box.querySelectorAll(':scope > .imsg-tail').forEach((child) => child.classList.remove('imsg-tail'));
     shown.at(-1)?.classList.add('imsg-tail');
 }
 
@@ -108,10 +110,6 @@ function renderSplit(mes) {
     state.set(mes, { key, timer: 0 });
 }
 
-function nearBottom(chatElement) {
-    return chatElement.scrollHeight - chatElement.scrollTop - chatElement.clientHeight < 200;
-}
-
 /** Brings a just-arrived reply in one bubble at a time. */
 function reveal(mes) {
     const entry = state.get(mes);
@@ -121,7 +119,7 @@ function reveal(mes) {
         return;
     }
     const chatElement = document.getElementById('chat');
-    const follow = !chatElement || nearBottom(chatElement);
+    const follow = !chatElement || nearBottom(chatElement, FOLLOW_DISTANCE);
     parts.slice(1).forEach((part) => { part.hidden = true; });
     const typing = document.createElement('div');
     typing.className = `${PART_CLASS} ${TYPING_CLASS}`;

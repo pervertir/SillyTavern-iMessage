@@ -36,10 +36,6 @@ function isSpace(char) {
     return char === undefined || /\s/.test(char);
 }
 
-function isLetter(char) {
-    return !!char && /\p{L}/u.test(char);
-}
-
 function isWordChar(char) {
     return !!char && /[\p{L}\p{N}]/u.test(char);
 }
@@ -249,15 +245,15 @@ function toSentences(text) {
             }
             continue;
         }
-        if (char === "'") {
+        if (char === '\'') {
             // a single quote opens at a word start and closes at a word end; apostrophes inside words don't count
-            if (top === "'" && !isSpace(text[i - 1]) && !isWordChar(text[i + 1])) {
+            if (top === '\'' && !isSpace(text[i - 1]) && !isWordChar(text[i + 1])) {
                 stack.pop();
                 if (!stack.length && endedInside && canEndAfterCloser(text, i + 1)) {
                     cut(i + 1);
                 }
             } else if ((isSpace(text[i - 1]) || /[([{]/.test(text[i - 1] ?? '')) && isWordChar(text[i + 1])) {
-                stack.push("'");
+                stack.push('\'');
             }
             continue;
         }

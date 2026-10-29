@@ -1,11 +1,11 @@
-// Keyboard shortcuts, as a Mac app has them (Ctrl in place of ⌘ elsewhere):
-// ⌘F or ⌘K search conversations, ⌥⌘N new message, ⌃⌘S hide or show the sidebar, ⌘, settings,
-// Esc closes the open sheet.
-// The app's own ↑ (edit your last message) keeps working.
+// Mac-style shortcuts (Ctrl instead of ⌘ elsewhere): ⌘F/⌘K search, ⌥⌘N new message,
+// ⌃⌘S toggle the sidebar, ⌘, settings, Esc closes the open sheet. ST's own ↑ still edits the
+// last message.
 
 import { whenOn } from './power.js';
 import { closeDrawers, newMessage, toggleSidebar } from './shell.js';
 import { openSettings } from './settings.js';
+import { overlayOpen, within } from './dom.js';
 
 function isMac() {
     return /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
@@ -19,7 +19,7 @@ function focusSearch() {
 }
 
 function onKeyDown(event) {
-    if (!document.body.classList.contains('imessage') || event.defaultPrevented) {
+    if (event.defaultPrevented) {
         return;
     }
     const command = isMac() ? event.metaKey : event.ctrlKey;
@@ -47,10 +47,9 @@ function onKeyDown(event) {
         return;
     }
     // Esc closes an open sheet, unless a dialog, menu or field is handling it
-    if (key === 'escape' && !document.querySelector('dialog.popup[open]')
-        && document.getElementById('imsg-menu')?.hidden !== false
+    if (key === 'escape' && !overlayOpen()
         && document.querySelector('#top-settings-holder .drawer-content.openDrawer')
-        && !/** @type {HTMLElement} */ (event.target).closest?.('.edit_textarea, .select2-container')) {
+        && !within(event, '.edit_textarea, .select2-container')) {
         closeDrawers();
     }
 }

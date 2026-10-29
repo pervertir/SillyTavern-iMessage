@@ -1,6 +1,5 @@
-// Borrowing the app's own controls: a panel of the app's (an extension's settings, a group of its
-// options) is moved into one of the theme's windows while it's open and put back exactly where it
-// was when the window closes, so every control keeps its handlers and saved values.
+// Moves one of ST's own nodes (an extension's settings, a group of options) into a theme window
+// and puts it back exactly where it was on close, so its handlers and values are untouched.
 
 /** Each borrowed node, with the marker it goes back to */
 const homes = new Map();

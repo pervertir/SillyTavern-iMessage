@@ -1,6 +1,5 @@
-// The Messages window around the app: the sidebar's toolbar (window buttons, the app menu and
-// compose), the conversation header, the app's menus as Mac sheets with a Done button, and the
-// empty pane while no conversation is open.
+// The window chrome around ST: sidebar toolbar, conversation header, the app menu, ST's drawers
+// as sheets, and the empty state when no chat is open.
 
 import { openContactCard } from './card.js';
 import { openContacts, openMyCard } from './contacts.js';
@@ -10,6 +9,7 @@ import { openExtensions } from './addons.js';
 import { openConnections, openFormatting, openResponseSettings, openSettings } from './settings.js';
 import { buildMonogram, monogramize } from './monograms.js';
 import { events, onStart, whenOn } from './power.js';
+import { button, glyph, t } from './dom.js';
 
 const HEADER_ID = 'imsg-head';
 const MENU_ID = 'imsg-menu';
@@ -42,22 +42,13 @@ const NATIVE = {
 
 let shellOptions = { setAppearance: (_appearance) => {}, isDark: () => false };
 
-function t(text) {
-    return SillyTavern.getContext().translate(text);
-}
-
 /** An icon button drawn with one of the theme's SF-style symbols (--imsg-sym-<name>). */
 export function symbolButton(className, label, symbol) {
-    const element = document.createElement('button');
-    element.type = 'button';
-    element.className = `imsg-sym-button ${className}`.trim();
-    element.title = t(label);
-    element.setAttribute('aria-label', t(label));
-    const glyph = document.createElement('i');
-    glyph.className = 'imsg-sym';
-    glyph.style.setProperty('--imsg-glyph', `var(--imsg-sym-${symbol})`);
-    element.append(glyph);
-    return element;
+    const node = button(`imsg-sym-button ${className}`.trim());
+    node.title = t(label);
+    node.setAttribute('aria-label', t(label));
+    node.append(glyph(symbol));
+    return node;
 }
 
 /** Clicks one of the app's drawer toggles, the way its own top bar does. */
@@ -273,13 +264,10 @@ export function buildSidebarToolbar() {
     const lights = document.createElement('div');
     lights.className = 'imsg-lights';
     const light = (className, label, run) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = `imsg-light ${className}`;
-        button.title = t(label);
-        button.setAttribute('aria-label', t(label));
-        button.addEventListener('click', run);
-        return button;
+        const node = button(`imsg-light ${className}`, undefined, run);
+        node.title = t(label);
+        node.setAttribute('aria-label', t(label));
+        return node;
     };
     lights.append(
         light('imsg-light-close', 'Close conversation', () => {
@@ -297,11 +285,7 @@ export function buildSidebarToolbar() {
     );
 
     // iPhone: "Edit" opens the same app menu
-    const edit = document.createElement('button');
-    edit.type = 'button';
-    edit.className = 'imsg-text-button imsg-edit';
-    edit.textContent = t('Edit');
-    edit.addEventListener('click', () => toggleMenu(edit, appMenuItems()));
+    const edit = button('imsg-text-button imsg-edit', 'Edit', () => toggleMenu(edit, appMenuItems()));
 
     const menu = symbolButton('imsg-app-menu', 'More', 'ellipsis-circle');
     menu.addEventListener('click', () => toggleMenu(menu, appMenuItems()));

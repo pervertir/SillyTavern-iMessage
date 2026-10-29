@@ -1,12 +1,12 @@
-// Pictures from links: an image link in a message (a bare URL ending in .png, .jpg and so on, or a
-// Markdown image) shows as the picture itself, in its own rounded bubble at its own shape, the way
-// Messages shows a photo. Clicking it opens a full-size viewer. The link text is taken out of the
-// bubble so the picture isn't shown twice.
+// Image links in a message (bare URLs to image files, Markdown or <img>) render as photos with a
+// full-size viewer, and the link text is removed from the bubble.
 //
-// The app's "Forbid External Media" setting removes Markdown images before they reach the page,
-// so the links are read from the message's own text, not from what the app drew.
+// ST's "Forbid External Media" strips Markdown images before rendering, so links are read from
+// the message source rather than from the rendered HTML.
 
+import { getSettings } from './config.js';
 import { events } from './power.js';
+import { t } from './dom.js';
 
 const PHOTOS_CLASS = 'imsg-photos';
 const VIEWER_ID = 'imsg-viewer';
@@ -17,12 +17,6 @@ const BARE_IMAGE = new RegExp(`https?://[^\\s<>"'()\\[\\]]+?\\.(?:${IMAGE_EXTENS
 const MARKDOWN_IMAGE = /!\[[^\]]*\]\(\s*<?(https?:\/\/[^\s)>]+)>?(?:\s+["'][^"']*["'])?\s*\)/gi;
 /** <img src="url"> written into the message */
 const HTML_IMAGE = /<img\b[^>]*?\ssrc\s*=\s*["']?(https?:\/\/[^\s"'>]+)/gi;
-
-let getSettings = () => ({ imageLinks: true });
-
-function t(text) {
-    return SillyTavern.getContext().translate(text);
-}
 
 /** The image links in a message's text, in order, each once. */
 export function imageLinks(text) {
@@ -216,8 +210,7 @@ export function showImages(mes, message) {
     mes.classList.toggle('imsg-photo-only', textless);
 }
 
-export function initImages({ settings }) {
-    getSettings = settings;
+export function initImages() {
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && document.getElementById(VIEWER_ID)) {
             event.stopPropagation();

@@ -1,8 +1,8 @@
-// The small things a modern messaging app does around the bubbles: tapbacks (double-click or
-// long-press a bubble to react), an "Edited" label, the time in the hover bar, a button to jump
-// back to the latest message, and quiet tooltips in place of the browser's.
+// Tapbacks (double-click or long-press a bubble), the "Edited" label, the time in the hover bar,
+// the jump-to-latest button and the theme's own tooltips.
 
 import { events, isOn, onStart } from './power.js';
+import { context, glyph, nearBottom, t, within } from './dom.js';
 
 const TAPBACKS = ['❤️', '👍', '👎', '😂', '‼️', '❓'];
 const PICKER_ID = 'imsg-tapback-picker';
@@ -11,14 +11,6 @@ const TOOLTIP_ID = 'imsg-tooltip';
 const TOOLTIP_DELAY_MS = 600;
 /** How far from the bottom, in pixels, before the jump button shows */
 const JUMP_DISTANCE = 400;
-
-function context() {
-    return SillyTavern.getContext();
-}
-
-function t(text) {
-    return context().translate(text);
-}
 
 /** Adds a tapback, swaps it for another, or takes it off when it's picked again. */
 async function setTapback(messageId, emoji) {
@@ -133,10 +125,6 @@ export function decorate(mes, message) {
     }
 }
 
-function nearBottom(chatElement) {
-    return chatElement.scrollHeight - chatElement.scrollTop - chatElement.clientHeight < JUMP_DISTANCE;
-}
-
 function initJump() {
     const chatElement = document.getElementById('chat');
     const sheld = document.getElementById('sheld');
@@ -149,17 +137,14 @@ function initJump() {
     jump.hidden = true;
     jump.title = t('Jump to Latest');
     jump.setAttribute('aria-label', t('Jump to Latest'));
-    const glyph = document.createElement('i');
-    glyph.className = 'imsg-sym';
-    glyph.style.setProperty('--imsg-glyph', 'var(--imsg-sym-chevron-left)');
-    jump.append(glyph);
+    jump.append(glyph('chevron-left'));
     jump.addEventListener('click', () => {
         chatElement.scrollTo({ top: chatElement.scrollHeight, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     });
     onStart(() => sheld.append(jump));
 
     const update = () => {
-        const away = !nearBottom(chatElement);
+        const away = !nearBottom(chatElement, JUMP_DISTANCE);
         jump.hidden = !away;
         if (!away) {
             jump.classList.remove('imsg-jump-new');
@@ -169,7 +154,7 @@ function initJump() {
     const { eventTypes } = context();
     const eventSource = events();
     eventSource.on(eventTypes.MESSAGE_RECEIVED, () => {
-        if (!nearBottom(chatElement)) {
+        if (!nearBottom(chatElement, JUMP_DISTANCE)) {
             jump.classList.add('imsg-jump-new');
         }
     });
@@ -267,7 +252,7 @@ export function initFeatures() {
         }
     }
     document.addEventListener('pointerdown', (event) => {
-        if (!/** @type {HTMLElement} */ (event.target).closest?.(`#${PICKER_ID}`)) {
+        if (!within(event, `#${PICKER_ID}`)) {
             closePicker();
         }
     }, { capture: true });

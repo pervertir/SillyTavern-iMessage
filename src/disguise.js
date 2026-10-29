@@ -1,6 +1,5 @@
-// Keeps the app's own name out of sight while the theme is on: the tab reads "Messages" with
-// a green speech-bubble icon, and the message box says "iMessage".
-// Turning the theme off puts the originals back.
+// While the theme is on, the tab reads "Messages" with a speech-bubble icon and the message box
+// placeholder says "iMessage". The originals are restored when it turns off.
 
 const TITLE = 'Messages';
 /** A green rounded square with a white speech bubble, drawn here rather than copied from Apple */

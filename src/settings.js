@@ -1,7 +1,8 @@
-// Settings, Connections, Formatting and Response Settings as System Settings-style windows
-// (panes.js). Each section lists which of the app's own controls it shows.
+// Settings, Connections, Formatting and Response Settings windows (built on panes.js). Each
+// section lists which of ST's own controls it shows.
 
 import { openPanes, redrawPanes } from './panes.js';
+import { context, t } from './dom.js';
 
 const BLUE = '#0a84ff';
 const GREEN = '#34c759';
@@ -13,14 +14,6 @@ const TEAL = '#30b0c7';
 const PINK = '#ff6482';
 const GRAY = '#8e8e93';
 const BROWN = '#ac8e68';
-
-function context() {
-    return SillyTavern.getContext();
-}
-
-function t(text) {
-    return context().translate(text);
-}
 
 // The app's nodes never go away, so each is looked up once and remembered: while a section is open
 // its nodes sit in the window rather than where a selector would look for them.

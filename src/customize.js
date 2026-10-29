@@ -1,12 +1,13 @@
-// Customize: every part of the theme can be changed from one panel that sits beside the
-// conversation, so each change shows straight away. Choices are kept as theme variables
-// (tokens) laid over the light or dark look, plus a few switches (flags) and your own CSS.
+// Customize panel: theme variables (tokens) laid over the light or dark palette, a few switches
+// (flags) and the user's own CSS, previewed live.
 //
 // Saved as settings.customize = { tokens: { '--name': 'value' }, flags: { name: true }, css: '' }.
-// Export and Import use { themeId: 'imessage', version: 1, tokens, flags, css }, the same shape
-// as the other themes.
+// Export/Import use { themeId: 'imessage', version: 1, tokens, flags, css }, shared with the
+// other themes.
 
+import { getSettings, saveSettings } from './config.js';
 import { isOn, onStart, onStop, whenOn } from './power.js';
+import { element, t, within } from './dom.js';
 
 const PANEL_ID = 'imsg-customize';
 const STYLE_ID = 'imsg-custom-style';
@@ -123,34 +124,17 @@ const TOKEN_KEYS = new Set(SECTIONS.flatMap((section) => section.controls.filter
 const FLAG_KEYS = new Set(SECTIONS.flatMap((section) => section.controls.filter((c) => c.flag).map((c) => c.flag)));
 
 let options = {
-    settings: () => ({}),
-    save: () => {},
     setSetting: () => {},
     pickBackground: () => {},
 };
 
-function t(text) {
-    return SillyTavern.getContext().translate(text);
-}
-
 function state() {
-    const settings = options.settings();
+    const settings = getSettings();
     settings.customize ??= {};
     settings.customize.tokens ??= {};
     settings.customize.flags ??= {};
     settings.customize.css ??= '';
     return settings.customize;
-}
-
-function element(tag, className, text) {
-    const node = document.createElement(tag);
-    if (className) {
-        node.className = className;
-    }
-    if (text !== undefined) {
-        node.textContent = text;
-    }
-    return node;
 }
 
 /** A value safe to put in a CSS declaration: no braces, semicolons or comment marks. */
@@ -310,7 +294,7 @@ function setControl(control, value) {
         custom.css = value ?? '';
     }
     applyCustomize();
-    options.save();
+    saveSettings();
 }
 
 function resetSection(section) {
@@ -325,7 +309,7 @@ function resetSection(section) {
         }
     }
     applyCustomize();
-    options.save();
+    saveSettings();
 }
 
 function buildControl(control, refresh) {
@@ -335,7 +319,7 @@ function buildControl(control, refresh) {
     label.htmlFor = id;
     let input;
     let output = null;
-    const settings = options.settings();
+    const settings = getSettings();
 
     switch (control.type) {
         case 'color': {
@@ -487,7 +471,7 @@ function importCustomize(refresh) {
             custom.flags = Object.fromEntries(Object.entries(data.flags ?? {}).filter(([key, value]) => FLAG_KEYS.has(key) && (typeof value === 'boolean' || typeof value === 'string')));
             custom.css = typeof data.css === 'string' ? data.css : '';
             applyCustomize();
-            options.save();
+            saveSettings();
             refresh();
             toastr.success(t('Your customizations are loaded.'), t('Imported'));
         } catch (error) {
@@ -555,7 +539,7 @@ export function openCustomize() {
         custom.flags = {};
         custom.css = '';
         applyCustomize();
-        options.save();
+        saveSettings();
         render();
     });
     const exportButton = element('button', 'menu_button', t('Export'));
@@ -578,7 +562,7 @@ export function initCustomize(given) {
     onStop(closePanel);
     document.addEventListener('keydown', whenOn((event) => {
         if (event.key === 'Escape' && document.getElementById(PANEL_ID) && !document.querySelector('dialog.popup[open]')
-            && !/** @type {HTMLElement} */ (event.target).closest?.(`#${PANEL_ID} textarea`)) {
+            && !within(event, `#${PANEL_ID} textarea`)) {
             closePanel();
         }
     }));

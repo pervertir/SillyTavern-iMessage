@@ -1,14 +1,11 @@
-// World Info, laid out like Notes: lorebooks in the sidebar, the open book's entries beside them,
-// and the selected entry's editor on the right. Each book shows whether it's on for every chat,
-// for this chat or for the open character, and the global scan settings have their own page.
-//
-// Books and entries are read and saved through the app's own World Info functions, so its cache,
-// events and the prompt stay in step. Renaming and duplicating a book go through the app's hidden
-// editor, which also updates the characters and chats that use it.
+// World Info window, laid out like Notes: lorebooks, the open book's entries and the entry
+// editor. Reads and writes go through ST's world-info.js so its cache and events stay in step;
+// rename and duplicate use ST's hidden editor, which also updates linked characters and chats.
 
+import * as wi from '../../../../world-info.js';
 import { events, onStop } from './power.js';
 import { toggleMenu } from './shell.js';
-import * as wi from '../../../world-info.js';
+import { button, context, element, escapeHtml, glyph, isPhone, overlayOpen, t } from './dom.js';
 
 const ROOT_ID = 'imsg-worldinfo';
 const SETTINGS = '__settings__';
@@ -56,40 +53,6 @@ let view = { book: null, uid: null, level: 0, needle: '' };
 /** The open book's entries, as last loaded */
 let bookData = null;
 let saveTimer = 0;
-
-function context() {
-    return SillyTavern.getContext();
-}
-
-function t(text) {
-    return context().translate(text);
-}
-
-function element(tag, className, text) {
-    const node = document.createElement(tag);
-    if (className) {
-        node.className = className;
-    }
-    if (text !== undefined) {
-        node.textContent = text;
-    }
-    return node;
-}
-
-function button(className, label, run) {
-    const node = element('button', className, label === undefined ? undefined : t(label));
-    node.type = 'button';
-    if (run) {
-        node.addEventListener('click', run);
-    }
-    return node;
-}
-
-function glyph(symbol) {
-    const node = element('i', 'imsg-sym');
-    node.style.setProperty('--imsg-glyph', `var(--imsg-sym-${symbol})`);
-    return node;
-}
 
 function select(options, value) {
     const node = element('select');
@@ -238,12 +201,6 @@ async function exportBook(name) {
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(link.href), 2000);
-}
-
-function escapeHtml(text) {
-    const node = element('span');
-    node.textContent = text;
-    return node.innerHTML;
 }
 
 function bookMenu(name, anchor, point) {
@@ -763,11 +720,11 @@ function close() {
 }
 
 function onKey(event) {
-    if (event.key !== 'Escape' || document.querySelector('dialog.popup[open]') || document.getElementById('imsg-menu')?.hidden === false) {
+    if (event.key !== 'Escape' || overlayOpen()) {
         return;
     }
     event.stopPropagation();
-    if (view.level > 0 && matchMedia('(max-width: 1000px)').matches) {
+    if (view.level > 0 && isPhone()) {
         view = { ...view, level: view.level - 1 };
         render();
     } else {
@@ -814,10 +771,10 @@ export async function openWorldInfo(book = null) {
     document.body.append(root);
     document.addEventListener('keydown', onKey, true);
 
-    const start = book ?? chatBook() ?? characterBook() ?? names().find(isGlobal) ?? (matchMedia('(max-width: 1000px)').matches ? null : names()[0]);
+    const start = book ?? chatBook() ?? characterBook() ?? names().find(isGlobal) ?? (isPhone() ? null : names()[0]);
     if (start && wi.world_names.includes(start)) {
         await openBook(start);
-        if (matchMedia('(max-width: 1000px)').matches) {
+        if (isPhone()) {
             return;
         }
         const first = entries()[0];

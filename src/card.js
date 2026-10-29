@@ -1,16 +1,12 @@
-// The contact card (Details): a big picture, the name and a line about them, round buttons for
-// what you'd do next, and the full editor one click away, instead of opening straight into the
-// app's character editor.
+// Contact card (Details popup): picture, name, a one-line description and quick actions, with
+// the full editor one click away.
 
 import { monogramize } from './monograms.js';
 import { buildGroupAvatar, clickOption } from './shell.js';
 import { deleteCurrentContact, openContacts, openCurrentContact } from './contacts.js';
+import { button, element, glyph, t } from './dom.js';
 
 const DESCRIPTION_LIMIT = 220;
-
-function t(text) {
-    return SillyTavern.getContext().translate(text);
-}
 
 /** One line about the contact, as plain text: their notes, or the start of their description. */
 function aboutLine(character) {
@@ -25,35 +21,18 @@ function aboutLine(character) {
     return text.length > DESCRIPTION_LIMIT ? `${text.slice(0, DESCRIPTION_LIMIT).replace(/\s+\S*$/, '')}…` : text;
 }
 
-function element(tag, className, text) {
-    const node = document.createElement(tag);
-    if (className) {
-        node.className = className;
-    }
-    if (text !== undefined) {
-        node.textContent = text;
-    }
-    return node;
-}
-
 /** A round action button with its label under it. */
 function action(label, symbol, run) {
-    const button = element('button', 'imsg-card-action');
-    button.type = 'button';
-    const glyph = element('i', 'imsg-sym');
-    glyph.style.setProperty('--imsg-glyph', `var(--imsg-sym-${symbol})`);
-    button.append(element('span', 'imsg-card-action-icon'), element('span', 'imsg-card-action-label', t(label)));
-    button.firstChild.append(glyph);
-    button.addEventListener('click', run);
-    return button;
+    const node = button('imsg-card-action', undefined, run);
+    const icon = element('span', 'imsg-card-action-icon');
+    icon.append(glyph(symbol));
+    node.append(icon, element('span', 'imsg-card-action-label', t(label)));
+    return node;
 }
 
 /** A row of the list under the buttons. */
 function row(label, run, danger = false) {
-    const button = element('button', `imsg-card-row${danger ? ' imsg-danger' : ''}`, t(label));
-    button.type = 'button';
-    button.addEventListener('click', run);
-    return button;
+    return button(`imsg-card-row${danger ? ' imsg-danger' : ''}`, label, run);
 }
 
 /** Opens the card for the open conversation's contact or group. */

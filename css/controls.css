@@ -124,9 +124,6 @@ body.imessage input[type="radio"] {
 /* Sliders: a thin track and a round white knob */
 body.imessage input[type="range"] {
     accent-color: var(--imsg-blue);
-}
-
-body.imessage input[type="range"] {
     height: 4px;
     border: none;
     border-radius: 2px;
