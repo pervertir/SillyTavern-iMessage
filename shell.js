@@ -6,6 +6,7 @@ import { openContactCard } from './card.js';
 import { openContacts, openMyCard } from './contacts.js';
 import { openBackgrounds } from './backgrounds.js';
 import { openWorldInfo } from './worldinfo.js';
+import { openExtensions } from './addons.js';
 import { buildMonogram, monogramize } from './monograms.js';
 
 const HEADER_ID = 'imsg-head';
@@ -30,6 +31,7 @@ const NATIVE = {
     'persona-management-button': () => openMyCard(),
     'backgrounds-button': () => openBackgrounds(),
     'WI-SP-button': () => openWorldInfo(),
+    'extensions-settings-button': () => openExtensions(),
 };
 
 let shellOptions = { setAppearance: (_appearance) => {}, isDark: () => false };

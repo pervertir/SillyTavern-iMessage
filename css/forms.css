@@ -2,23 +2,23 @@
    checkboxes level with their labels, pop-up menus with their up/down chevrons, quiet icon
    buttons, small disclosure chevrons. Scoped to the sheets and dialogs. */
 
-body.imessage :is(.drawer-content, .popup) {
+body.imessage :is(.drawer-content, .popup, .imsg-host) {
     --imsg-form-gap: 10px;
 }
 
 /* labels and help text */
-body.imessage :is(.drawer-content, .popup) :is(label, .range-block-title, h4, h5) {
+body.imessage :is(.drawer-content, .popup, .imsg-host) :is(label, .range-block-title, h4, h5) {
     text-align: start;
 }
 
-body.imessage :is(.drawer-content, .popup) :is(small, .toggle-description, .notes-link, .text_muted) {
+body.imessage :is(.drawer-content, .popup, .imsg-host) :is(small, .toggle-description, .notes-link, .text_muted) {
     color: var(--imsg-fg-2);
     font-size: var(--imsg-text-xs);
     line-height: 14px;
 }
 
 /* sliders: the title on its own line at the start, the track and its value field in a row */
-body.imessage .drawer-content .range-block {
+body.imessage :is(.drawer-content, .imsg-host) .range-block {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -26,7 +26,7 @@ body.imessage .drawer-content .range-block {
     margin: 0 0 var(--imsg-form-gap);
 }
 
-body.imessage .drawer-content .range-block-title {
+body.imessage :is(.drawer-content, .imsg-host) .range-block-title {
     flex: 1 1 100%;
     width: auto;
     margin: 0;
@@ -36,59 +36,59 @@ body.imessage .drawer-content .range-block-title {
     text-align: start;
 }
 
-body.imessage .drawer-content .range-block-range-and-counter {
+body.imessage :is(.drawer-content, .imsg-host) .range-block-range-and-counter {
     align-items: center;
     gap: 10px;
 }
 
-body.imessage .drawer-content .range-block-range {
+body.imessage :is(.drawer-content, .imsg-host) .range-block-range {
     flex: 1;
     display: flex;
     align-items: center;
 }
 
-body.imessage .drawer-content .range-block-counter {
+body.imessage :is(.drawer-content, .imsg-host) .range-block-counter {
     flex: none;
     width: 64px;
     margin: 0;
 }
 
-body.imessage .drawer-content .range-block-counter input {
+body.imessage :is(.drawer-content, .imsg-host) .range-block-counter input {
     width: 100%;
     text-align: end;
     font-variant-numeric: tabular-nums;
 }
 
 /* checkboxes level with their label */
-body.imessage :is(.drawer-content, .popup) :is(.checkbox_label, label:has(> input[type="checkbox"])) {
+body.imessage :is(.drawer-content, .popup, .imsg-host) :is(.checkbox_label, label:has(> input[type="checkbox"])) {
     align-items: center;
     column-gap: 7px;
 }
 
-body.imessage :is(.drawer-content, .popup) input[type="checkbox"] {
+body.imessage :is(.drawer-content, .popup, .imsg-host) input[type="checkbox"] {
     flex: none;
     margin: 0;
     align-self: center;
 }
 
 /* labels the app packs with no gap */
-body.imessage :is(.drawer-content, .popup) .flexNoGap > input[type="checkbox"] {
+body.imessage :is(.drawer-content, .popup, .imsg-host) .flexNoGap > input[type="checkbox"] {
     margin-right: 7px;
 }
 
-body.imessage :is(.drawer-content, .popup) .checkbox_label + :is(small, .toggle-description) {
+body.imessage :is(.drawer-content, .popup, .imsg-host) .checkbox_label + :is(small, .toggle-description) {
     display: block;
     margin: 2px 0 var(--imsg-form-gap) 21px;
 }
 
 /* fields: one height, roomy padding */
-body.imessage :is(.drawer-content, .popup) :is(input.text_pole, input[type="text"], input[type="number"], input[type="search"], input[type="password"], input[type="url"]) {
+body.imessage :is(.drawer-content, .popup, .imsg-host) :is(input.text_pole, input[type="text"], input[type="number"], input[type="search"], input[type="password"], input[type="url"]) {
     min-height: 24px;
     padding: 3px 8px;
     box-sizing: border-box;
 }
 
-body.imessage :is(.drawer-content, .popup) textarea:not([id="send_textarea"]) {
+body.imessage :is(.drawer-content, .popup, .imsg-host) textarea:not([id="send_textarea"]) {
     padding: 6px 8px;
     line-height: 17px;
 }
@@ -109,29 +109,29 @@ body.imessage select:not(.imsg-search select):not([multiple]) {
 }
 
 /* icon buttons: quiet glyphs that get a soft background under the pointer */
-body.imessage :is(.drawer-content, .popup) .menu_button:is(.fa-solid, .fa-regular, .fa-brands):not(.toggleEnabled, .active, .redWarningBG, .red_button) {
+body.imessage :is(.drawer-content, .popup, .imsg-host) .menu_button:is(.fa-solid, .fa-regular, .fa-brands):not(.toggleEnabled, .active, .redWarningBG, .red_button) {
     background: none;
     box-shadow: none;
     color: var(--imsg-fg-2);
 }
 
-body.imessage :is(.drawer-content, .popup) .menu_button:is(.fa-solid, .fa-regular, .fa-brands):not(.toggleEnabled, .active, .redWarningBG, .red_button):hover {
+body.imessage :is(.drawer-content, .popup, .imsg-host) .menu_button:is(.fa-solid, .fa-regular, .fa-brands):not(.toggleEnabled, .active, .redWarningBG, .red_button):hover {
     background: var(--imsg-hover);
     color: var(--imsg-fg);
 }
 
-body.imessage :is(.drawer-content, .popup) .menu_button:is(.redWarningBG, .red_button):is(.fa-solid, .fa-regular) {
+body.imessage :is(.drawer-content, .popup, .imsg-host) .menu_button:is(.redWarningBG, .red_button):is(.fa-solid, .fa-regular) {
     background: none;
     box-shadow: none;
     color: var(--imsg-red);
 }
 
 /* text buttons with an icon: the icon smaller and quieter than the words */
-body.imessage :is(.drawer-content, .popup) .menu_button.menu_button_icon {
+body.imessage :is(.drawer-content, .popup, .imsg-host) .menu_button.menu_button_icon {
     gap: 5px;
 }
 
-body.imessage :is(.drawer-content, .popup) .menu_button.menu_button_icon > i {
+body.imessage :is(.drawer-content, .popup, .imsg-host) .menu_button.menu_button_icon > i {
     font-size: 11px;
     opacity: 0.7;
 }
@@ -179,7 +179,7 @@ body.imessage .tag[style*="background"] {
 }
 
 /* the app's hairlines between groups */
-body.imessage .drawer-content hr {
+body.imessage :is(.drawer-content, .imsg-host) hr {
     margin: 10px 0;
     border: none;
     border-top: 1px solid var(--imsg-line);
@@ -267,13 +267,13 @@ body.imessage .select2-results__option--highlighted {
 }
 
 /* destructive icon buttons: a red glyph, not a red block */
-body.imessage :is(.drawer-content, .popup) .menu_button:is(.redWarningBG, .red_button):is(.fa-solid, .fa-regular) {
+body.imessage :is(.drawer-content, .popup, .imsg-host) .menu_button:is(.redWarningBG, .red_button):is(.fa-solid, .fa-regular) {
     background: none !important;
     box-shadow: none;
     color: var(--imsg-red);
 }
 
-body.imessage :is(.drawer-content, .popup) .menu_button:is(.redWarningBG, .red_button):is(.fa-solid, .fa-regular):hover {
+body.imessage :is(.drawer-content, .popup, .imsg-host) .menu_button:is(.redWarningBG, .red_button):is(.fa-solid, .fa-regular):hover {
     background: color-mix(in srgb, var(--imsg-red) 14%, transparent) !important;
 }
 
@@ -301,7 +301,7 @@ body.imessage .select2-container .select2-selection__choice__remove {
 }
 
 /* on/off settings: switches */
-body.imessage :is(.drawer-content, .popup) input[type="checkbox"]:not(.del_checkbox, .bulk_select_checkbox, .tag_as_folder) {
+body.imessage :is(.drawer-content, .popup, .imsg-host) input[type="checkbox"]:not(.del_checkbox, .bulk_select_checkbox, .tag_as_folder) {
     width: 26px;
     height: 15px;
     border-radius: 8px;
@@ -310,7 +310,7 @@ body.imessage :is(.drawer-content, .popup) input[type="checkbox"]:not(.del_check
     transition: background-color 0.18s var(--imsg-ease);
 }
 
-body.imessage :is(.drawer-content, .popup) input[type="checkbox"]:not(.del_checkbox, .bulk_select_checkbox, .tag_as_folder)::after {
+body.imessage :is(.drawer-content, .popup, .imsg-host) input[type="checkbox"]:not(.del_checkbox, .bulk_select_checkbox, .tag_as_folder)::after {
     content: '';
     position: absolute;
     top: 1px;
@@ -326,12 +326,12 @@ body.imessage :is(.drawer-content, .popup) input[type="checkbox"]:not(.del_check
     transition: transform 0.18s var(--imsg-ease);
 }
 
-body.imessage :is(.drawer-content, .popup) input[type="checkbox"]:not(.del_checkbox, .bulk_select_checkbox, .tag_as_folder):checked {
+body.imessage :is(.drawer-content, .popup, .imsg-host) input[type="checkbox"]:not(.del_checkbox, .bulk_select_checkbox, .tag_as_folder):checked {
     background: var(--imsg-blue);
     box-shadow: none;
 }
 
-body.imessage :is(.drawer-content, .popup) input[type="checkbox"]:not(.del_checkbox, .bulk_select_checkbox, .tag_as_folder):checked::after {
+body.imessage :is(.drawer-content, .popup, .imsg-host) input[type="checkbox"]:not(.del_checkbox, .bulk_select_checkbox, .tag_as_folder):checked::after {
     inset: auto;
     top: 1px;
     left: 1px;
@@ -339,15 +339,15 @@ body.imessage :is(.drawer-content, .popup) input[type="checkbox"]:not(.del_check
 }
 
 @media (prefers-reduced-motion: reduce) {
-    body.imessage :is(.drawer-content, .popup) input[type="checkbox"],
-    body.imessage :is(.drawer-content, .popup) input[type="checkbox"]::after {
+    body.imessage :is(.drawer-content, .popup, .imsg-host) input[type="checkbox"],
+    body.imessage :is(.drawer-content, .popup, .imsg-host) input[type="checkbox"]::after {
         transition: none;
     }
 }
 
 
 /* a switch's own label reads as a label, not as help text */
-body.imessage :is(.drawer-content, .popup) .checkbox_label > :is(small, span) {
+body.imessage :is(.drawer-content, .popup, .imsg-host) .checkbox_label > :is(small, span) {
     color: var(--imsg-fg);
     opacity: 1;
 }
