@@ -5,7 +5,7 @@ import { MODULE_NAME, defaultSettings, getSettings, isDark, onSystemAppearanceCh
 import { isPhone } from './src/dom.js';
 import { renderPanel, setSetting, showSetting } from './src/panel.js';
 import { events, isOn, startTheme, stopTheme } from './src/power.js';
-import { registerTheme } from './src/shared/theme-exclusive.js';
+import { registerTheme, reloadPage } from './src/shared/theme-exclusive.js';
 import { initAlerts } from './src/alerts.js';
 import { initBackgrounds, openBackgrounds } from './src/backgrounds.js';
 import { initContacts } from './src/contacts.js';
@@ -158,7 +158,12 @@ async function init() {
             after: {
                 enabled: () => {
                     refreshMessages();
-                    getSettings().enabled ? exclusive?.activated() : exclusive?.changed();
+                    if (getSettings().enabled) {
+                        exclusive?.activated();
+                        reloadWhenOn('iMessage is on.');
+                    } else {
+                        exclusive?.changed();
+                    }
                 },
                 pauseUserTheme: () => exclusive?.changed(),
                 recentMax: () => scheduleRefresh(),
@@ -176,16 +181,30 @@ async function init() {
 }
 
 /**
- * ST calls this after updating the extension (manifest "hooks"). The running code is the old
- * version, so the page reloads once to load the new one. An update made while the page loads,
- * before init(), already loads the new code and needs no reload.
+ * Reloads the page once the settings are saved, so the theme starts from a fresh page whenever
+ * it's loaded into one that's already running. Called on a user's action only (installing,
+ * turning on, updating), so it can't repeat by itself.
+ */
+function reloadWhenOn(message) {
+    if (getSettings().enabled) {
+        reloadPage(SillyTavern.getContext().translate(message), { stillWanted: () => !!getSettings().enabled });
+    }
+}
+
+/** ST calls this right after installing the extension and loading it (manifest "hooks"). */
+export function onInstall() {
+    reloadWhenOn('iMessage is installed.');
+}
+
+/**
+ * ST calls this after updating the extension. The running code is the old version, so the page
+ * reloads to load the new one. An update made while the page loads, before init(), already
+ * loads the new code.
  */
 export function onUpdate() {
-    if (!initialized || !getSettings().enabled) {
-        return;
+    if (initialized) {
+        reloadWhenOn('iMessage was updated.');
     }
-    toastr.info(SillyTavern.getContext().translate('Loading the new version…'), 'iMessage Theme');
-    setTimeout(() => location.reload(), 1500);
 }
 
 function delay(ms) {
