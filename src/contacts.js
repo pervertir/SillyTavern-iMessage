@@ -7,7 +7,7 @@ import { default_user_avatar, setUserName } from '../../../../../script.js';
 import { events, onStop } from './power.js';
 import { monogramize, buildMonogram } from './monograms.js';
 import { buildGroupAvatar, clickOption, toggleMenu } from './shell.js';
-import { button, context, element, escapeHtml, glyph, isPhone, overlayOpen, t } from './dom.js';
+import { button, context, element, escapeHtml, glyph, isPhone, overlayOpen, setPicture, t } from './dom.js';
 
 const ROOT_ID = 'imsg-contacts';
 const ABOUT_LIMIT = 160;
@@ -99,15 +99,12 @@ function picture(item, size) {
     const holder = element('span', 'imsg-avatar imsg-cn-pic');
     holder.style.setProperty('--imsg-cn-pic', `${size}px`);
     if (item.group) {
-        holder.append(buildGroupAvatar(item.group));
+        holder.append(buildGroupAvatar(item.group, size));
     } else {
         const img = element('img');
         img.alt = '';
         img.loading = 'lazy';
-        img.src = size > 64 ? `/characters/${encodeURIComponent(item.character.avatar)}` : context().getThumbnailUrl('avatar', item.character.avatar);
-        if (size > 64) {
-            img.addEventListener('error', () => { img.src = context().getThumbnailUrl('avatar', item.character.avatar); }, { once: true });
-        }
+        setPicture(img, 'avatar', item.character.avatar, size);
         holder.append(img);
         monogramize(img, item.character.name);
     }
@@ -211,9 +208,11 @@ async function uploadPicture(avatar, file) {
     await fetch(thumbnail, { cache: 'reload' }).catch(() => {});
     await fetch(`/characters/${encodeURIComponent(avatar)}`, { cache: 'reload' }).catch(() => {});
     document.querySelectorAll(`img[src^="${CSS.escape(thumbnail)}"], img[src^="${thumbnail}"]`).forEach((img) => {
-        const src = img.src;
+        const { src, srcset } = img;
+        img.srcset = '';
         img.src = '';
         img.src = src;
+        img.srcset = srcset;
     });
 }
 
@@ -370,7 +369,7 @@ function myCard() {
     if (avatar) {
         const img = element('img');
         img.alt = '';
-        img.src = ctx.getThumbnailUrl('persona', avatar);
+        setPicture(img, 'persona', avatar, 44);
         holder.append(img);
         monogramize(img, ctx.name1);
     } else {
@@ -794,7 +793,7 @@ function renderGroupForm(pane, item) {
     search.placeholder = t('Add someone…');
     const suggestions = element('div', 'imsg-cn-suggest');
     const drawPicture = () => {
-        pic.replaceChildren(buildGroupAvatar({ members, name: name.input.value }));
+        pic.replaceChildren(buildGroupAvatar({ members, name: name.input.value }, 112));
     };
     const drawMembers = () => {
         memberList.replaceChildren(...members.map((avatar, index) => {
@@ -987,10 +986,7 @@ function personaPicture(avatar, size) {
     const img = element('img');
     img.alt = '';
     img.loading = 'lazy';
-    img.src = size > 64 ? `/User Avatars/${encodeURIComponent(avatar)}` : context().getThumbnailUrl('persona', avatar);
-    if (size > 64) {
-        img.addEventListener('error', () => { img.src = context().getThumbnailUrl('persona', avatar); }, { once: true });
-    }
+    setPicture(img, 'persona', avatar, size);
     holder.append(img);
     monogramize(img, personaName(avatar));
     return holder;
