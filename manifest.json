@@ -9,5 +9,8 @@
     "version": "1.0.0",
     "license": "MIT",
     "homepage": "https://github.com/pervertir/SillyTavern-iMessage",
-    "auto_update": true
+    "auto_update": true,
+    "hooks": {
+        "update": "onUpdate"
+    }
 }
