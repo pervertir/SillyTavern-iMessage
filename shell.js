@@ -9,6 +9,7 @@ import { openWorldInfo } from './worldinfo.js';
 import { openExtensions } from './addons.js';
 import { openConnections, openFormatting, openResponseSettings, openSettings } from './settings.js';
 import { buildMonogram, monogramize } from './monograms.js';
+import { events, onStart, whenOn } from './power.js';
 
 const HEADER_ID = 'imsg-head';
 const MENU_ID = 'imsg-menu';
@@ -158,6 +159,7 @@ function closeMenu() {
 }
 
 let menuAnchor = null;
+let menuListening = false;
 
 function getMenu() {
     let menu = document.getElementById(MENU_ID);
@@ -169,14 +171,23 @@ function getMenu() {
     menu.setAttribute('role', 'menu');
     menu.hidden = true;
     document.body.append(menu);
+    // the menu is built again each time the theme turns on; its page-wide handlers are added once
+    if (menuListening) {
+        return menu;
+    }
+    menuListening = true;
     document.addEventListener('pointerdown', (event) => {
+        const menu = document.getElementById(MENU_ID);
+        if (!menu) {
+            return;
+        }
         const target = /** @type {Node} */ (event.target);
         if (!menu.hidden && !menu.contains(target) && !menuAnchor?.contains(target)) {
             closeMenu();
         }
     });
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && !menu.hidden) {
+        if (event.key === 'Escape' && document.getElementById(MENU_ID)?.hidden === false) {
             closeMenu();
         }
     });
@@ -500,14 +511,14 @@ function trackDrawers() {
         }
         document.body.classList.toggle('imsg-menu-open', any);
     };
-    const observer = new MutationObserver(update);
+    const observer = new MutationObserver(whenOn(update));
     for (const drawer of drawers) {
         const content = drawer.querySelector(':scope > .drawer-content');
         if (content) {
             observer.observe(content, { attributes: true, attributeFilter: ['class'] });
         }
     }
-    update();
+    return update;
 }
 
 /**
@@ -542,16 +553,20 @@ function clusterGroupRows() {
 }
 
 export function initShell(options) {
-    const { eventSource, eventTypes } = SillyTavern.getContext();
-    eventSource.on(eventTypes.CHARACTER_PAGE_LOADED, () => setTimeout(clusterGroupRows, 0));
-    eventSource.on(eventTypes.GROUP_UPDATED, () => setTimeout(clusterGroupRows, 0));
-    clusterGroupRows();
-    markAlerts();
-    new MutationObserver(() => markAlerts()).observe(document.body, { childList: true });
+    const { eventTypes } = SillyTavern.getContext();
+    const eventSource = events();
+    eventSource.on(eventTypes.CHARACTER_PAGE_LOADED, () => setTimeout(whenOn(clusterGroupRows), 0));
+    eventSource.on(eventTypes.GROUP_UPDATED, () => setTimeout(whenOn(clusterGroupRows), 0));
+    new MutationObserver(whenOn(() => markAlerts())).observe(document.body, { childList: true });
     shellOptions = options;
-    createHeader();
-    createEmptyState();
-    createPanelHeads();
-    trackDrawers();
-    refreshHeader();
+    const updateDrawers = trackDrawers();
+    onStart(() => {
+        clusterGroupRows();
+        markAlerts();
+        createHeader();
+        createEmptyState();
+        createPanelHeads();
+        updateDrawers();
+        refreshHeader();
+    });
 }

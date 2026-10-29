@@ -4,6 +4,7 @@
 // bubble shows while a reply is being written. Everything here is classes and data attributes on
 // the existing .mes elements; CSS draws them. Long replies split into short bubbles in split.js.
 
+import { events, isOn, onStart, whenOn } from './power.js';
 import { splitAll } from './split.js';
 import { decorate } from './features.js';
 import { showImages } from './images.js';
@@ -162,7 +163,7 @@ function markPending(mes, message) {
 
 /** Re-marks the chat on the next frame, so a burst of events costs one pass. */
 export function refreshMessages() {
-    if (!frame) {
+    if (isOn() && !frame) {
         frame = requestAnimationFrame(markAll);
     }
 }
@@ -206,7 +207,8 @@ function hideTyping() {
 }
 
 export function initMessages() {
-    const { eventSource, eventTypes } = SillyTavern.getContext();
+    const { eventTypes } = SillyTavern.getContext();
+    const eventSource = events();
     for (const type of [
         eventTypes.CHARACTER_MESSAGE_RENDERED, eventTypes.USER_MESSAGE_RENDERED, eventTypes.MESSAGE_SWIPED,
         eventTypes.MESSAGE_UPDATED, eventTypes.MESSAGE_EDITED, eventTypes.MESSAGE_DELETED, eventTypes.CHAT_CHANGED,
@@ -244,7 +246,7 @@ export function initMessages() {
     eventSource.on(eventTypes.STREAM_TOKEN_RECEIVED, refreshMessages);
     const chatElement = document.getElementById('chat');
     if (chatElement) {
-        new MutationObserver(refreshMessages).observe(chatElement, { childList: true });
+        new MutationObserver(whenOn(refreshMessages)).observe(chatElement, { childList: true });
         // a click on a picture opens it large, like its zoom button
         chatElement.addEventListener('click', (event) => {
             const target = /** @type {HTMLElement} */ (event.target);
@@ -260,5 +262,5 @@ export function initMessages() {
             refreshMessages();
         });
     }
-    refreshMessages();
+    onStart(refreshMessages);
 }

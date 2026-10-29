@@ -16,6 +16,7 @@ import { initContacts } from './contacts.js';
 import { initBackgrounds, openBackgrounds } from './backgrounds.js';
 import { initWorldInfo } from './worldinfo.js';
 import { registerTheme } from './theme-exclusive.js';
+import { events, isOn, startTheme, stopTheme } from './power.js';
 
 const MODULE_NAME = 'iMessageTheme';
 /** Folder path under scripts/extensions/, e.g. third-party/SillyTavern-iMessage */
@@ -74,6 +75,9 @@ const SETTING_FIELDS = {
 /** The one-theme-at-a-time helper shared by our themes */
 let exclusive = null;
 
+/** Whether the theme's parts are in the page */
+let running = false;
+
 const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
 function getSettings() {
@@ -105,15 +109,26 @@ function applySettings() {
     body.classList.toggle(BODY_CLASS, on);
     document.documentElement.classList.toggle('imsg-html', on);
     body.classList.toggle('imsg-dark', on && isDark(settings));
-    body.classList.toggle('imsg-lights', !!settings.windowButtons);
-    body.classList.toggle('imsg-receipts', !!settings.receipts);
-    body.classList.toggle('imsg-typing-on', !!settings.typing);
-    body.classList.toggle('imsg-split-on', !!settings.splitReplies);
+    body.classList.toggle('imsg-lights', on && !!settings.windowButtons);
+    body.classList.toggle('imsg-receipts', on && !!settings.receipts);
+    body.classList.toggle('imsg-typing-on', on && !!settings.typing);
+    body.classList.toggle('imsg-split-on', on && !!settings.splitReplies);
     body.classList.toggle('imsg-wall', on && !!settings.wallpaper);
-    body.style.setProperty('--imsg-wall-blur', `${Number(settings.wallpaperBlur) || 0}px`);
-    body.style.setProperty('--imsg-wall-dim', `${Number(settings.wallpaperDim) || 0}%`);
+    if (on) {
+        body.style.setProperty('--imsg-wall-blur', `${Number(settings.wallpaperBlur) || 0}px`);
+        body.style.setProperty('--imsg-wall-dim', `${Number(settings.wallpaperDim) || 0}%`);
+    }
     setDisguise(on);
     refreshPanelTitles(on);
+    // the parts of the theme in the page are built as it turns on and taken away as it turns off
+    if (on !== running) {
+        running = on;
+        if (on) {
+            startTheme();
+        } else {
+            stopTheme();
+        }
+    }
 }
 
 /** Phones show one pane at a time: the conversation list, or the open conversation. */
@@ -135,6 +150,9 @@ function setAppearance(appearance) {
 }
 
 function onChatChanged(chatId) {
+    if (!isOn()) {
+        return;
+    }
     refreshHeader();
     refreshTitle();
     markCurrent();
@@ -299,7 +317,8 @@ async function init() {
     });
     applySettings();
 
-    const { eventSource, eventTypes } = SillyTavern.getContext();
+    const { eventTypes } = SillyTavern.getContext();
+    const eventSource = events();
     eventSource.on(eventTypes.CHAT_CHANGED, onChatChanged);
     eventSource.on(eventTypes.GROUP_UPDATED, refreshHeader);
     eventSource.on(eventTypes.CHARACTER_EDITED, refreshHeader);

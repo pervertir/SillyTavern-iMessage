@@ -3,6 +3,7 @@
 // prompt are unchanged; only the display is split. A new reply that wasn't streamed comes in
 // bubble by bubble, with the typing dots between.
 
+import { events } from './power.js';
 import { splitMessage } from './message-splitter.js';
 
 const BOX_CLASS = 'imsg-parts';
@@ -182,7 +183,8 @@ export function resetSplits() {
 }
 
 export function initSplit() {
-    const { eventSource, eventTypes } = SillyTavern.getContext();
+    const { eventTypes } = SillyTavern.getContext();
+    const eventSource = events();
     eventSource.on(eventTypes.GENERATION_STARTED, (_type, _options, dryRun) => {
         if (!dryRun) {
             generating = true;

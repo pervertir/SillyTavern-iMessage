@@ -7,6 +7,7 @@
 
 import { toggleMenu } from './shell.js';
 import { host, releaseAll } from './host.js';
+import { onStop } from './power.js';
 import * as ext from '../../../extensions.js';
 
 const ROOT_ID = 'imsg-extensions';
@@ -345,3 +346,6 @@ export function openExtensions(title = null) {
     document.addEventListener('keydown', onKey, true);
     render();
 }
+
+// turning the theme off closes the window, putting back what it borrowed
+onStop(close);

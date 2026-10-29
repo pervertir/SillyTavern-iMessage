@@ -6,6 +6,7 @@
 // events and the prompt stay in step. Renaming and duplicating a book go through the app's hidden
 // editor, which also updates the characters and chats that use it.
 
+import { events, onStop } from './power.js';
 import { toggleMenu } from './shell.js';
 import * as wi from '../../../world-info.js';
 
@@ -828,7 +829,8 @@ export async function openWorldInfo(book = null) {
 }
 
 export function initWorldInfo() {
-    const { eventSource, eventTypes } = context();
+    const { eventTypes } = context();
+    const eventSource = events();
     // imports, renames and deletes made through the app redraw the list
     for (const type of [eventTypes.WORLDINFO_UPDATED, eventTypes.WORLDINFO_SETTINGS_UPDATED, eventTypes.CHAT_CHANGED]) {
         if (!type) {
@@ -847,3 +849,6 @@ export function initWorldInfo() {
         });
     }
 }
+
+// turning the theme off closes the window, putting back what it borrowed
+onStop(close);

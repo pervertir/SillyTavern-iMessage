@@ -6,6 +6,7 @@
 // for saving, its own functions for opening a conversation, its slash commands for duplicate and
 // delete.
 
+import { events, onStop } from './power.js';
 import { monogramize, buildMonogram } from './monograms.js';
 import { buildGroupAvatar, clickOption, toggleMenu } from './shell.js';
 import * as personas from '../../../personas.js';
@@ -1443,7 +1444,8 @@ export function deleteCurrentContact() {
 }
 
 export function initContacts() {
-    const { eventSource, eventTypes } = context();
+    const { eventTypes } = context();
+    const eventSource = events();
     // the list keeps up with imports, deletes and edits made anywhere
     for (const type of [eventTypes.CHARACTER_PAGE_LOADED, eventTypes.CHARACTER_DELETED, eventTypes.GROUP_UPDATED, eventTypes.CHARACTER_EDITED, eventTypes.PERSONA_CHANGED, eventTypes.PERSONA_DELETED]) {
         if (type) {
@@ -1457,3 +1459,6 @@ export function initContacts() {
         }
     }
 }
+
+// turning the theme off closes the window, putting back what it borrowed
+onStop(close);

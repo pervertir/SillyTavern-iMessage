@@ -3,6 +3,7 @@
 // Esc closes the open sheet.
 // The app's own ↑ (edit your last message) keeps working.
 
+import { whenOn } from './power.js';
 import { closeDrawers, newMessage, toggleSidebar } from './shell.js';
 import { openSettings } from './settings.js';
 
@@ -55,5 +56,5 @@ function onKeyDown(event) {
 }
 
 export function initKeys() {
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keydown', whenOn(onKeyDown));
 }

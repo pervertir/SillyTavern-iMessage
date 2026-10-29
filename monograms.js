@@ -2,6 +2,8 @@
 // default pictures into new characters and personas, so a placeholder is found by how it looks:
 // a tiny version of the picture is compared with a tiny version of the defaults.
 
+import { events, onStart, whenOn } from './power.js';
+
 const DEFAULT_PICTURES = ['img/ai4.png', 'img/user-default.png'];
 const SIZE = 12;
 /** Average difference per color channel (0-255) under which two pictures count as the same */
@@ -135,12 +137,13 @@ function monogramizeMessages() {
 }
 
 export function initMonograms() {
-    const { eventSource, eventTypes } = SillyTavern.getContext();
+    const { eventTypes } = SillyTavern.getContext();
+    const eventSource = events();
     const one = (mesId) => {
         const mes = document.querySelector(`#chat .mes[mesid="${Number(mesId)}"]`);
         monogramizeAll(mes, '.avatar img', messageName);
     };
-    const later = () => setTimeout(monogramizeMessages, 0);
+    const later = () => setTimeout(whenOn(monogramizeMessages), 0);
     eventSource.on(eventTypes.CHARACTER_MESSAGE_RENDERED, one);
     eventSource.on(eventTypes.USER_MESSAGE_RENDERED, one);
     eventSource.on(eventTypes.CHAT_CHANGED, later);
@@ -148,15 +151,15 @@ export function initMonograms() {
 
     // Characters
     const people = () => monogramizeAll(document.getElementById('rm_print_characters_block'), '.avatar:not(.avatar_collage) > img', rowName);
-    eventSource.on(eventTypes.CHARACTER_PAGE_LOADED, () => setTimeout(people, 0));
-    people();
+    eventSource.on(eventTypes.CHARACTER_PAGE_LOADED, () => setTimeout(whenOn(people), 0));
 
     // Personas: the list is redrawn without an event, so watch the list itself
     const personas = document.getElementById('user_avatar_block');
     if (personas) {
         const run = () => monogramizeAll(personas, '.avatar img', rowName);
-        new MutationObserver(run).observe(personas, { childList: true });
-        run();
+        new MutationObserver(whenOn(run)).observe(personas, { childList: true });
+        onStart(run);
     }
-    later();
+    onStart(people);
+    onStart(later);
 }

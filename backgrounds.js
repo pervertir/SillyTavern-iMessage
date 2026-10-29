@@ -5,6 +5,7 @@
 // The app keeps its own Backgrounds panel, hidden. This window reads what it shows and asks it to
 // do the work, so locking, folders and uploads behave exactly as they always have.
 
+import { events, onStop } from './power.js';
 import { toggleMenu } from './shell.js';
 import { background_settings } from '../../../backgrounds.js';
 
@@ -409,10 +410,14 @@ export async function openBackgrounds() {
 }
 
 export function initBackgrounds() {
-    const { eventSource, eventTypes } = context();
+    const { eventTypes } = context();
+    const eventSource = events();
     eventSource.on(eventTypes.CHAT_CHANGED, () => {
         if (document.getElementById(ROOT_ID)) {
             scheduleRedraw();
         }
     });
 }
+
+// turning the theme off closes the window, putting back what it borrowed
+onStop(close);

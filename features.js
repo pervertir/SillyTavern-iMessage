@@ -2,6 +2,8 @@
 // long-press a bubble to react), an "Edited" label, the time in the hover bar, a button to jump
 // back to the latest message, and quiet tooltips in place of the browser's.
 
+import { events, isOn, onStart } from './power.js';
+
 const TAPBACKS = ['❤️', '👍', '👎', '😂', '‼️', '❓'];
 const PICKER_ID = 'imsg-tapback-picker';
 const JUMP_ID = 'imsg-jump';
@@ -16,10 +18,6 @@ function context() {
 
 function t(text) {
     return context().translate(text);
-}
-
-function isOn() {
-    return document.body.classList.contains('imessage');
 }
 
 /** Adds a tapback, swaps it for another, or takes it off when it's picked again. */
@@ -158,7 +156,7 @@ function initJump() {
     jump.addEventListener('click', () => {
         chatElement.scrollTo({ top: chatElement.scrollHeight, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     });
-    sheld.append(jump);
+    onStart(() => sheld.append(jump));
 
     const update = () => {
         const away = !nearBottom(chatElement);
@@ -168,7 +166,8 @@ function initJump() {
         }
     };
     chatElement.addEventListener('scroll', update, { passive: true });
-    const { eventSource, eventTypes } = context();
+    const { eventTypes } = context();
+    const eventSource = events();
     eventSource.on(eventTypes.MESSAGE_RECEIVED, () => {
         if (!nearBottom(chatElement)) {
             jump.classList.add('imsg-jump-new');
@@ -188,7 +187,7 @@ function initTooltips() {
     tip.id = TOOLTIP_ID;
     tip.hidden = true;
     tip.setAttribute('role', 'tooltip');
-    document.body.append(tip);
+    onStart(() => document.body.append(tip));
 
     const hide = () => {
         clearTimeout(timer);
@@ -238,7 +237,8 @@ function initTooltips() {
 
 export function initFeatures() {
     const chatElement = document.getElementById('chat');
-    const { eventSource, eventTypes } = context();
+    const { eventTypes } = context();
+    const eventSource = events();
 
     if (chatElement) {
         chatElement.addEventListener('dblclick', (event) => {

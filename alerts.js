@@ -3,6 +3,7 @@
 // away, and a system notification if you've allowed them. The sounds are made here with Web Audio,
 // so no sound files ship with the theme.
 
+import { events, whenOn } from './power.js';
 import { imageLabel, withoutImages } from './images.js';
 
 const RECEIVED_SKIP = new Set(['first_message', 'command', 'extension']);
@@ -161,15 +162,16 @@ function onSeen() {
 
 export function initAlerts({ settings }) {
     getSettings = settings;
-    const { eventSource, eventTypes } = context();
+    const { eventTypes } = context();
+    const eventSource = events();
     eventSource.on(eventTypes.MESSAGE_SENT, () => {
         if (document.body.classList.contains('imessage')) {
             playSend();
         }
     });
     eventSource.on(eventTypes.MESSAGE_RECEIVED, onReceived);
-    document.addEventListener('visibilitychange', onSeen);
-    window.addEventListener('focus', onSeen);
+    document.addEventListener('visibilitychange', whenOn(onSeen));
+    window.addEventListener('focus', whenOn(onSeen));
     // browsers start audio only after the page has been used, so wake it on the first press
     const unlock = () => {
         if (volume()) {

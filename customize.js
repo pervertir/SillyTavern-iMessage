@@ -6,6 +6,8 @@
 // Export and Import use { themeId: 'imessage', version: 1, tokens, flags, css }, the same shape
 // as the other themes.
 
+import { isOn, onStart, onStop, whenOn } from './power.js';
+
 const PANEL_ID = 'imsg-customize';
 const STYLE_ID = 'imsg-custom-style';
 const THEME_ID = 'imessage';
@@ -158,6 +160,9 @@ function clean(value) {
 
 /** Writes the chosen tokens, switches and CSS into the page. */
 export function applyCustomize() {
+    if (!isOn()) {
+        return;
+    }
     const custom = state();
     const tokens = { ...custom.tokens };
     // tokens that follow another unless set themselves
@@ -569,11 +574,12 @@ export function openCustomize() {
 
 export function initCustomize(given) {
     options = { ...options, ...given };
-    applyCustomize();
-    document.addEventListener('keydown', (event) => {
+    onStart(applyCustomize);
+    onStop(closePanel);
+    document.addEventListener('keydown', whenOn((event) => {
         if (event.key === 'Escape' && document.getElementById(PANEL_ID) && !document.querySelector('dialog.popup[open]')
             && !/** @type {HTMLElement} */ (event.target).closest?.(`#${PANEL_ID} textarea`)) {
             closePanel();
         }
-    });
+    }));
 }

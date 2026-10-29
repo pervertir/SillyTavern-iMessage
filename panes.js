@@ -6,6 +6,7 @@
 
 import { toggleMenu } from './shell.js';
 import { host, releaseAll } from './host.js';
+import { onStop } from './power.js';
 
 const TILE_COLORS = ['#0a84ff', '#30b0c7', '#34c759', '#ff9f0a', '#ff375f', '#bf5af2', '#5e5ce6', '#8e8e93', '#64d2ff', '#ac8e68'];
 
@@ -260,3 +261,6 @@ export function openPanes(def, start = null) {
     document.addEventListener('keydown', onKey, true);
     render();
 }
+
+// turning the theme off closes the window, putting back what it borrowed
+onStop(close);

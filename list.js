@@ -5,6 +5,7 @@
 import { imageLabel, withoutImages } from './images.js';
 import { monogramizeAll } from './monograms.js';
 import { buildGroupAvatar, buildSidebarToolbar, clickOption, toggleMenu } from './shell.js';
+import { events, onStart, whenOn } from './power.js';
 
 const SIDEBAR_ID = 'imsg-sidebar';
 /** The app's own pinned chats, kept in account storage by welcome-screen.js */
@@ -310,7 +311,7 @@ async function deleteEntry(entry) {
 /** Refreshes after a pause, so a burst of events costs one request. */
 export function scheduleRefresh(delay = 600) {
     clearTimeout(refreshTimer);
-    refreshTimer = setTimeout(refreshList, delay);
+    refreshTimer = setTimeout(whenOn(refreshList), delay);
 }
 
 async function openEntry(entry) {
@@ -479,9 +480,14 @@ function createSidebar() {
 export function initList({ settings, opened }) {
     getSettings = settings;
     onOpen = opened;
-    createSidebar();
+    let loaded = Promise.resolve();
+    onStart(() => {
+        createSidebar();
+        loaded = refreshList();
+    });
 
-    const { eventSource, eventTypes } = SillyTavern.getContext();
+    const { eventTypes } = SillyTavern.getContext();
+    const eventSource = events();
     eventSource.on(eventTypes.CHAT_CHANGED, () => {
         markCurrent();
         scheduleRefresh(300);
@@ -493,5 +499,5 @@ export function initList({ settings, opened }) {
             eventSource.on(type, () => scheduleRefresh());
         }
     }
-    return refreshList();
+    return loaded;
 }

@@ -6,6 +6,8 @@
 // The app's "Forbid External Media" setting removes Markdown images before they reach the page,
 // so the links are read from the message's own text, not from what the app drew.
 
+import { events } from './power.js';
+
 const PHOTOS_CLASS = 'imsg-photos';
 const VIEWER_ID = 'imsg-viewer';
 const IMAGE_EXTENSIONS = 'png|jpe?g|gif|webp|avif|bmp|apng';
@@ -222,5 +224,5 @@ export function initImages({ settings }) {
             closeViewer();
         }
     }, { capture: true });
-    SillyTavern.getContext().eventSource.on(SillyTavern.getContext().eventTypes.CHAT_CHANGED, closeViewer);
+    events().on(SillyTavern.getContext().eventTypes.CHAT_CHANGED, closeViewer);
 }
