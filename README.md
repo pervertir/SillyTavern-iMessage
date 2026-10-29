@@ -19,7 +19,7 @@ A SillyTavern extension that makes the whole app look and work like Messages on 
 
   | Menu item | Opens |
   |---|---|
-  | New Message | Contacts, to pick someone to talk to |
+  | New Message | A "To:" picker of your contacts and groups |
   | Response Settings | AI Response Configuration |
   | Connections | API Connections |
   | Formatting | AI Response Formatting |
@@ -28,9 +28,10 @@ A SillyTavern extension that makes the whole app look and work like Messages on 
   | Backgrounds | Backgrounds |
   | Extensions | Extensions |
   | Personas | Persona Management |
-  | Contacts | Character Management |
+  | Contacts | The theme's own Contacts window (below) |
 
-  Each one opens as a Mac sheet with its name in the title bar and a blue Done button.
+  Each SillyTavern menu opens as a Mac sheet with its name in the title bar and a blue Done button.
+- **Contacts.** A Contacts-style window in place of SillyTavern's character list and editor: search, tag chips, Favorites, Groups and A to Z with a letter index on the left, the selected contact's card on the right (picture, about line, Message, New, History and Favorite, description, first message, export, duplicate, delete). Edit opens a native form for every card field, other first messages and the advanced prompts. The + menu makes a new contact or group, or imports a card from a file or a link. Groups get their own form for members (add, mute, reorder), who answers next and how cards are combined. On a phone it fills the screen and the card slides over the list.
 - **Header.** "To: Name", with the video button (new conversation) and the ⓘ button (Details, Conversation History, New Conversation, Close Conversation). On a phone it's the back chevron, the contact's picture with their name under it, and the video button.
 - **Bubbles.** Theirs are grey on the left, yours blue on the right. Messages in a row from the same person sit close together, with the tail only on the last one. A centered time line (`Today 9:41 AM`, `Yesterday 9:41 AM`, `Monday 9:41 AM`, `Wed, Oct 21 at 9:41 AM`) starts each stretch of conversation after an hour's gap. `Delivered` sits under your last message until there's a reply, then `Read`.
 - **Typing bubble.** The three-dot bubble shows while a reply is being written, and a streamed reply shows the dots until its first words arrive.
@@ -48,7 +49,7 @@ SillyTavern's background image is hidden while the theme is on, unless you turn 
 
 1. In SillyTavern, open **Extensions** → **Install extension**.
 2. Paste `https://github.com/pervertir/SillyTavern-iMessage` and install.
-3. Turn off any other UI theme extension (such as Microsoft Teams, Moonlit Echoes or Yodayo Tavern) so they don't fight.
+3. Other theme extensions are switched off for you when the theme turns on (Moonlit Echoes and similar after a reload).
 
 ## Settings
 
@@ -56,7 +57,8 @@ Find them under **Extensions** → **iMessage Theme**:
 
 | Setting | What it does |
 |---|---|
-| Enable theme | Turns the whole look on or off. Off leaves SillyTavern exactly as it was. |
+| Enable theme | Turns the whole look on or off. Off leaves SillyTavern exactly as it was. Turning it on switches off our other themes live, and other theme extensions (such as Moonlit Echoes) after a reload. |
+| Pause my Custom CSS and UI theme | While the theme is on, your Custom CSS and UI theme preset are set aside without changing them, and come back when it's off. On by default. |
 | Appearance | Auto (follow the system), Light or Dark. The ⋯ menu switches it too. |
 | Show the window buttons | The red, yellow and green buttons at the top of the sidebar. |
 | Show Delivered and Read | The receipt under your last message. |

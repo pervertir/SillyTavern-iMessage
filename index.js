@@ -13,6 +13,7 @@ import { initFeatures } from './features.js';
 import { initImages } from './images.js';
 import { initCustomize, openCustomize } from './customize.js';
 import { initContacts } from './contacts.js';
+import { registerTheme } from './theme-exclusive.js';
 
 const MODULE_NAME = 'iMessageTheme';
 /** Folder path under scripts/extensions/, e.g. third-party/SillyTavern-iMessage */
@@ -49,6 +50,8 @@ const defaultSettings = Object.freeze({
     soundVolume: 50,
     /** A system notification for replies that arrive while the tab is in the background */
     notify: false,
+    /** Your Custom CSS and UI theme are set aside while the theme is on (theme-exclusive.js) */
+    pauseUserTheme: true,
     /** Customize: theme variables, switches and your own CSS (customize.js) */
     customize: { tokens: {}, flags: {}, css: '' },
 });
@@ -65,6 +68,9 @@ const SETTING_FIELDS = {
     wallpaperDim: 'imsg_wallpaper_dim',
     sounds: 'imsg_sounds',
 };
+
+/** The one-theme-at-a-time helper shared by our themes */
+let exclusive = null;
 
 const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -149,6 +155,7 @@ async function renderSettingsPanel() {
     const settings = getSettings();
     const field = (id) => /** @type {HTMLInputElement} */ (document.getElementById(id));
     const enabled = field('imsg_enabled');
+    const pauseUserTheme = field('imsg_pause_user_theme');
     const appearance = /** @type {HTMLSelectElement} */ (document.getElementById('imsg_appearance'));
     const windowButtons = field('imsg_window_buttons');
     const receipts = field('imsg_receipts');
@@ -171,6 +178,7 @@ async function renderSettingsPanel() {
     };
 
     enabled.checked = settings.enabled;
+    pauseUserTheme.checked = settings.pauseUserTheme !== false;
     appearance.value = settings.appearance;
     windowButtons.checked = settings.windowButtons;
     receipts.checked = settings.receipts;
@@ -194,7 +202,11 @@ async function renderSettingsPanel() {
             after?.();
         });
     };
-    bind(enabled, 'enabled', () => enabled.checked, () => refreshMessages());
+    bind(enabled, 'enabled', () => enabled.checked, () => {
+        refreshMessages();
+        settings.enabled ? exclusive?.activated() : exclusive?.changed();
+    });
+    bind(pauseUserTheme, 'pauseUserTheme', () => pauseUserTheme.checked, () => exclusive?.changed());
     bind(appearance, 'appearance', () => appearance.value);
     bind(windowButtons, 'windowButtons', () => windowButtons.checked);
     bind(receipts, 'receipts', () => receipts.checked);
@@ -228,6 +240,25 @@ async function renderSettingsPanel() {
 
 async function init() {
     applySettings();
+    exclusive = registerTheme({
+        id: 'imessage',
+        name: 'iMessage',
+        folder: 'SillyTavern-iMessage',
+        settingsKey: 'iMessageTheme',
+        bodyClass: 'imessage',
+        isEnabled: () => !!getSettings().enabled,
+        disable: () => {
+            getSettings().enabled = false;
+            applySettings();
+            const box = /** @type {HTMLInputElement} */ (document.getElementById('imsg_enabled'));
+            if (box) {
+                box.checked = false;
+            }
+            saveSettings();
+            refreshMessages();
+        },
+        pauseUserTheme: () => getSettings().pauseUserTheme !== false,
+    });
     darkQuery.addEventListener('change', applySettings);
 
     initShell({
