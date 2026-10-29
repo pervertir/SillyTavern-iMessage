@@ -11,6 +11,7 @@
     "homepage": "https://github.com/pervertir/SillyTavern-iMessage",
     "auto_update": true,
     "hooks": {
+        "install": "onInstall",
         "update": "onUpdate"
     }
 }

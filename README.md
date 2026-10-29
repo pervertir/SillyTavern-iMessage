@@ -59,7 +59,9 @@ SillyTavern's background image is hidden while the theme is on, unless you turn 
 
 1. In SillyTavern, open **Extensions** → **Install extension**.
 2. Paste `https://github.com/pervertir/SillyTavern-iMessage` and install.
-3. Other theme extensions are switched off for you when the theme turns on (Moonlit Echoes and similar after a reload).
+3. The page reloads by itself once the install is saved, and opens in iMessage. Other theme extensions (such as Moonlit Echoes) are switched off for you.
+
+The page also reloads by itself when you turn the theme on and after an update, so you never need to reload it yourself.
 
 ## Settings
 
@@ -67,7 +69,7 @@ Find them under **Extensions** → **iMessage Theme**:
 
 | Setting | What it does |
 |---|---|
-| Enable theme | Turns the whole look on or off. Off leaves SillyTavern exactly as it was. Turning it on switches off our other themes live, and other theme extensions (such as Moonlit Echoes) after a reload. |
+| Enable theme | Turns the whole look on or off. Off leaves SillyTavern exactly as it was. Turning it on reloads the page once and switches off our other themes and other theme extensions (such as Moonlit Echoes). |
 | Pause my Custom CSS and UI theme | While the theme is on, your Custom CSS and UI theme preset are set aside without changing them, and come back when it's off. On by default. |
 | Appearance | Auto (follow the system), Light or Dark. The ⋯ menu switches it too. |
 | Show the window buttons | The red, yellow and green buttons at the top of the sidebar. |
