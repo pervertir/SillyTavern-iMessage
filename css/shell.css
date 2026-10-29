@@ -722,12 +722,6 @@ body.imessage .imsg-panel-head .imsg-done:active {
     background: var(--imsg-blue-pressed);
 }
 
-/* Parts our other themes (Discord, Teams, Yodayo) may have left in the page while switched off,
-   such as Discord's buttons beside the send button: hidden while this theme is on */
-body.imessage :is([id^="dsc-"], [id^="mst-"], [id^="yt-"]):not(style, link, script) {
-    display: none !important;
-}
-
 /* SillyTavern's own "back" controls (a list icon or a long arrow) as an iOS back button:
    a chevron and the screen it goes back to */
 body.imessage :is(#rm_button_characters, #rm_button_back, #rm_button_back_from_group):not([style*="display: none"]) {
