@@ -40,6 +40,7 @@ body.imessage .imsg-cn-window {
 body.imessage .imsg-cn-side {
     display: flex;
     flex-direction: column;
+    min-width: 0;
     min-height: 0;
     background: var(--imsg-sidebar);
     border-right: 0.5px solid var(--imsg-line);
@@ -142,6 +143,7 @@ body.imessage .imsg-cn-tags {
     gap: 6px;
     flex: none;
     padding: 0 12px 8px;
+    min-width: 0;
     overflow-x: auto;
     scrollbar-width: none;
 }
@@ -840,7 +842,8 @@ body.imessage .imsg-cn-check input {
 
 /* New Message: only the list, as a picker */
 body.imessage .imsg-cn.imsg-cn-picking .imsg-cn-window {
-    grid-template-columns: 1fr;
+    /* minmax(0, …): a long tag row or name scrolls or wraps instead of widening the window */
+    grid-template-columns: minmax(0, 1fr);
     width: min(380px, calc(100vw - 48px));
     height: min(560px, calc(100dvh - 48px));
 }
