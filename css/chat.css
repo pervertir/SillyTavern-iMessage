@@ -176,6 +176,34 @@ body.imessage.imsg-receipts #chat .mes[data-imsg-receipt]::after {
     font-weight: 500;
 }
 
+/* The app's message details (time, model, timer, tokens, number; messages.js), beside the bubble on
+   the open side while the pointer is on it */
+body.imessage #chat .mes .mes_block[data-imsg-details]::after {
+    content: attr(data-imsg-details);
+    position: absolute;
+    left: calc(100% + 10px);
+    bottom: 2px;
+    color: var(--imsg-label);
+    font-size: var(--imsg-text-xs);
+    line-height: 13px;
+    font-weight: 400;
+    width: max-content;
+    max-width: 24vw;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s var(--imsg-ease);
+}
+
+body.imessage #chat .mes[is_user="true"] .mes_block[data-imsg-details]::after {
+    left: auto;
+    text-align: right;
+    right: calc(100% + 10px);
+}
+
+body.imessage #chat .mes:is(:hover, :focus-within):not(:has(.edit_textarea), .imsg-sys) .mes_block[data-imsg-details]::after {
+    opacity: 1;
+}
+
 /* Pictures: none in a one-on-one conversation; in a group, a small one beside the last bubble of a run */
 body.imessage #chat .mes .mesAvatarWrapper {
     grid-area: avatar;
@@ -471,6 +499,81 @@ body.imessage #chat .mes .mes_reasoning_actions {
 
 body.imessage #chat .mes .mes_reasoning_details:hover .mes_reasoning_actions {
     opacity: 0.7;
+}
+
+/* editing the thinking: Save, Delete and Cancel stay in view on a bar like the message's own edit
+   bar, and the thoughts take the bubble's width */
+body.imessage #chat .mes .mes_reasoning_details:has(.reasoning_edit_textarea) {
+    width: auto;
+    min-width: min(420px, 60vw);
+}
+
+body.imessage #chat .mes .mes_reasoning_details:has(.reasoning_edit_textarea) .mes_reasoning_actions {
+    align-items: center;
+    gap: 0;
+    height: 30px;
+    margin: 0 0 6px;
+    padding: 0 3px;
+    box-sizing: border-box;
+    border-radius: 15px;
+    background: var(--imsg-menu);
+    box-shadow: var(--imsg-shadow-menu);
+    opacity: 1;
+}
+
+/* the app swaps the thinking's buttons while it's edited; the message button display above would
+   show both sets */
+body.imessage #chat .mes .mes_reasoning_details:has(.reasoning_edit_textarea) :is(.mes_reasoning_header_block, .mes_reasoning_actions .mes_button:not(.edit_button)),
+body.imessage #chat .mes .mes_reasoning_details:not(:has(.reasoning_edit_textarea)) .mes_reasoning_actions .edit_button,
+body.imessage #chat .mes .mes_reasoning_details:not([data-has-content="true"]) .mes_reasoning_copy {
+    display: none;
+}
+
+body.imessage #chat .mes .mes_reasoning_actions .edit_button {
+    width: 26px;
+    height: 24px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 12px;
+    background: none;
+    box-shadow: none;
+    color: var(--imsg-fg-2);
+    font-size: 12px;
+}
+
+body.imessage #chat .mes .mes_reasoning_actions .edit_button:hover {
+    background: var(--imsg-hover);
+    color: var(--imsg-fg);
+}
+
+body.imessage #chat .mes .mes_reasoning_actions .mes_reasoning_edit_done {
+    order: 10;
+    margin-left: 3px;
+    background: var(--imsg-blue);
+    color: #ffffff;
+}
+
+body.imessage #chat .mes .mes_reasoning_actions .mes_reasoning_delete:hover {
+    color: var(--imsg-red);
+}
+
+body.imessage #chat .mes .reasoning_edit_textarea {
+    display: block;
+    width: 100%;
+    margin: 0 0 6px;
+    padding: 6px 8px;
+    box-sizing: border-box;
+    border: none;
+    border-radius: var(--imsg-radius-md);
+    background: var(--imsg-field);
+    box-shadow: inset 0 0 0 1.5px var(--imsg-blue), 0 0 0 3px var(--imsg-focus);
+    color: var(--imsg-fg);
+    font-family: var(--imsg-font);
+    font-size: var(--imsg-text-sm);
+    line-height: 17px;
+    resize: none;
+    outline: none;
 }
 
 /* split into short bubbles, the thinking line sits above them on its own */
@@ -775,7 +878,9 @@ body.imessage #chat .mes:not([data-media-display="list"]) .mes_media_list,
 body.imessage:not(.translate) #chat .mes .mes_translate,
 body.imessage:not(.sd) #chat .mes .sd_message_gen,
 body.imessage:not(.tts) #chat .mes .mes_narrate,
-body.imessage #chat .mes[is_system="true"] .mes_narrate {
+body.imessage #chat .mes[is_system="true"] .mes_narrate,
+body.imessage #chat .mes.reasoning:has(.mes_reasoning_details[data-has-content="true"]) .mes_edit_add_reasoning,
+body.imessage #chat .mes:has(.mes_reasoning_details .reasoning_edit_textarea) .mes_edit_add_reasoning {
     display: none;
 }
 
@@ -972,13 +1077,44 @@ body.imessage #chat .mes:not(.imsg-versions, .swipes_visible, .last_swipe) :is(.
     display: none;
 }
 
-/* Delete mode checkboxes */
+/* Delete mode, as selecting messages in Messages: a round check at the start of every row, the
+   conversation moved over to make room (the app shows the checks with an inline display: grid) */
+body.imessage #chat:has(.del_checkbox[style*="grid"]) .mes {
+    position: relative;
+    padding-left: 48px;
+}
+
 body.imessage #chat .mes .del_checkbox {
-    grid-area: bubble;
-    justify-self: start;
-    align-self: center;
-    margin: 0 0 0 -28px;
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0;
+    border-radius: 50%;
+    border: 1.5px solid var(--imsg-label);
+    background: none;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    place-items: center;
+    opacity: 1;
+    cursor: pointer;
     z-index: 3;
+}
+
+body.imessage #chat .mes .del_checkbox:checked {
+    border-color: var(--imsg-blue);
+    background: var(--imsg-blue);
+}
+
+body.imessage #chat .mes .del_checkbox:checked::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: #ffffff;
+    -webkit-mask: var(--imsg-sym-check) center / contain no-repeat;
+    mask: var(--imsg-sym-check) center / contain no-repeat;
 }
 
 body.imessage #chat .mes .for_checkbox {

@@ -161,6 +161,35 @@ function markPending(mes, message) {
     }
 }
 
+/**
+ * The app's message details (time, model, generation time, tokens, message number), each only when
+ * its User Settings switch is on. Messages keeps them out of sight: they show beside the bubble
+ * while the pointer is on it, as the times do when you pull a conversation aside on an iPhone.
+ */
+function setDetails(mes) {
+    const block = mes?.querySelector(':scope > .mes_block');
+    if (!block) {
+        return;
+    }
+    const off = (name) => document.body.classList.contains(name);
+    const text = (selector) => mes.querySelector(selector)?.textContent.trim() ?? '';
+    const message = SillyTavern.getContext().chat[Number(mes.getAttribute('mesid'))];
+    // the day is on the time line above; the time alone fits beside a bubble
+    const time = toMoment(message?.send_date)?.format('LT') ?? text('.timestamp');
+    const details = [
+        off('no-timestamps') ? '' : time,
+        off('no-modelIcons') ? '' : message?.extra?.model ?? '',
+        off('no-timer') ? '' : text('.mes_timer'),
+        off('no-tokenCount') ? '' : text('.tokenCounterDisplay'),
+        off('no-mesIDDisplay') ? '' : text('.mesIDDisplay'),
+    ].filter(Boolean).join(' · ');
+    if (details) {
+        block.dataset.imsgDetails = details;
+    } else {
+        delete block.dataset.imsgDetails;
+    }
+}
+
 /** Re-marks the chat on the next frame, so a burst of events costs one pass. */
 export function refreshMessages() {
     if (isOn() && !frame) {
@@ -254,6 +283,14 @@ export function initMessages() {
                 target.closest('.mes_media_container')?.querySelector('.mes_media_enlarge')?.click();
             }
         });
+        // read as the pointer arrives, so a switch just changed in User Settings counts
+        for (const type of ['pointerover', 'focusin']) {
+            chatElement.addEventListener(type, (event) => {
+                if (isOn()) {
+                    setDetails(/** @type {HTMLElement} */ (event.target).closest?.('#chat > .mes'));
+                }
+            });
+        }
     }
     for (const type of [eventTypes.GENERATION_ENDED, eventTypes.GENERATION_STOPPED, eventTypes.CHAT_CHANGED]) {
         eventSource.on(type, () => {

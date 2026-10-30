@@ -237,3 +237,10 @@ body.imessage #dialogue_del_mes {
     gap: 8px;
     padding: 0 0 8px;
 }
+
+/* Delete is the destructive choice: red words on a plain button, as in a macOS sheet */
+body.imessage #dialogue_del_mes_ok {
+    background: var(--imsg-field);
+    color: var(--imsg-red);
+    filter: none;
+}
