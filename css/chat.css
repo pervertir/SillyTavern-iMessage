@@ -951,6 +951,12 @@ body.imessage:not(.swipeAllMessages) #chat .mes:not(.last_mes) .swipeRightBlock 
     display: none;
 }
 
+/* nothing to show (your own messages, or one version with Swipe All Messages on): no control, so
+   no empty pill over a wallpaper either */
+body.imessage #chat .mes:not(.imsg-versions, .swipes_visible, .last_swipe) :is(.swipe_left, .swipeRightBlock) {
+    display: none;
+}
+
 /* Delete mode checkboxes */
 body.imessage #chat .mes .del_checkbox {
     grid-area: bubble;
