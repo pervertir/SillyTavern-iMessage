@@ -764,6 +764,21 @@ body.imessage #chat .mes .extraMesButtons > div:hover {
     color: var(--imsg-blue);
 }
 
+/* SillyTavern shows some message buttons only when they apply (a checkpoint, a hidden message,
+   media, the extension turned on); the display set above would show them on every message */
+body.imessage #chat .mes[bookmark_link=''] .mes_bookmark,
+body.imessage #chat .mes:not([bookmark_link='']) .mes_create_bookmark,
+body.imessage #chat .mes[is_system="true"] .mes_hide,
+body.imessage #chat .mes[is_system="false"] .mes_unhide,
+body.imessage #chat .mes:not([data-media-display="gallery"]) .mes_media_gallery,
+body.imessage #chat .mes:not([data-media-display="list"]) .mes_media_list,
+body.imessage:not(.translate) #chat .mes .mes_translate,
+body.imessage:not(.sd) #chat .mes .sd_message_gen,
+body.imessage:not(.tts) #chat .mes .mes_narrate,
+body.imessage #chat .mes[is_system="true"] .mes_narrate {
+    display: none;
+}
+
 /* Editing: the bubble becomes a field in place, with a floating bar of actions over it */
 body.imessage #chat .mes:has(.edit_textarea) .mes_block {
     background: var(--imsg-field) !important;
