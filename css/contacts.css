@@ -1522,6 +1522,41 @@ body.imessage .imsg-ext-row {
     min-height: 34px;
 }
 
+body.imessage .imsg-ext-row.imsg-ext-off .imsg-ext-tile {
+    filter: grayscale(1);
+    opacity: 0.5;
+}
+
+/* an extension's page: its name and maker under the big tile, a note when it has no settings */
+body.imessage .imsg-ext-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+body.imessage .imsg-ext-name small {
+    font-size: var(--imsg-text-xs);
+    color: var(--imsg-fg-2);
+}
+
+body.imessage .imsg-ext-note {
+    margin: 4px 4px 0;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--imsg-fg-2);
+}
+
+/* Manage Extensions: each row opens its extension's page */
+body.imessage .imsg-ext-list .imsg-ext-item[role="button"] {
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+body.imessage .imsg-ext-list .imsg-ext-item[role="button"]:hover {
+    background: var(--imsg-hover);
+}
+
 body.imessage .imsg-ext-head {
     display: flex;
     flex-direction: column;
@@ -1664,4 +1699,12 @@ body.imessage .imsg-ext-host :is(button, .menu_button) {
 
 body.imessage .imsg-ext-body > * {
     flex: none;
+}
+
+/* an extension that drew more than one panel: each under its own small heading */
+body.imessage .imsg-ext-subtitle {
+    margin: 10px 4px -4px;
+    font-size: var(--imsg-text-xs);
+    font-weight: 600;
+    color: var(--imsg-fg-2);
 }

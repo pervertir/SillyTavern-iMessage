@@ -47,8 +47,10 @@ function panels() {
                 continue;
             }
             const head = drawer.querySelector(':scope > .inline-drawer-header, :scope > .inline-drawer-toggle');
-            const content = drawer.querySelector(':scope > .inline-drawer-content');
             const title = head?.textContent.replace(/\s+/g, ' ').trim().replace(/\s*\?$/, '');
+            // a panel borrowed into the window left its drawer behind
+            const content = drawer.querySelector(':scope > .inline-drawer-content')
+                ?? [...document.querySelectorAll(`#${ROOT_ID} .imsg-hosted`)].find((x) => x.dataset.imsgTitle === title);
             if (title && content) {
                 found.push({ key: `p:${title}`, title, content, drawer });
             }
@@ -77,6 +79,45 @@ function installed() {
             on: !disabled.includes(name),
         };
     }).sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
+}
+
+/** Words of a title, each cut to its stem, so "Quick Reply" meets "Quick Replies". */
+function stems(text) {
+    return text.toLowerCase().replace(/\(.*?\)/g, ' ').split(/[^a-z0-9]+/).filter((x) => x.length > 1).map((x) => x.slice(0, 4));
+}
+
+/**
+ * The installed extensions with the settings panels each one drew. A panel belongs to the
+ * extension whose name it carries (all of its words, or the panel's words within the name);
+ * a panel without a name of its own goes with the panel that sits in the same container.
+ */
+function catalog() {
+    const items = installed().map((item) => ({ ...item, key: `e:${item.name}`, panels: [] }));
+    const all = panels();
+    const holder = (panel) => panel.drawer?.parentElement?.closest('[id]')?.id ?? '';
+    const contains = (outer, inner) => inner.length > 0 && inner.every((x) => outer.includes(x));
+    const rest = [];
+    for (const panel of all) {
+        const words = stems(panel.title);
+        const fits = items.filter((item) => item.on && !item.panels.length);
+        const owner = fits.find((item) => stems(item.title).join(' ') === words.join(' '))
+            ?? fits.find((item) => contains(words, stems(item.title)) || contains(stems(item.title), words));
+        if (owner) {
+            owner.panels.push(panel);
+        } else {
+            rest.push(panel);
+        }
+    }
+    const extras = [];
+    for (const panel of rest) {
+        const owner = holder(panel) && items.find((item) => item.panels.some((x) => holder(x) === holder(panel)));
+        if (owner) {
+            owner.panels.push(panel);
+        } else {
+            extras.push(panel);
+        }
+    }
+    return { items, extras };
 }
 
 async function setEnabled(item, on) {
@@ -114,15 +155,31 @@ function renderSide(side) {
         });
         return node;
     };
+    const { items, extras } = catalog();
     const top = element('div', 'imsg-cn-section');
-    top.append(row(MANAGE, t('Manage Extensions'), tile('Manage', 'gear'), String(installed().length)));
-    const box = element('div', 'imsg-cn-section');
-    box.append(element('h3', 'imsg-cn-section-title', t('Settings')));
-    for (const panel of panels().filter((x) => !needle || x.title.toLowerCase().includes(needle))) {
-        box.append(row(panel.key, panel.title, tile(panel.title)));
+    top.append(row(MANAGE, t('Manage Extensions'), tile('Manage', 'gear'), String(items.length)));
+    const sections = [top];
+    const groups = [
+        [t('Added by You'), items.filter((x) => x.thirdParty)],
+        [t('Built In'), items.filter((x) => !x.thirdParty)],
+        [t('Other Settings'), extras],
+    ];
+    for (const [title, entries] of groups) {
+        const shown = entries.filter((x) => !needle || x.title.toLowerCase().includes(needle));
+        if (!shown.length) {
+            continue;
+        }
+        const box = element('div', 'imsg-cn-section');
+        box.append(element('h3', 'imsg-cn-section-title', title));
+        for (const entry of shown) {
+            const node = row(entry.key, entry.title, tile(entry.title), entry.on === false ? t('Off') : '');
+            node.classList.toggle('imsg-ext-off', entry.on === false);
+            box.append(node);
+        }
+        sections.push(box);
     }
     const scroll = list.scrollTop;
-    list.replaceChildren(top, box);
+    list.replaceChildren(...sections);
     list.scrollTop = scroll;
 }
 
@@ -167,6 +224,22 @@ function renderManage(pane) {
         box.append(element('legend', '', title));
         for (const item of items) {
             const row = element('div', `imsg-ext-item${item.on ? '' : ' imsg-ext-off'}`);
+            // the row opens the extension's own page; its switch and menu keep their own jobs
+            row.tabIndex = 0;
+            row.setAttribute('role', 'button');
+            const open = (event) => {
+                if (!/** @type {HTMLElement} */ (event.target).closest('input, button')) {
+                    view = { ...view, key: `e:${item.name}`, level: 1 };
+                    render();
+                }
+            };
+            row.addEventListener('click', open);
+            row.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    open(event);
+                }
+            });
             const text = element('span', 'imsg-ext-item-text');
             text.append(element('b', '', item.title));
             const sub = [item.author, item.version ? `v${item.version}` : ''].filter(Boolean).join(' · ');
@@ -200,6 +273,65 @@ function renderManage(pane) {
     pane.replaceChildren(paneBar(t('Manage Extensions'), more), body);
 }
 
+/** One extension's page: what it is, its switch, and every settings panel it drew. */
+function renderItem(pane, item) {
+    const body = element('div', 'imsg-cn-form imsg-ext-body');
+    if (needsReload) {
+        body.append(reloadBanner());
+    }
+    const header = element('div', 'imsg-ext-head');
+    const big = tile(item.title);
+    big.classList.add('imsg-ext-tile-big');
+    const name = element('div', 'imsg-ext-name');
+    name.append(element('h2', '', item.title));
+    const sub = [item.author, item.version ? `v${item.version}` : ''].filter(Boolean).join(' · ');
+    if (sub) {
+        name.append(element('small', '', sub));
+    }
+    header.append(big, name);
+    body.append(header);
+
+    const box = element('fieldset', 'imsg-cn-group imsg-ext-list');
+    const row = element('label', 'imsg-ext-item');
+    row.append(element('span', 'imsg-ext-item-text', t('Turned On')));
+    const sw = element('input', 'imsg-wi-switch');
+    sw.type = 'checkbox';
+    sw.checked = item.on;
+    sw.setAttribute('role', 'switch');
+    sw.addEventListener('change', () => setEnabled(item, sw.checked));
+    row.append(sw);
+    box.append(row);
+    body.append(box);
+
+    let more = null;
+    if (item.thirdParty) {
+        more = button('imsg-sym-button imsg-ext-more');
+        more.setAttribute('aria-label', t('More'));
+        more.append(glyph('ellipsis'));
+        more.addEventListener('click', () => toggleMenu(more, [
+            { label: 'Delete…', danger: true, run: () => remove(item) },
+        ]));
+    }
+    releaseAll();
+    if (item.panels.length) {
+        for (const panel of item.panels) {
+            const hostBox = element('div', 'imsg-host imsg-ext-host');
+            if (item.panels.length > 1) {
+                body.append(element('h3', 'imsg-ext-subtitle', panel.title));
+            }
+            body.append(hostBox);
+            panel.content.dataset.imsgTitle = panel.title;
+            host(panel.content, hostBox);
+        }
+    } else {
+        const note = !item.on ? t('Turn it on to see its settings. The page reloads when you close Extensions.')
+            : needsReload ? t('Its settings show after the page reloads.')
+                : t('This extension has no settings of its own. Find it in the + and emoji menus by the message box, or in the conversation.');
+        body.append(element('p', 'imsg-ext-note', note));
+    }
+    pane.replaceChildren(paneBar(item.title, more), body);
+}
+
 function renderPanel(pane, panel) {
     const body = element('div', 'imsg-cn-form imsg-ext-body');
     const header = element('div', 'imsg-ext-head');
@@ -225,8 +357,12 @@ function render() {
         releaseAll();
         renderManage(pane);
     } else {
-        const panel = panels().find((x) => x.key === view.key);
-        if (panel) {
+        const { items, extras } = catalog();
+        const item = items.find((x) => x.key === view.key);
+        const panel = extras.find((x) => x.key === view.key);
+        if (item) {
+            renderItem(pane, item);
+        } else if (panel) {
             renderPanel(pane, panel);
         } else {
             view.key = MANAGE;
@@ -272,6 +408,10 @@ export function openExtensions(title = null) {
     close();
     const phone = isPhone();
     view = { key: title ? `p:${title}` : MANAGE, level: title || !phone ? 1 : 0, needle: '' };
+    if (title) {
+        const owner = catalog().items.find((item) => item.panels.some((panel) => panel.title === title));
+        view.key = owner ? owner.key : view.key;
+    }
 
     const root = element('div', 'imsg-cn imsg-ext');
     root.id = ROOT_ID;
