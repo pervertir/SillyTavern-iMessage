@@ -65,3 +65,15 @@ body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar > #qr--popoutTrigger
     flex: none;
     z-index: 1;
 }
+
+/* World Info Drawer sets its screen to the full window width, which runs off the right of these themes' sheets */
+body.imessage.stwid--.stwid--nonDiscord #top-settings-holder #WorldInfo {
+    width: var(--imsg-panel);
+    height: calc(100dvh - 72px);
+}
+
+@media screen and (min-width: 1001px) {
+    body.yodayo-tavern.stwid--.stwid--nonDiscord #top-settings-holder #WorldInfo {
+        width: min(1200px, calc(100vw - 96px));
+    }
+}
