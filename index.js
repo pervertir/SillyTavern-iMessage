@@ -17,6 +17,7 @@ import { initKeys } from './src/keys.js';
 import { initList, markCurrent, scheduleRefresh } from './src/list.js';
 import { initMessages, refreshMessages } from './src/messages.js';
 import { initMonograms } from './src/monograms.js';
+import { watchExtensionDrawers } from './lib/extension-drawers.js';
 import { initShell, refreshHeader, refreshPanelTitles } from './src/shell.js';
 import { initSplit, resetSplits } from './src/split.js';
 import { initWorldInfo } from './src/worldinfo.js';
@@ -46,6 +47,9 @@ let running = false;
 /** Whether init() has run, i.e. this code was already in use before an update */
 let initialized = false;
 
+/** Set on first use: keeps other extensions' top-bar drawers reachable */
+let updateExtensionDrawers;
+
 function applySettings() {
     const settings = getSettings();
     const body = document.body;
@@ -66,6 +70,8 @@ function applySettings() {
         running = on;
         on ? startTheme() : stopTheme();
     }
+    updateExtensionDrawers ??= watchExtensionDrawers('imessage', () => !!getSettings().enabled);
+    updateExtensionDrawers();
 }
 
 /** Phones show one pane at a time: the conversation list, or the open conversation. */
