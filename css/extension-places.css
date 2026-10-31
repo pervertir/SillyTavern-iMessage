@@ -1,0 +1,180 @@
+/* Where popular extensions' pieces sit in this theme: Quick Persona, Typing Indicator, Inject Manager,
+   Guided Generations, Message Summarize, WTracker and floating panels (Objective, Notebook).
+   Their menus and message buttons already land in the theme's own wand menu and message bar. */
+
+/* Quick Persona: a small picture among the message box's buttons */
+body.imessage #leftSendForm > #quickPersona {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    margin: auto 4px;
+    align-self: center;
+}
+
+body.imessage #quickPersona #quickPersonaImg {
+    display: block;
+    border: none;
+    box-shadow: none;
+}
+
+body.imessage #quickPersonaCaret {
+    display: none;
+}
+
+body.imessage #quickPersonaMenu {
+    background: var(--imsg-menu);
+    border: 1px solid var(--imsg-line);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+body.imessage .quickPersonaMenuImg.selected {
+    outline-color: var(--imsg-blue);
+}
+
+/* Inject Manager: a small chip in the chat's corner */
+body.imessage #chat .injectsElement {
+    gap: 4px;
+    margin: 4px 8px;
+    padding: 2px 8px;
+    background: var(--imsg-menu);
+    border: 1px solid var(--imsg-line);
+    border-radius: 999px;
+    color: var(--imsg-label);
+    font-size: 12px;
+    opacity: 1;
+}
+
+body.imessage #chat .injectsElement:hover {
+    color: var(--imsg-fg);
+}
+
+/* Guided Generations: quiet icon buttons instead of outlined boxes */
+body.imessage #gg-action-button-container {
+    box-sizing: border-box;
+    align-items: center;
+    padding: 2px 4px;
+}
+
+body.imessage .gg-action-button,
+body.imessage .gg-menu-button {
+    box-sizing: border-box;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    color: var(--imsg-label);
+    font-size: 14px;
+}
+
+body.imessage .gg-action-button:hover,
+body.imessage .gg-menu-button:hover {
+    background: var(--imsg-hover);
+    color: var(--imsg-fg);
+}
+
+body.imessage .gg-tools-menu {
+    background: var(--imsg-menu);
+    border: 1px solid var(--imsg-line);
+    border-radius: 12px;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+body.imessage .gg-tools-menu > .interactable:hover,
+body.imessage .gg-tools-menu .list-group-item:hover {
+    background: var(--imsg-hover);
+    color: var(--imsg-fg);
+}
+
+/* Message Summarize: a quiet note under the message, keeping the colour that tells its kind */
+body.imessage #chat .qvink_memory_display {
+    margin-top: 4px;
+    padding-left: 8px;
+    border-left: 2px solid var(--imsg-line);
+    font-size: 0.86em;
+    font-style: normal;
+    line-height: 1.35;
+}
+
+body.imessage {
+    --qm-default: var(--imsg-label);
+}
+
+/* WTracker: a card at the head of the message */
+body.imessage #chat .mes_wtracker {
+    margin: 4px 0;
+    padding: 6px 10px;
+    background: var(--imsg-group-bg);
+    border: 1px solid var(--imsg-line);
+    border-radius: 999px;
+    font-size: 0.9em;
+}
+
+body.imessage #chat .mes_wtracker .wtracker-controls > div {
+    color: var(--imsg-label);
+}
+
+/* Floating panels: the theme's own window look, below the theme's menus */
+body.imessage #movingDivs > .draggable {
+    background: var(--imsg-menu);
+    border: 1px solid var(--imsg-line);
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+    color: var(--imsg-fg);
+    /* room for the panel's move and close buttons above its content */
+    padding-top: 34px;
+}
+
+/* Typing Indicator: the grey bubble with three dots */
+body.imessage #chat .typing_indicator {
+    bottom: 6px;
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    width: fit-content;
+    margin: 6px 16px;
+    padding: 8px 12px;
+    background: var(--imsg-bubble-in);
+    border-radius: 18px;
+    font-size: 0;
+    text-shadow: none;
+    opacity: 1;
+}
+
+body.imessage #chat .typing_indicator .svg_dots {
+    display: block;
+    width: 30px;
+    height: 16px;
+    margin: 0;
+    fill: var(--imsg-label);
+}
+
+/* Quick Persona: this theme hides the box's left buttons, so only the picture comes back, inside the oval */
+body.imessage #leftSendForm:has(#quickPersona) {
+    width: 32px;
+    align-items: center;
+    overflow: visible;
+    z-index: 1;
+    opacity: 1;
+    pointer-events: none;
+}
+
+body.imessage #leftSendForm:has(#quickPersona) > div:not(#quickPersona) {
+    opacity: 0;
+}
+
+body.imessage #leftSendForm > #quickPersona {
+    width: 24px;
+    height: 24px;
+    margin: 0 0 0 5px;
+    pointer-events: auto;
+}
+
+body.imessage #nonQRFormItems:has(#quickPersona) #send_textarea {
+    padding-left: 36px;
+}
