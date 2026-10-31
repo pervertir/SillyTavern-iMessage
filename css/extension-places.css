@@ -56,6 +56,26 @@ body.imessage #gg-action-button-container {
     padding: 2px 4px;
 }
 
+/* It moves Quick Replies into this row: they scroll inside the room between its buttons */
+body.imessage #gg-qr-container {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-inline: 4px;
+    overflow: hidden;
+}
+
+body.imessage #gg-qr-container > #qr--bar {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding-block: 0;
+}
+
+body.imessage #gg-qr-container #qr--popoutTrigger {
+    background: var(--imsg-menu);
+}
+
 body.imessage .gg-action-button,
 body.imessage .gg-menu-button {
     box-sizing: border-box;
@@ -88,6 +108,33 @@ body.imessage .gg-tools-menu {
 body.imessage .gg-tools-menu > .interactable:hover,
 body.imessage .gg-tools-menu .list-group-item:hover {
     background: var(--imsg-hover);
+    color: var(--imsg-fg);
+}
+
+/* Prompt Inspector adds its row twice */
+body.imessage #inspectNextPromptButton ~ #inspectNextPromptButton {
+    display: none;
+}
+
+/* Notebook: opens at the top right, clear of the theme's title bar, until it is dragged */
+body.imessage #notebookPanel {
+    left: auto;
+    right: 16px;
+    top: 72px;
+    width: min(420px, calc(100vw - 32px));
+    max-height: calc(100dvh - 160px);
+    background: var(--imsg-menu);
+    color: var(--imsg-fg);
+}
+
+body.imessage #notebookPanel .react-tabs__tab {
+    color: var(--imsg-label);
+    background: transparent;
+}
+
+body.imessage #notebookPanel .react-tabs__tab--selected {
+    background: var(--imsg-hover);
+    border-color: var(--imsg-line);
     color: var(--imsg-fg);
 }
 
