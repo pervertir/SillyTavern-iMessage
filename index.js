@@ -5,6 +5,7 @@ import { MODULE_NAME, defaultSettings, getSettings, isDark, onSystemAppearanceCh
 import { isPhone } from './src/dom.js';
 import { renderPanel, setSetting, showSetting } from './src/panel.js';
 import { events, isOn, startTheme, stopTheme } from './src/power.js';
+import { registerExtensionSwitch } from './src/shared/theme-extensions.js';
 import { registerTheme, reloadPage } from './src/shared/theme-exclusive.js';
 import { initAlerts } from './src/alerts.js';
 import { initBackgrounds, openBackgrounds } from './src/backgrounds.js';
@@ -102,12 +103,29 @@ function onChatChanged(chatId) {
     }
 }
 
+const extensionSwitch = registerExtensionSwitch({
+    settings: getSettings,
+    isEnabled: () => !!getSettings().enabled,
+    reload: message => reloadPage(message),
+});
+
 function disable() {
     getSettings().enabled = false;
     applySettings();
     showSetting('enabled', false);
     saveSettings();
     refreshMessages();
+    if (extensionSwitch.sync()) {
+        reloadPage(SillyTavern.getContext().translate('Extensions updated.'));
+    }
+}
+
+/** The settings panel is drawn by then; a failure here only costs the picker. */
+async function renderExtensionSwitch() {
+    const box = document.getElementById('imsg_extension_switch');
+    if (box && !box.childElementCount) {
+        await extensionSwitch.renderPicker(box);
+    }
 }
 
 async function init() {
@@ -166,13 +184,18 @@ async function init() {
                     refreshMessages();
                     if (getSettings().enabled) {
                         exclusive?.activated();
+                        extensionSwitch.sync();
                         reloadWhenOn('iMessage is on.');
                     } else {
                         exclusive?.changed();
+                        if (extensionSwitch.sync()) {
+                            reloadPage(SillyTavern.getContext().translate('Extensions updated.'));
+                        }
                     }
                 },
                 pauseUserTheme: () => exclusive?.changed(),
                 recentMax: () => scheduleRefresh(),
+                chatNames: () => scheduleRefresh(0),
                 splitReplies: () => {
                     resetSplits();
                     refreshMessages();
@@ -181,6 +204,7 @@ async function init() {
                 imageLinks: () => SillyTavern.getContext().reloadCurrentChat(),
             },
         });
+        await renderExtensionSwitch();
     } catch (error) {
         console.error('[iMessage] Could not render the settings panel', error);
     }

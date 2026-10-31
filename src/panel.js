@@ -17,6 +17,7 @@ const FIELDS = {
     windowButtons: { id: 'imsg_window_buttons' },
     receipts: { id: 'imsg_receipts' },
     typing: { id: 'imsg_typing' },
+    chatNames: { id: 'imsg_chat_names' },
     recentMax: {
         id: 'imsg_recent_max',
         read: (input) => Math.min(500, Math.max(5, Number(input.value) || defaultSettings.recentMax)),

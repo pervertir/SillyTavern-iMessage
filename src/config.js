@@ -13,6 +13,11 @@ export const defaultSettings = Object.freeze({
     /** The three-dot bubble while a reply is being written */
     typing: true,
     recentMax: 50,
+    /** The chat name in the list instead of the last message */
+    chatNames: false,
+    /** Extensions picked to turn off with the theme, and the ones it has turned off */
+    switchExtensions: [],
+    switchedExtensions: [],
     /** Long replies as several short bubbles, split at the ends of sentences */
     splitReplies: true,
     /** Image links in messages show as the pictures themselves */

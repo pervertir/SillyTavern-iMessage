@@ -1,0 +1,67 @@
+/* Quick Replies stay one scrolling row, so they never make the message box grow, and Chat Top Bar
+   keeps its height. Shared by the Discord, iMessage and Yodayo themes; each copies this unchanged. */
+
+body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar::-webkit-scrollbar {
+    display: none;
+}
+
+/* centered while they fit, and every chip can still be scrolled to when they don't */
+body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar > :first-child {
+    margin-left: auto;
+}
+
+body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar > :last-child {
+    margin-right: auto;
+}
+
+body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar .qr--buttons {
+    flex: none;
+    flex-wrap: nowrap;
+    width: auto;
+    max-width: none;
+}
+
+body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar .qr--button {
+    flex: none;
+    white-space: nowrap;
+}
+
+body:is(.discord-theme, .imessage, .yodayo-tavern) #extensionTopBar {
+    flex: none;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: auto;
+}
+
+body:is(.discord-theme, .imessage, .yodayo-tavern) #extensionTopBar #extensionTopBarChatName {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+body:is(.discord-theme, .imessage, .yodayo-tavern) #extensionTopBar #extensionTopBarSearchInput {
+    flex: 0 1 180px;
+    min-width: 60px;
+}
+
+/* Yodayo's floating back and settings buttons sit over the bar's two ends */
+body.yodayo-tavern #extensionTopBar {
+    padding-inline: 52px;
+}
+
+/* Quick Replies' popout button stays reachable at the row's end instead of lying over the chips */
+body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar > #qr--popoutTrigger {
+    position: sticky;
+    right: 0;
+    top: auto;
+    order: 99;
+    flex: none;
+    z-index: 1;
+}

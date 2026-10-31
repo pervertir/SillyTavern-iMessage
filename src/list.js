@@ -137,7 +137,7 @@ function buildRow(entry) {
     top.append(name, time);
     const preview = document.createElement('span');
     preview.className = 'imsg-row-preview';
-    preview.textContent = entry.preview;
+    preview.textContent = getSettings().chatNames ? entry.fileId : entry.preview;
     // shown in place of the preview while this conversation's reply is being written
     const typing = document.createElement('span');
     typing.className = 'imsg-row-typing';
