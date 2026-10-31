@@ -3,7 +3,8 @@
 
 body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar {
     flex-wrap: nowrap;
-    justify-content: flex-start;
+    /* centered while they fit, and every chip can still be scrolled to when they don't */
+    justify-content: safe center;
     gap: 6px;
     overflow-x: auto;
     scrollbar-width: none;
@@ -11,15 +12,6 @@ body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar {
 
 body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar::-webkit-scrollbar {
     display: none;
-}
-
-/* centered while they fit, and every chip can still be scrolled to when they don't */
-body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar > :first-child {
-    margin-left: auto;
-}
-
-body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar > :last-child {
-    margin-right: auto;
 }
 
 body:is(.discord-theme, .imessage, .yodayo-tavern) #qr--bar .qr--buttons {
