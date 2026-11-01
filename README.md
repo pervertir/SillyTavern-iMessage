@@ -2,21 +2,22 @@
 
 A SillyTavern extension that makes the whole app look and work like Messages on a Mac, and like Messages on an iPhone when the window is narrow. It comes in light and dark, and can follow the system.
 
-![Desktop, light](.github/desktop-light.jpg)
+![chat light](.github/screenshots/chat-light.webp)
 
-![Desktop, dark](.github/desktop-dark.jpg)
+![chat dark](.github/screenshots/chat-dark.webp)
+
+![tour](.github/screenshots/clip-tour.webp)
 
 <p>
-  <img src=".github/phone-list.jpg" width="240" alt="Phone: the conversation list">
-  <img src=".github/phone-chat.jpg" width="240" alt="Phone: a group conversation">
-  <img src=".github/phone-dark.jpg" width="240" alt="Phone: a conversation in dark mode">
+  <img src=".github/screenshots/phone-home.webp" width="240" alt="phone home">
+  <img src=".github/screenshots/phone-chat.webp" width="240" alt="phone chat">
 </p>
 
 Every SillyTavern panel opens as its own Mac-style window, such as Contacts and Settings:
 
-![Contacts](.github/contacts.jpg)
+![windows](.github/screenshots/clip-windows.webp)
 
-![Settings](.github/settings.jpg)
+Every feature, with pictures: **[UI_SCREENSHOTS.md](UI_SCREENSHOTS.md)**.
 
 ## What it changes
 
