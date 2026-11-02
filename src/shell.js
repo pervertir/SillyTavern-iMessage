@@ -57,6 +57,12 @@ export function symbolButton(className, label, symbol) {
 
 /** Clicks one of the app's drawer toggles, the way its own top bar does. */
 export function toggleDrawer(drawerId) {
+    // straight to SillyTavern's handler for Characters: an extension can catch clicks on that hidden
+    // button and open a menu of its own under it, off screen (Character Library's launcher)
+    if (drawerId === 'rightNavHolder') {
+        $(`#${drawerId} > .drawer-toggle`).triggerHandler('click');
+        return;
+    }
     document.querySelector(`#${drawerId} > .drawer-toggle`)?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 }
 
@@ -257,6 +263,10 @@ function appMenuItems() {
         { label: 'Dark Mode', checked: dark, run: () => shellOptions.setAppearance('dark') },
         { label: 'Match System', run: () => shellOptions.setAppearance('system') },
         { label: 'Customize…', run: () => shellOptions.customize?.() },
+        // its own launcher hangs off the app's hidden Characters button
+        ...(document.querySelector('#charlib-launcher-dropdown')
+            ? [{ label: 'Character Library', run: () => /** @type {HTMLElement|null} */ (document.querySelector('#charlib-launcher-dropdown [data-action="library"]'))?.click() }]
+            : []),
     ];
 }
 
