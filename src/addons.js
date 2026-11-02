@@ -228,7 +228,7 @@ function renderManage(pane) {
             row.tabIndex = 0;
             row.setAttribute('role', 'button');
             const open = (event) => {
-                if (!/** @type {HTMLElement} */ (event.target).closest('input, button')) {
+                if (!event.target.closest('input, button')) {
                     view = { ...view, key: `e:${item.name}`, level: 1 };
                     render();
                 }
