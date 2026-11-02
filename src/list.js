@@ -1,6 +1,7 @@
 // Conversation sidebar: search, pinned chats as large avatars, then recent chats (the same list
 // as ST's welcome screen) with a preview and time. Pins are ST's own pinned chats.
 
+import { nameFor } from './shared/chat-nicknames.js';
 import { deleteCharacterChatByName } from '../../../../../script.js';
 import { deleteGroupChatByName } from '../../../../group-chats.js';
 import { imageLabel, withoutImages } from './images.js';
@@ -130,7 +131,7 @@ function buildRow(entry) {
     top.className = 'imsg-row-top';
     const name = document.createElement('span');
     name.className = 'imsg-row-name';
-    name.textContent = entry.name;
+    name.textContent = entry.group ? entry.name : nameFor(entry.avatar, entry.name, entry.fileId);
     const time = document.createElement('span');
     time.className = 'imsg-row-time';
     time.textContent = entry.time;
@@ -159,7 +160,7 @@ function buildPin(entry) {
     pin.title = entry.title;
     const name = document.createElement('span');
     name.className = 'imsg-pin-name';
-    name.textContent = entry.name;
+    name.textContent = entry.group ? entry.name : nameFor(entry.avatar, entry.name, entry.fileId);
     pin.append(buildAvatar(entry, PIN_AVATAR), name);
     return pin;
 }

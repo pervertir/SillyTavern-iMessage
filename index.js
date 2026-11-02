@@ -1,6 +1,7 @@
 // iMessage theme for SillyTavern. Every style is scoped to body.imessage (style.css); the
 // modules in src/ build the Messages window and its native panels while the theme is on.
 
+import { registerNicknames } from './src/shared/chat-nicknames.js';
 import { MODULE_NAME, defaultSettings, getSettings, isDark, onSystemAppearanceChange, saveSettings } from './src/config.js';
 import { isPhone } from './src/dom.js';
 import { renderPanel, setSetting, showSetting } from './src/panel.js';
@@ -15,7 +16,7 @@ import { refreshTitle, setDisguise } from './src/disguise.js';
 import { initFeatures } from './src/features.js';
 import { initImages } from './src/images.js';
 import { initKeys } from './src/keys.js';
-import { initList, markCurrent, scheduleRefresh } from './src/list.js';
+import { initList, markCurrent, scheduleRefresh, refreshList } from './src/list.js';
 import { initMessages, refreshMessages } from './src/messages.js';
 import { initMonograms } from './src/monograms.js';
 import { watchExtensionDrawers } from './lib/extension-drawers.js';
@@ -147,6 +148,13 @@ async function init() {
         setAppearance,
         isDark: () => document.body.classList.contains('imsg-dark'),
         customize: () => openCustomize(),
+    });
+    registerNicknames({
+        isOn: () => document.body.classList.contains('imessage'),
+        changed: () => {
+            refreshHeader();
+            refreshList();
+        },
     });
     const listLoaded = initList({ opened: showChatOnPhone });
     initSplit();

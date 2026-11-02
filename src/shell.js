@@ -1,6 +1,7 @@
 // The window chrome around ST: sidebar toolbar, conversation header, the app menu, ST's drawers
 // as sheets, and the empty state when no chat is open.
 
+import { canUseNicknames, nameFor, openNicknames } from './shared/chat-nicknames.js';
 import { openContactCard } from './card.js';
 import { openContacts, openMyCard } from './contacts.js';
 import { openBackgrounds } from './backgrounds.js';
@@ -359,6 +360,7 @@ function openInfoMenu(anchor) {
     const submenu = (items) => () => setTimeout(() => toggleMenu(anchor, items), 0);
     toggleMenu(anchor, [
         { label: 'Details', run: openProfile },
+        ...(canUseNicknames() ? [{ label: 'Nicknames…', run: () => openNicknames() }] : []),
         { label: 'Conversation History', run: () => clickOption('option_select_chat') },
         { label: 'New Conversation', run: () => clickOption('option_start_new_chat') },
         {},
@@ -438,7 +440,7 @@ export function refreshHeader() {
         img.alt = '';
         setPicture(img, 'avatar', character.avatar, HEAD_AVATAR, HEAD_AVATAR_PHONE);
         avatar.append(img);
-        name.textContent = character.name;
+        name.textContent = nameFor(character.avatar, character.name);
         monogramize(img, character.name);
     } else {
         name.textContent = '';
