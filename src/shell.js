@@ -1,7 +1,7 @@
 // The window chrome around ST: sidebar toolbar, conversation header, the app menu, ST's drawers
 // as sheets, and the empty state when no chat is open.
 
-import { canUseNicknames, nameFor, openNicknames } from './shared/chat-nicknames.js';
+import { canUseNicknames, nameFor, openNicknames } from '../lib/chat-nicknames.js';
 import { openContactCard } from './card.js';
 import { openContacts, openMyCard } from './contacts.js';
 import { openBackgrounds } from './backgrounds.js';

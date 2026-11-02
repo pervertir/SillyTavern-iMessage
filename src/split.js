@@ -1,10 +1,10 @@
-// Long replies display as several short bubbles split at sentence ends (shared/message-splitter.js).
+// Long replies display as several short bubbles split at sentence ends (lib/message-splitter.js).
 // The chat still stores one message, so edit, swipe and regenerate are unaffected. A reply that
 // wasn't streamed is revealed bubble by bubble with the typing dots in between.
 
 import { events } from './power.js';
 import { nearBottom } from './dom.js';
-import { splitMessage } from './shared/message-splitter.js';
+import { splitMessage } from '../lib/message-splitter.js';
 
 const BOX_CLASS = 'imsg-parts';
 const PART_CLASS = 'imsg-part';

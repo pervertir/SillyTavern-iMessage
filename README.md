@@ -119,7 +119,7 @@ index.js           entry point: settings, boot cover, wiring
 settings.html      the block in SillyTavern's Extensions panel
 style.css          imports css/, every rule scoped to body.imessage
 src/               one module per part of the window (list, messages, contacts, settings…)
-src/shared/        files copied unchanged between our themes
+lib/               files copied unchanged between our themes
 tests/             leak check
 ```
 

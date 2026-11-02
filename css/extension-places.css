@@ -5,9 +5,6 @@
 /* Quick Persona: a small picture among the message box's buttons */
 body.imessage #leftSendForm > #quickPersona {
     flex: none;
-    width: 24px;
-    height: 24px;
-    margin: auto 4px;
     align-self: center;
 }
 

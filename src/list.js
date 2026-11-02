@@ -1,7 +1,7 @@
 // Conversation sidebar: search, pinned chats as large avatars, then recent chats (the same list
 // as ST's welcome screen) with a preview and time. Pins are ST's own pinned chats.
 
-import { nameFor } from './shared/chat-nicknames.js';
+import { nameFor } from '../lib/chat-nicknames.js';
 import { deleteCharacterChatByName } from '../../../../../script.js';
 import { deleteGroupChatByName } from '../../../../group-chats.js';
 import { imageLabel, withoutImages } from './images.js';

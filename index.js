@@ -1,13 +1,13 @@
 // iMessage theme for SillyTavern. Every style is scoped to body.imessage (style.css); the
 // modules in src/ build the Messages window and its native panels while the theme is on.
 
-import { registerNicknames } from './src/shared/chat-nicknames.js';
+import { registerNicknames } from './lib/chat-nicknames.js';
 import { MODULE_NAME, defaultSettings, getSettings, isDark, onSystemAppearanceChange, saveSettings } from './src/config.js';
 import { isPhone } from './src/dom.js';
 import { renderPanel, setSetting, showSetting } from './src/panel.js';
 import { events, isOn, startTheme, stopTheme } from './src/power.js';
-import { registerExtensionSwitch } from './src/shared/theme-extensions.js';
-import { registerTheme, reloadPage } from './src/shared/theme-exclusive.js';
+import { registerExtensionSwitch } from './lib/theme-extensions.js';
+import { registerTheme, reloadPage } from './lib/theme-exclusive.js';
 import { initAlerts } from './src/alerts.js';
 import { initBackgrounds, openBackgrounds } from './src/backgrounds.js';
 import { initContacts } from './src/contacts.js';
